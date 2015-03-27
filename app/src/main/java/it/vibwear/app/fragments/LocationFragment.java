@@ -16,9 +16,6 @@ public class LocationFragment extends Fragment {
 	private ImageView icBattery;
 
 	private OnLocationChangeListener mCallback;
-	private String batteryLevel = null;
-	private int signalLevel = -1;
-	private boolean connected = false;
 
 	public interface OnLocationChangeListener {
 		public void onLocationChange();
@@ -45,15 +42,6 @@ public class LocationFragment extends Fragment {
 			
 		});
 
-//		if(savedInstanceState != null) {
-//			boolean connected = savedInstanceState.getBoolean("connected");
-//			updateConnectionImageResource(connected);
-//			
-//			if(connected) {
-//				updateBatteryLevelImageResource(savedInstanceState.getString("batteryLevel"));
-//				updateSignalImageResource(savedInstanceState.getInt("signalLevel"));
-//			}
-//		}		
 		
 //		icSignal.setOnClickListener(new View.OnClickListener() {
 //			
@@ -89,8 +77,6 @@ public class LocationFragment extends Fragment {
 	}
 
 	public void updateConnectionImageResource(boolean connected) {
-		this.connected = connected;
-		
 		if(connected) {
 			icLocation.setImageResource(R.drawable.ic_connection_on);
 			layout.setBackgroundColor(getResources().getColor(R.color.headColorOn));
@@ -103,8 +89,6 @@ public class LocationFragment extends Fragment {
 	}
 	
 	public void updateSignalImageResource(int rssiPercent) {
-		this.signalLevel = rssiPercent;
-		
 		if(rssiPercent > 0 && rssiPercent <= 25) {
 			icSignal.setImageResource(R.drawable.ic_signal_low);
 			mCallback.onLowSignal();
@@ -116,7 +100,6 @@ public class LocationFragment extends Fragment {
 	}
 	
 	public void updateBatteryLevelImageResource(String batteryLevel) {
-		this.batteryLevel = batteryLevel;
 		int bl = Integer.parseInt(batteryLevel);
 		
 		if(bl > 80)
@@ -130,26 +113,4 @@ public class LocationFragment extends Fragment {
 		
 	}
 	
-	public String getCurrentBatteryLevel() {
-		return batteryLevel;
-	}
-
-	public int getCurrentSignalLevel() {
-		return signalLevel;
-	}
-	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
-		super.onSaveInstanceState(outState);
-		
-//        if(connected) {
-//            outState.putBoolean("connected", true);
-//            outState.putString("batteryLevel", getCurrentBatteryLevel());
-//            outState.putInt("signalLevel", getCurrentSignalLevel());
-//        } else {
-//            outState.putBoolean("connected", false);
-//        }  
-	}
-
 }

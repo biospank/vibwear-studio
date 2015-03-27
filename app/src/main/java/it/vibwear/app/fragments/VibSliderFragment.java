@@ -1,9 +1,7 @@
 package it.vibwear.app.fragments;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.utils.CallPreference;
 import it.vibwear.app.utils.VibrationPreference;
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,10 +14,6 @@ public class VibSliderFragment extends Fragment {
 
 	protected VibrationPreference vibPreference;
 	protected SeekBar sbVib;
-	
-	public VibSliderFragment() {
-
-	}
 	
 	public VibSliderFragment(VibrationPreference vibPreference) {
 		this.vibPreference = vibPreference;
@@ -59,12 +53,5 @@ public class VibSliderFragment extends Fragment {
 		
 		return layout;
 	}
-	
-	@Override
-	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
-		super.onAttach(activity);
-		this.vibPreference = new CallPreference(activity);
-	}
-	
+
 }

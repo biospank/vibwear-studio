@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ChatDetailFragment extends Fragment {
-	private Fragment vibSliderFragment;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -18,22 +17,12 @@ public class ChatDetailFragment extends Fragment {
 		
 		View layout = inflater.inflate(R.layout.fragment_detail, container, false);
 		
-		if(savedInstanceState != null) {
-			vibSliderFragment = getChildFragmentManager().getFragment(savedInstanceState, "VibFrag");
-		} else {
-			vibSliderFragment = new VibSliderFragment(new ChatPreference(getActivity()));
-			FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-			transaction.add(R.id.rootDetailLayout, vibSliderFragment).commit();
-		}
-		
+		Fragment vibSliderFragment = new VibSliderFragment(new ChatPreference(getActivity()));
+		FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+		transaction.add(R.id.rootDetailLayout, vibSliderFragment).commit();
+
 		return layout;
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		
-		getChildFragmentManager().putFragment(outState, "VibFrag", vibSliderFragment);
-	}
 
 }

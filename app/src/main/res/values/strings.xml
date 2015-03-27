@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2014 MbientLab Inc. All rights reserved.
 
+IMPORTANT: Your use of this Software is limited to those specific rights
+granted under the terms of a software license agreement between the user who 
+downloaded the software, his/her employer (which must be your employer) and 
+MbientLab Inc, (the "License").  You may not use this Software unless you 
+agree to abide by the terms of the License which can be found at 
+www.mbientlab.com/terms . The License limits your use, and you acknowledge, 
+that the  Software may not be modified, copied or distributed and can be used 
+solely and exclusively in conjunction with a MbientLab Inc, product.  Other 
+than for the foregoing purpose, you may not use, reproduce, copy, prepare 
+derivative works of, modify, distribute, perform, display or sell this 
+Software and/or its documentation for any purpose.
+
+YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE 
+PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, 
+INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE, 
+NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL 
+MBIENTLAB OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT, NEGLIGENCE, 
+STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER LEGAL EQUITABLE 
+THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES INCLUDING BUT NOT LIMITED 
+TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE OR CONSEQUENTIAL DAMAGES, LOST 
+PROFITS OR LOST DATA, COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY, 
+SERVICES, OR ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT LIMITED TO ANY 
+DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
+
+Should you have any questions regarding your right to use this Software, 
+contact MbientLab Inc, at www.mbientlab.com.
+ 
+-->
 <resources>
 
     <string name="app_name">VibWear</string>
-
+    
     <string name="ble_not_supported">BLE not supported</string>
     <string name="refresh">Refresh</string>
     <string name="inboundsms">incoming sms</string>
@@ -30,7 +60,7 @@
 
     <string name="accessibility_dialog_title">Accessibility</string>
     <string name="accessibility_dialog_msg">VibWear accessibility is not enabled.\nEnable VibWear to receive notification events?</string>
-
+    
     <string name="callServiceDesc">Call alert off!</string>
     <string name="smsServiceDesc">Sms alert off!</string>
     <string name="chatServiceDesc">Chat alert off!</string>
@@ -40,7 +70,7 @@
     <string name="activeChatServiceDesc">Chat alert on!</string>
     <string name="activeSosServiceDesc">S.O.S. alert on!</string>
     <string name="tapAlarmDesc">Tap to set alarm</string>
-
+    	
     <string name="pick_contact_label">Browse</string>
    	<string name="label_sos_msg">S.O.S. message</string>
    	<string name="label_sos_contacts">S.O.S. contacts</string>
@@ -53,12 +83,12 @@
 	<string name="contact_with_number_msg">Only contacts with numbers will be added</string>
 	<string name="sos_msg_hint">Type here your message</string>
 	<string name="sos_default_msg">Vibwear: type your message on s.o.s. settings</string>
-
+				
     <string name="scanner_title">Select device:</string>
     <string name="scanner_empty">No device found</string>
     <string name="scanner_action_scan">Scan</string>
     <string name="scanner_action_cancel">Cancel</string>
     <string name="scanner_subtitle_bonded">BONDED DEVICES:</string>
     <string name="scanner_subtitle__not_bonded">AVAILABLE DEVICES:</string>
-
+    
 </resources>
