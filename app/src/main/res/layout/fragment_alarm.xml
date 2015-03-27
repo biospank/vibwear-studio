@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <LinearLayout android:id="@+id/fragmentAlarm"
+	    android:orientation="vertical"
+        android:background="@color/sectionColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+	    
+	    <TextView
+	        android:labelFor="@+id/timePickerAlarm"
+	        android:text="@string/label_time_picker_alarm"
+	        android:layout_marginLeft="15dp"
+	        android:layout_marginRight="15dp"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:fontFamily="sans-serif-light"
+	        android:textStyle="normal"
+	        android:textSize="25sp"
+	        android:textColor="@color/sectionTextColor"
+	        />
+	
+   	</LinearLayout>
+
+  	<TimePicker
+        android:id="@+id/timePickerAlarm"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp" />
+    
+    
+</LinearLayout>

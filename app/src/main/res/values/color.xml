@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2013 Nordic Semiconductor. All Rights Reserved.
+  
+  The information contained herein is property of Nordic Semiconductor ASA.
+  Terms and conditions of usage are described in detail in NORDIC SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
+  Licensees are granted free, non-transferable use of the information. NO WARRANTY of ANY KIND is provided. 
+  This heading must NOT be removed from the file.
+-->
+<resources>
+    <color name="featureTitleColor">#939597</color>
+    <color name="actionBarColor">#428bca</color>
+    <color name="backgroundColor">#f5f5f5</color>
+    <color name="headerBackgroundColor">#009ada</color>
+    <color name="headerTextColor">#FFFFFF</color>
+    <color name="dividerColor">#BBBDC0</color>
+    <color name="darkGray">#AAABAF</color>
+    <color name="headColorOff">#f2dede</color>
+    <color name="headColorOn">#dff0d8</color>
+    <color name="sectionColor">#d9edf7</color>
+    <color name="sectionBorderColor">#bce8f1</color>
+    <color name="sectionTextColor">#31708f</color>
+    <color name="serviceItemColor">#fcf8e3</color>
+    <color name="serviceItemTextColor">#8a6d3b</color>
+    
+    <color name="transparent">#00000000</color>
+    <color name="contact_list_item_bg">#ffffff</color>
+    <color name="view_divider_color">#BABABA</color>
+</resources>
+
