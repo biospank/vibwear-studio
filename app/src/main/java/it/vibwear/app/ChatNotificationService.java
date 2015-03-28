@@ -85,7 +85,7 @@ public class ChatNotificationService extends AccessibilityService {
 	public static boolean isAccessibilitySettingsOn(Context mContext) {
         int accessibilityEnabled = 0;
 //        String TAG = "VibWear";
-        final String service = "it.lampwireless.vibwear.app/it.vibwear.app.ChatNotificationService";
+        final String service = "it.lampwireless.vibwear/it.vibwear.app.ChatNotificationService";
         boolean accessibilityFound = false;
         try {
             accessibilityEnabled = Settings.Secure.getInt(
