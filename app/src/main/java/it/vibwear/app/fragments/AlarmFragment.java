@@ -23,12 +23,12 @@ public class AlarmFragment extends Fragment {
 	public interface AlarmListner {
 		public void onTimeAlarmChanged();
 	}
-	
-	public AlarmFragment() {
 
-	}
-	
-	public AlarmFragment(TimePreference timePreference) {
+    public AlarmFragment() {
+
+    }
+
+    public AlarmFragment(TimePreference timePreference) {
 		this.timePreference = timePreference;
 	}
 	

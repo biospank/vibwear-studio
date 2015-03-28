@@ -10,6 +10,7 @@ import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.Toast;
 
 public class ChatNotificationService extends AccessibilityService {
 	
@@ -110,6 +111,7 @@ public class ChatNotificationService extends AccessibilityService {
                     String accessabilityService = splitter.next();
 
 //                    Log.v(TAG, "-------------- > accessabilityService :: " + accessabilityService);
+//                    Toast.makeText(mContext, accessabilityService, Toast.LENGTH_LONG);
                     if (accessabilityService.equalsIgnoreCase(service)) {
 //                        Log.v(TAG, "We've found the correct setting - accessibility is switched on!");
                         return true;
