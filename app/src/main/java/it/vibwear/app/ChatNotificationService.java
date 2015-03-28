@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 public class ChatNotificationService extends AccessibilityService {
@@ -85,7 +86,7 @@ public class ChatNotificationService extends AccessibilityService {
 	public static boolean isAccessibilitySettingsOn(Context mContext) {
         int accessibilityEnabled = 0;
 //        String TAG = "VibWear";
-        final String service = "it.lampwireless.vibwear/it.vibwear.app.ChatNotificationService";
+        final String service = "it.lampwireless.vibwear.app/it.vibwear.app.ChatNotificationService";
         boolean accessibilityFound = false;
         try {
             accessibilityEnabled = Settings.Secure.getInt(
