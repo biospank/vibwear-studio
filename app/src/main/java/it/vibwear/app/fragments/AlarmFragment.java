@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.VibWearUtil;
+import it.vibwear.app.utils.AlarmPreference;
 import it.vibwear.app.utils.TimePreference;
 import android.app.Activity;
 import android.app.Fragment;
@@ -21,6 +22,10 @@ public class AlarmFragment extends Fragment {
 	
 	public interface AlarmListner {
 		public void onTimeAlarmChanged();
+	}
+	
+	public AlarmFragment() {
+
 	}
 	
 	public AlarmFragment(TimePreference timePreference) {
@@ -69,6 +74,7 @@ public class AlarmFragment extends Fragment {
 		super.onAttach(activity);
 		
 		try {
+			timePreference = new AlarmPreference(activity);
 			listener = (AlarmListner) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()

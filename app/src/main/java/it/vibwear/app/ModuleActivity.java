@@ -165,16 +165,11 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
         
-        getApplicationContext().bindService(new Intent(this,MetaWearBleService.class), 
+        getApplicationContext().bindService(new Intent(this, MetaWearBleService.class), 
                 this, Context.BIND_AUTO_CREATE);
         
-        registerReceiver(metaWearUpdateReceiver, MetaWearBleService.getMetaWearIntentFilter());
-        
         if (savedInstanceState != null) {
-            device= (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
-            if (device != null) {
-                mwController.reconnect(false);
-            }
+            device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
         }
     }
     
@@ -201,11 +196,18 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
      */
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        mwService= ((MetaWearBleService.LocalBinder) service).getService();
+        mwService = ((MetaWearBleService.LocalBinder) service).getService();
         if (device != null) {
-            mwController= mwService.getMetaWearController(device);
+        	initializeAndConnect();
         }
-
+    }
+    
+    /* (non-Javadoc)
+     * @see android.content.ServiceConnection#onServiceDisconnected(android.content.ComponentName)
+     */
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+    	invalidateOptionsMenu();
     }
     
     /* (non-Javadoc)
@@ -218,13 +220,17 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             mwController = null;
         }
         ModuleActivity.device = device;
-        mwController = mwService.getMetaWearController(device);
+        initializeAndConnect();
+    }
+    
+	private void initializeAndConnect() {
+		mwController = mwService.getMetaWearController(device);
     	switchController = (MechanicalSwitch) mwController.getModuleController(Module.MECHANICAL_SWITCH);
         mwController.addDeviceCallback(dCallback);
         mwController.addModuleCallback(mCallback);
-        hapticController = (Haptic)mwController.getModuleController(Module.HAPTIC);
+        hapticController = (Haptic) mwController.getModuleController(Module.HAPTIC);
         mwController.connect();
-    }
+	}
 
     /* (non-Javadoc)
      * @see no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment.OnDeviceSelectedListener#onDialogCanceled()
@@ -233,17 +239,6 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     public void onDialogCanceled() {
         // TODO Auto-generated method stub
         
-    }
-    
-    protected void connectDevice() {
-    }
-
-    /* (non-Javadoc)
-     * @see android.content.ServiceConnection#onServiceDisconnected(android.content.ComponentName)
-     */
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-    	invalidateOptionsMenu();
     }
     
 	protected void vibrate(int vibMode, Intent intent) {
@@ -317,25 +312,20 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(metaWearUpdateReceiver);
-        if(mwController != null) {
-	    	mwController.removeDeviceCallback(dCallback);
-	        mwController.removeModuleCallback(mCallback);
-        }
         getApplicationContext().unbindService(this);
     }
     
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        registerReceiver(metaWearUpdateReceiver, MetaWearBleService.getMetaWearIntentFilter());
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        unregisterReceiver(metaWearUpdateReceiver);
-//    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(metaWearUpdateReceiver, MetaWearBleService.getMetaWearIntentFilter());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(metaWearUpdateReceiver);
+    }
     
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -347,10 +337,10 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     
     protected void unbindDevice() {
     	switchController.disableNotification();
-    	ModuleActivity.device = null;
+    	device = null;
         mwController.setRetainState(false);
         mwController.close(true);
-//        mwController= null;
+        mwController= null;
     }
     
     
