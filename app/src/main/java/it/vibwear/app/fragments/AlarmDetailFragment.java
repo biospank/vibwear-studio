@@ -23,9 +23,11 @@ public class AlarmDetailFragment extends Fragment {
 			vibSliderFragment = getChildFragmentManager().getFragment(savedInstanceState, "VibFrag");
 			alarmFragment = getChildFragmentManager().getFragment(savedInstanceState, "AlarmFrag");
 		} else {
-			AlarmPreference alarmPref = new AlarmPreference(getActivity());
-			alarmFragment = new AlarmFragment(alarmPref);
-			vibSliderFragment = new VibSliderFragment(alarmPref);
+			alarmFragment = new AlarmFragment();
+            vibSliderFragment = new VibSliderFragment();
+            Bundle preference = new Bundle();
+            preference.putString("preference", "AlarmPreference");
+            vibSliderFragment.setArguments(preference);
 			FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 			transaction.add(R.id.rootDetailLayout, alarmFragment);
 			transaction.add(R.id.rootDetailLayout, vibSliderFragment);

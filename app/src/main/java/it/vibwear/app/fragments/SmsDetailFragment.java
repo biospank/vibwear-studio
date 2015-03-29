@@ -21,8 +21,11 @@ public class SmsDetailFragment extends Fragment {
 		if(savedInstanceState != null) {
 			vibSliderFragment = getChildFragmentManager().getFragment(savedInstanceState, "VibFrag");
 		} else {
-			vibSliderFragment = new VibSliderFragment(new SmsPreference(getActivity()));
-			FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            vibSliderFragment = new VibSliderFragment();
+            Bundle preference = new Bundle();
+            preference.putString("preference", "SmsPreference");
+            vibSliderFragment.setArguments(preference);
+			FragmentTransaction transaction = getFragmentManager().beginTransaction();
 			transaction.add(R.id.rootDetailLayout, vibSliderFragment).commit();
 		}
 		

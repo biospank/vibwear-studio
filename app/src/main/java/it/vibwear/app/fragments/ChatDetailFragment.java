@@ -21,7 +21,10 @@ public class ChatDetailFragment extends Fragment {
 		if(savedInstanceState != null) {
 			vibSliderFragment = getChildFragmentManager().getFragment(savedInstanceState, "VibFrag");
 		} else {
-			vibSliderFragment = new VibSliderFragment(new ChatPreference(getActivity()));
+            vibSliderFragment = new VibSliderFragment();
+            Bundle preference = new Bundle();
+            preference.putString("preference", "ChatPreference");
+            vibSliderFragment.setArguments(preference);
 			FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 			transaction.add(R.id.rootDetailLayout, vibSliderFragment).commit();
 		}

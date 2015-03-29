@@ -313,6 +313,8 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     public void onDestroy() {
         super.onDestroy();
         getApplicationContext().unbindService(this);
+//        mwController.removeDeviceCallback(dCallback);
+//        mwController.removeModuleCallback(mCallback);
     }
     
     @Override

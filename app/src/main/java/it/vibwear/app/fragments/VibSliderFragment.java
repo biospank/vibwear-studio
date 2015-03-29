@@ -1,7 +1,12 @@
 package it.vibwear.app.fragments;
 
 import it.lampwireless.vibwear.app.R;
+import it.vibwear.app.VibWearUtil;
+import it.vibwear.app.utils.AlarmPreference;
 import it.vibwear.app.utils.CallPreference;
+import it.vibwear.app.utils.ChatPreference;
+import it.vibwear.app.utils.SmsPreference;
+import it.vibwear.app.utils.SosPreference;
 import it.vibwear.app.utils.VibrationPreference;
 import android.app.Activity;
 import android.app.Fragment;
@@ -12,6 +17,9 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 public class VibSliderFragment extends Fragment {
 
 	protected VibrationPreference vibPreference;
@@ -21,10 +29,10 @@ public class VibSliderFragment extends Fragment {
 
 	}
 	
-	public VibSliderFragment(VibrationPreference vibPreference) {
-		this.vibPreference = vibPreference;
-	}
-	
+//	public VibSliderFragment(VibrationPreference vibPreference) {
+//		this.vibPreference = vibPreference;
+//	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -64,7 +72,25 @@ public class VibSliderFragment extends Fragment {
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		this.vibPreference = new CallPreference(activity);
-	}
+        Bundle preference = getArguments();
+        String preferenceClassName = preference.getString("preference");
+
+        switch (preferenceClassName) {
+            case "CallPreference":
+                this.vibPreference = new CallPreference(activity);
+                break;
+            case "SmsPreference":
+                this.vibPreference = new SmsPreference(activity);
+                break;
+            case "ChatPreference":
+                this.vibPreference = new ChatPreference(activity);
+                break;
+            case "AlarmPreference":
+                this.vibPreference = new AlarmPreference(activity);
+                break;
+        }
+
+
+    }
 	
 }

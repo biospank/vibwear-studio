@@ -21,7 +21,10 @@ public class CallDetailFragment extends Fragment {
 		if(savedInstanceState != null) {
 			vibSliderFragment = getChildFragmentManager().getFragment(savedInstanceState, "VibFrag");
 		} else {
-			vibSliderFragment = new VibSliderFragment(new CallPreference(getActivity()));
+			vibSliderFragment = new VibSliderFragment();
+            Bundle preference = new Bundle();
+            preference.putString("preference", "CallPreference");
+            vibSliderFragment.setArguments(preference);
 			FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 			transaction.add(R.id.rootDetailLayout, vibSliderFragment).commit();
 		}

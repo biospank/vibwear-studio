@@ -28,10 +28,6 @@ public class AlarmFragment extends Fragment {
 
     }
 
-    public AlarmFragment(TimePreference timePreference) {
-		this.timePreference = timePreference;
-	}
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
