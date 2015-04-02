@@ -70,20 +70,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     		switchController.enableNotification();
             invalidateOptionsMenu();
             
-            Handler handler = new Handler(); 
-            
-            handler.postDelayed(new Runnable() { 
-                 public void run() { 
-                     requestSignalLevel();
-                 } 
-            }, 500);
-            
-            handler.postDelayed(new Runnable() { 
-                public void run() { 
-                    requestBatteryLevel();
-                } 
-           }, 500);
-           
+            getRemoteSignals();
         }
 
         @Override
@@ -94,7 +81,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             } else {
             	switchController.disableNotification();
             }
-            invalidateOptionsMenu();
+//            invalidateOptionsMenu();
         }
     	
         public void receivedGATTCharacteristic(GATTCharacteristic characteristic, byte[] data) {
@@ -153,7 +140,24 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     
     protected void updateSignalLevel(int rssiPercent) {};
     protected void updateBatteryLevel(String batteryLevel) {};
-    
+
+    protected void getRemoteSignals() {
+        Handler handler = new Handler();
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                requestSignalLevel();
+            }
+        }, 500);
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                requestBatteryLevel();
+            }
+        }, 500);
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -312,7 +316,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getApplicationContext().unbindService(this);
+//        getApplicationContext().unbindService(this);
 //        mwController.removeDeviceCallback(dCallback);
 //        mwController.removeModuleCallback(mCallback);
     }
@@ -322,7 +326,6 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         super.onResume();
         registerReceiver(metaWearUpdateReceiver, MetaWearBleService.getMetaWearIntentFilter());
     }
-
     @Override
     protected void onPause() {
         super.onPause();

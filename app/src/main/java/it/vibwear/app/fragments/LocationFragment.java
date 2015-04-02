@@ -45,15 +45,15 @@ public class LocationFragment extends Fragment {
 			
 		});
 
-//		if(savedInstanceState != null) {
-//			boolean connected = savedInstanceState.getBoolean("connected");
-//			updateConnectionImageResource(connected);
-//			
-//			if(connected) {
-//				updateBatteryLevelImageResource(savedInstanceState.getString("batteryLevel"));
-//				updateSignalImageResource(savedInstanceState.getInt("signalLevel"));
-//			}
-//		}		
+		if(savedInstanceState != null) {
+			boolean connected = savedInstanceState.getBoolean("connected");
+			updateConnectionImageResource(connected);
+
+			if(connected) {
+				updateBatteryLevelImageResource(savedInstanceState.getString("batteryLevel"));
+				updateSignalImageResource(savedInstanceState.getInt("signalLevel"));
+			}
+		}
 		
 //		icSignal.setOnClickListener(new View.OnClickListener() {
 //			
@@ -143,13 +143,13 @@ public class LocationFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 		
-//        if(connected) {
-//            outState.putBoolean("connected", true);
-//            outState.putString("batteryLevel", getCurrentBatteryLevel());
-//            outState.putInt("signalLevel", getCurrentSignalLevel());
-//        } else {
-//            outState.putBoolean("connected", false);
-//        }  
+        if(connected) {
+            outState.putBoolean("connected", true);
+            outState.putString("batteryLevel", getCurrentBatteryLevel());
+            outState.putInt("signalLevel", getCurrentSignalLevel());
+        } else {
+            outState.putBoolean("connected", false);
+        }
 	}
 
 }
