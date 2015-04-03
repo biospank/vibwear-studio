@@ -93,12 +93,14 @@ public class LocationFragment extends Fragment {
 		
 		if(connected) {
 			icLocation.setImageResource(R.drawable.ic_connection_on);
-			layout.setBackgroundColor(getResources().getColor(R.color.headColorOn));
+            if(isAdded())
+			    layout.setBackgroundColor(getResources().getColor(R.color.headColorOn));
 		} else {
 			icLocation.setImageResource(R.drawable.ic_connection);
 			icSignal.setImageResource(R.drawable.ic_signal);
 			icBattery.setImageResource(R.drawable.ic_battery);
-			layout.setBackgroundColor(getResources().getColor(R.color.headColorOff));
+            if(isAdded())
+    			layout.setBackgroundColor(getResources().getColor(R.color.headColorOff));
 		}
 	}
 	

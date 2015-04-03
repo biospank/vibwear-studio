@@ -81,7 +81,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             } else {
             	switchController.disableNotification();
             }
-//            invalidateOptionsMenu();
+            invalidateOptionsMenu();
         }
     	
         public void receivedGATTCharacteristic(GATTCharacteristic characteristic, byte[] data) {
@@ -105,14 +105,18 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     		    }
     		});
 	    }
-	    
-	    public void receivedGattError(GattOperation gattOp, int status) {
-			if (gattOp.name() == GattOperation.CONNECTION_STATE_CHANGE.toString() &&
-					status == 133)
-	            if (device != null && mwController != null)
-	            	mwController.reconnect(false);
-			
-	    }
+
+	    /*
+	        receivedGattError is no more called on disconnect
+	        look at disconnect callback
+	     */
+//	    public void receivedGattError(GattOperation gattOp, int status) {
+//			if (gattOp.name() == GattOperation.CONNECTION_STATE_CHANGE.toString() &&
+//					status == 133)
+//	            if (device != null && mwController != null)
+//	            	mwController.reconnect(false);
+//
+//	    }
     };
 
     private ModuleCallbacks mCallback = new MechanicalSwitch.Callbacks() {
@@ -341,9 +345,10 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     }
     
     protected void unbindDevice() {
+//        getApplicationContext().unbindService(this);
     	switchController.disableNotification();
     	device = null;
-        mwController.setRetainState(false);
+//        mwController.setRetainState(false);
         mwController.close(true);
         mwController= null;
     }
