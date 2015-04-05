@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 
 public class ModuleActivity extends Activity implements ServiceConnection, OnDeviceSelectedListener {
@@ -54,7 +55,8 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     private static final Short LOW_SIGNAL_VIBRATION_LENGHT = 300;
     private static final Short LOW_SIGNAL_VIBRATION_GAP = 500;
 
-    private final BroadcastReceiver metaWearUpdateReceiver= MetaWearBleService.getMetaWearBroadcastReceiver();
+    //private final BroadcastReceiver metaWearUpdateReceiver= MetaWearBleService.getMetaWearBroadcastReceiver();
+    private LocalBroadcastManager broadcastManager= null;
     protected MetaWearBleService mwService;
     protected MetaWearController mwController;
     protected Haptic hapticController;
@@ -117,13 +119,13 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 	        receivedGattError is no more called on disconnect
 	        look at disconnect callback
 	     */
-//	    public void receivedGattError(GattOperation gattOp, int status) {
-//			if (gattOp.name() == GattOperation.CONNECTION_STATE_CHANGE.toString() &&
-//					status == 133)
-//	            if (device != null && mwController != null)
-//	            	mwController.reconnect(false);
-//
-//	    }
+	    public void receivedGattError(GattOperation gattOp, int status) {
+			if (gattOp.name() == GattOperation.CONNECTION_STATE_CHANGE.toString() &&
+					status == 133)
+	            if (device != null && mwController != null)
+	            	mwController.reconnect(false);
+
+	    }
     };
 
     private ModuleCallbacks mCallback = new MechanicalSwitch.Callbacks() {
@@ -220,6 +222,11 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         mwService = ((MetaWearBleService.LocalBinder) service).getService();
+        broadcastManager = LocalBroadcastManager.getInstance(mwService);
+        broadcastManager.registerReceiver(MetaWearBleService.getMetaWearBroadcastReceiver(),
+                MetaWearBleService.getMetaWearIntentFilter());
+        mwService.useLocalBroadcastManager(broadcastManager);
+
         if (device != null) {
         	initializeAndConnect();
             if (mwController != null && mwController.isConnected()) {
@@ -343,6 +350,9 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (broadcastManager != null) {
+            broadcastManager.unregisterReceiver(MetaWearBleService.getMetaWearBroadcastReceiver());
+        }
 //        getApplicationContext().unbindService(this);
 //        mwController.removeDeviceCallback(dCallback);
 //        mwController.removeModuleCallback(mCallback);
@@ -351,12 +361,12 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(metaWearUpdateReceiver, MetaWearBleService.getMetaWearIntentFilter());
+//        registerReceiver(metaWearUpdateReceiver, MetaWearBleService.getMetaWearIntentFilter());
     }
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(metaWearUpdateReceiver);
+//        unregisterReceiver(metaWearUpdateReceiver);
     }
     
     @Override
