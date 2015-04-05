@@ -6,6 +6,7 @@ import it.vibwear.app.fragments.LocationFragment;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
+import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.scanner.ScannerFragment;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,8 +26,9 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, AlarmListner {
+public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.2.0";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 5000;
@@ -199,6 +201,16 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		//vibrate(ModuleActivity.LOW_SIGNAL_VIB_MODE, null);
 	}
 
+    @Override
+    public void onBoardNameChange(String boardName) {
+        if(mwController != null && mwController.isConnected()) {
+            settingsController.setDeviceName(boardName);
+            deviceName = boardName;
+        }
+    }
+
+    public boolean isBoardConnected() {return (mwController != null && mwController.isConnected());}
+
 	protected void initializeView(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
 			locationFrag = (LocationFragment) getFragmentManager().getFragment(savedInstanceState, "locationFragment");
@@ -272,5 +284,5 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         getFragmentManager().putFragment(outState, "servicesFragment", servicesFrag);
         
     }
-	
+
 }

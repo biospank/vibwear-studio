@@ -23,6 +23,7 @@ import com.mbientlab.metawear.api.characteristic.Battery;
 import com.mbientlab.metawear.api.characteristic.DeviceInformation;
 import com.mbientlab.metawear.api.controller.Haptic;
 import com.mbientlab.metawear.api.controller.MechanicalSwitch;
+import com.mbientlab.metawear.api.controller.Settings;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -59,7 +60,9 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     protected Haptic hapticController;
     protected static BluetoothDevice device;
     protected MechanicalSwitch switchController;
+    protected Settings settingsController;
     protected String firmwareVersion;
+    protected String deviceName;
 
     
     private DeviceCallbacks dCallback= new MetaWearController.DeviceCallbacks() {
@@ -67,6 +70,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         @Override
         public void connected() {
             mwController.readDeviceInformation();
+            settingsController.readDeviceName();
     		switchController.enableNotification();
             invalidateOptionsMenu();
             
@@ -141,6 +145,14 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         	}
         }
     };
+
+    private Settings.Callbacks sCallback = new Settings.Callbacks() {
+
+        @Override
+        public void receivedDeviceName(String name) {
+            deviceName = name;
+        }
+    };
     
     protected void updateSignalLevel(int rssiPercent) {};
     protected void updateBatteryLevel(String batteryLevel) {};
@@ -207,6 +219,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         mwService = ((MetaWearBleService.LocalBinder) service).getService();
         if (device != null) {
         	initializeAndConnect();
+            settingsController.readDeviceName();
         }
     }
     
@@ -234,8 +247,10 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 	private void initializeAndConnect() {
 		mwController = mwService.getMetaWearController(device);
     	switchController = (MechanicalSwitch) mwController.getModuleController(Module.MECHANICAL_SWITCH);
+        settingsController = (Settings) mwController.getModuleController(Module.SETTINGS);
         mwController.addDeviceCallback(dCallback);
         mwController.addModuleCallback(mCallback);
+        mwController.addModuleCallback(sCallback);
         hapticController = (Haptic) mwController.getModuleController(Module.HAPTIC);
         mwController.connect();
 	}
@@ -304,8 +319,8 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 
 		}
 	}
-	
-	protected void requestSignalLevel() {
+
+    protected void requestSignalLevel() {
     	if(mwController != null && mwController.isConnected()) {
     		mwController.readRemoteRSSI();
 		}
@@ -316,6 +331,8 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     		mwController.readBatteryLevel();
 		}
 	}
+
+    public String getDeviceName() { return deviceName; }
 
     @Override
     public void onDestroy() {

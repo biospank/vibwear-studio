@@ -1,8 +1,12 @@
 package it.vibwear.app.fragments;
 
 import it.lampwireless.vibwear.app.R;
+import it.vibwear.app.VibWearActivity;
+
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +18,7 @@ public class LocationFragment extends Fragment {
 	private ImageView icSignal;
 	private ImageView icLocation;
 	private ImageView icBattery;
+    private ImageView icSettings;
 
 	private OnLocationChangeListener mCallback;
 	private String batteryLevel = null;
@@ -35,7 +40,8 @@ public class LocationFragment extends Fragment {
 		icSignal = (ImageView) layout.findViewById(R.id.icSignal);
 		icBattery = (ImageView) layout.findViewById(R.id.icBattery);
 		icLocation = (ImageView) layout.findViewById(R.id.icLocation);
-		
+        icSettings = (ImageView) layout.findViewById(R.id.icSettings);
+
 		icLocation.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -45,14 +51,38 @@ public class LocationFragment extends Fragment {
 			
 		});
 
-		if(savedInstanceState != null) {
+        icSettings.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                VibWearActivity activity = (VibWearActivity) getActivity();
+                if(activity.isBoardConnected()) {
+                    FragmentManager fm = activity.getFragmentManager();
+                    Fragment settingsFrag = fm.findFragmentByTag("settingsDetail");
+                    if (settingsFrag == null) {
+                        FragmentTransaction ft = fm.beginTransaction();
+                        settingsFrag = SettingsDetailFragment.newInstance(activity.getDeviceName());
+                        ft.replace(R.id.servicesLayout, settingsFrag, "settingsDetail");
+                        ft.addToBackStack(null);
+                        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+                        ft.commit();
+                    }
+                }
+            }
+
+        });
+
+        if(savedInstanceState != null) {
 			boolean connected = savedInstanceState.getBoolean("connected");
 			updateConnectionImageResource(connected);
 
 			if(connected) {
 				updateBatteryLevelImageResource(savedInstanceState.getString("batteryLevel"));
 				updateSignalImageResource(savedInstanceState.getInt("signalLevel"));
-			}
+                icSettings.setImageResource(R.drawable.ic_settings_active);
+			} else {
+                icSettings.setImageResource(R.drawable.ic_settings);
+            }
 		}
 		
 //		icSignal.setOnClickListener(new View.OnClickListener() {
@@ -93,14 +123,16 @@ public class LocationFragment extends Fragment {
 		
 		if(connected) {
 			icLocation.setImageResource(R.drawable.ic_connection_on);
+            icSettings.setImageResource(R.drawable.ic_settings_active);
             if(isAdded())
-			    layout.setBackgroundColor(getResources().getColor(R.color.headColorOn));
+                layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOn));
 		} else {
 			icLocation.setImageResource(R.drawable.ic_connection);
+            icSettings.setImageResource(R.drawable.ic_settings);
 			icSignal.setImageResource(R.drawable.ic_signal);
 			icBattery.setImageResource(R.drawable.ic_battery);
             if(isAdded())
-    			layout.setBackgroundColor(getResources().getColor(R.color.headColorOff));
+                layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOff));
 		}
 	}
 	
@@ -139,10 +171,9 @@ public class LocationFragment extends Fragment {
 	public int getCurrentSignalLevel() {
 		return signalLevel;
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 		
         if(connected) {
@@ -152,6 +183,7 @@ public class LocationFragment extends Fragment {
         } else {
             outState.putBoolean("connected", false);
         }
+
 	}
 
 }

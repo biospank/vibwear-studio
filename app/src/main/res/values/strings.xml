@@ -38,6 +38,9 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="refresh">Refresh</string>
     <string name="inboundsms">incoming sms</string>
     <string name="audiosensor">audio sensor</string>
+    <string name="label_change_board_name_msg">Change board name</string>
+    <string name="board_name_changed_msg">Board name changed</string>
+    <string name="change">Change</string>
     <string name="test">Test</string>
     <string name="stop">Interrupt</string>
     <string name="alarm">Alarm</string>
@@ -90,5 +93,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="scanner_action_cancel">Cancel</string>
     <string name="scanner_subtitle_bonded">BONDED DEVICES:</string>
     <string name="scanner_subtitle__not_bonded">AVAILABLE DEVICES:</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     
 </resources>
