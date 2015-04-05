@@ -11,10 +11,14 @@
         android:background="@color/headColorOff">
 
         <ImageView
-            android:id="@+id/icSettings"
+            android:id="@+id/icLocation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_settings"
+            android:src="@drawable/ic_connection"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="20dp"
             android:layout_weight="1" />
 
         <ImageView
@@ -22,6 +26,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/ic_signal"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginRight="20dp"
             android:layout_weight="1" />
 
         <ImageView
@@ -29,13 +36,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/ic_battery"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginRight="20dp"
             android:layout_weight="1" />
 
         <ImageView
-            android:id="@+id/icLocation"
+            android:id="@+id/icSettings"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_connection"
+            android:src="@drawable/ic_settings"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1" />
 
     </LinearLayout>

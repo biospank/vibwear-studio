@@ -60,6 +60,8 @@ public class LocationFragment extends Fragment {
                     FragmentManager fm = activity.getFragmentManager();
                     Fragment settingsFrag = fm.findFragmentByTag("settingsDetail");
                     if (settingsFrag == null) {
+                        if(fm.getBackStackEntryCount() > 0)
+                            fm.popBackStackImmediate();
                         FragmentTransaction ft = fm.beginTransaction();
                         settingsFrag = SettingsDetailFragment.newInstance(activity.getDeviceName());
                         ft.replace(R.id.servicesLayout, settingsFrag, "settingsDetail");

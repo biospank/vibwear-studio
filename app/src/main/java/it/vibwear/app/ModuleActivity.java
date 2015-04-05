@@ -69,9 +69,12 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     	
         @Override
         public void connected() {
-            mwController.readDeviceInformation();
-            settingsController.readDeviceName();
-    		switchController.enableNotification();
+            if (mwController != null && mwController.isConnected()) {
+                mwController.readDeviceInformation();
+                settingsController.readDeviceName();
+                switchController.enableNotification();
+            }
+
             invalidateOptionsMenu();
             
             getRemoteSignals();
@@ -219,7 +222,10 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         mwService = ((MetaWearBleService.LocalBinder) service).getService();
         if (device != null) {
         	initializeAndConnect();
-            settingsController.readDeviceName();
+            if (mwController != null && mwController.isConnected()) {
+                mwController.readDeviceInformation();
+                settingsController.readDeviceName();
+            }
         }
     }
     

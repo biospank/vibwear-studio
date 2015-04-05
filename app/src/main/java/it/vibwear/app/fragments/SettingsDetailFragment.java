@@ -78,8 +78,11 @@ public class SettingsDetailFragment extends Fragment {
 
     public void onButtonPressed() {
         if (mListener != null) {
-            mListener.onBoardNameChange(etBoardName.getText().toString());
-            getFragmentManager().popBackStackImmediate();
+            String name = etBoardName.getText().toString();
+            if(name.length() > 0) {
+                mListener.onBoardNameChange(etBoardName.getText().toString());
+                getFragmentManager().popBackStackImmediate();
+            }
         }
     }
 

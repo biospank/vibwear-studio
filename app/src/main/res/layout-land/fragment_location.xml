@@ -12,36 +12,45 @@
         android:background="@color/headColorOff" >
 
         <ImageView
-            android:id="@+id/icSettings"
-            android:layout_gravity="center"
+            android:id="@+id/icLocation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/ic_settings" />
+            android:src="@drawable/ic_connection"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/icSignal"
-            android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/ic_signal" />
+            android:src="@drawable/ic_signal"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/icBattery"
-            android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/ic_battery" />
+            android:src="@drawable/ic_battery"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1" />
 
         <ImageView
-            android:id="@+id/icLocation"
-            android:layout_gravity="center"
+            android:id="@+id/icSettings"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/ic_connection" />
+            android:src="@drawable/ic_settings"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 </ScrollView>
