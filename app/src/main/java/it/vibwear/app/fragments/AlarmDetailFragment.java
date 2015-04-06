@@ -42,7 +42,7 @@ public class AlarmDetailFragment extends Fragment {
 		super.onSaveInstanceState(outState);
 		
 		getChildFragmentManager().putFragment(outState, "VibFrag", vibSliderFragment);
-		getChildFragmentManager().putFragment(outState, "AlarmFrag", vibSliderFragment);
+		getChildFragmentManager().putFragment(outState, "AlarmFrag", alarmFragment);
 	}
 
 }
