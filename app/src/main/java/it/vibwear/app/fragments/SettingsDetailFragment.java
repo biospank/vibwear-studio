@@ -61,7 +61,11 @@ public class SettingsDetailFragment extends Fragment {
         View layout = inflater.inflate(R.layout.fragment_settings_detail, container, false);
 
         etBoardName = (EditText) layout.findViewById(R.id.et_board_name);
-        etBoardName.setText(mBoardName);
+
+        if(mBoardName.equalsIgnoreCase(getResources().getString(R.string.factory_device_name)))
+            etBoardName.setText(getResources().getString(R.string.default_device_name));
+        else
+            etBoardName.setText(mBoardName);
 
         btChange = (Button) layout.findViewById(R.id.bt_change);
 

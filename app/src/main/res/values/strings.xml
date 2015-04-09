@@ -45,6 +45,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="stop">Interrupt</string>
     <string name="alarm">Alarm</string>
     <string name="phone">Phone</string>
+    <string name="factory_device_name">MetaWear</string>
+    <string name="default_device_name">VibWear</string>
     <string name="pref_title_inbound_sms">Sms</string>
     <string name="pref_summary_inbound_sms">Incoming sms alert</string>
     <string name="menu_settings">Settings</string>
