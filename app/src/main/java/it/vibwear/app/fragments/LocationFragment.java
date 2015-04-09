@@ -28,6 +28,7 @@ public class LocationFragment extends Fragment {
 	public interface OnLocationChangeListener {
 		public void onLocationChange();
 		public void onLowSignal();
+        public void onLowBattery();
 //		public void onSignalRequest();
 //		public void onBatteryRequest();
 	}
@@ -155,16 +156,18 @@ public class LocationFragment extends Fragment {
 		this.batteryLevel = batteryLevel;
 		int bl = Integer.parseInt(batteryLevel);
 		
-		if(bl > 80)
-			icBattery.setImageResource(R.drawable.ic_battery_full);
-		else if(bl > 60 && bl <= 80)
-			icBattery.setImageResource(R.drawable.ic_battery_high);
-		else if(bl > 30 && bl <= 60)
-			icBattery.setImageResource(R.drawable.ic_battery_mid);
-		else if(bl > 0 && bl <= 30)
-			icBattery.setImageResource(R.drawable.ic_battery_low);
-		
-	}
+		if(bl > 80) {
+            icBattery.setImageResource(R.drawable.ic_battery_full);
+        } else if(bl > 60 && bl <= 80) {
+            icBattery.setImageResource(R.drawable.ic_battery_high);
+        } else if(bl > 30 && bl <= 60) {
+            icBattery.setImageResource(R.drawable.ic_battery_mid);
+        } else if(bl > 0 && bl <= 30) {
+            icBattery.setImageResource(R.drawable.ic_battery_low);
+            mCallback.onLowBattery();
+        }
+
+    }
 	
 	public String getCurrentBatteryLevel() {
 		return batteryLevel;

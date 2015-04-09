@@ -46,6 +46,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             "it.lampwireless.vibwear.app.ModuleActivity.EXTRA_BLE_DEVICE";
     protected static final String ARG_ITEM_ID = "item_id";
 
+    public static final int LOW_BATTERY_VIB_MODE = 0;
     public static final int LOW_SIGNAL_VIB_MODE = 1;
     public static final int NOTIFY_VIB_MODE = 2;
     
@@ -278,7 +279,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     }
     
 	protected void vibrate(int vibMode, Intent intent) {
-		if(vibMode == LOW_SIGNAL_VIB_MODE) {
+		if(vibMode == LOW_SIGNAL_VIB_MODE || vibMode == LOW_BATTERY_VIB_MODE) {
 			Thread background = new Thread(new Runnable() {
                 public void run() { 
         			for (int i = 0; i < LOW_SIGNAL_VIBRATION_TIME; i++) {

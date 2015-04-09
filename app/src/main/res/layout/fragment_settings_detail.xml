@@ -29,6 +29,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal" >
             <EditText
                 android:id="@+id/et_board_name"
@@ -55,5 +57,51 @@
                 android:text="@string/change"/>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/sectionColor" >
+            <TextView
+                android:labelFor="@+id/cb_notify_me"
+                android:text="@string/label_low_battery"
+                android:background="@color/sectionColor"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textSize="25sp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/notify_me"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textSize="20sp"
+                />
+
+            <CheckBox
+                android:id="@+id/cb_notify_me"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

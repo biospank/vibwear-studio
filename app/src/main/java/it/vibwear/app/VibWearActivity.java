@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
@@ -202,6 +203,17 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	}
 
     @Override
+    public void onLowBattery() {
+        SharedPreferences settings = getSharedPreferences(SettingsDetailFragment.LOW_BATTERY_PREFS_NAME,
+                Context.MODE_PRIVATE);
+
+        if(settings.getBoolean(SettingsDetailFragment.NOTIFY_ME_KEY, false)) {
+            vibrate(ModuleActivity.LOW_BATTERY_VIB_MODE, null);
+//            requestUserAttention();
+        }
+    }
+
+    @Override
     public void onBoardNameChange(String boardName) {
         if(mwController != null && mwController.isConnected()) {
             settingsController.setDeviceName(boardName);
@@ -283,6 +295,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         getFragmentManager().putFragment(outState, "locationFragment", locationFrag);
         getFragmentManager().putFragment(outState, "servicesFragment", servicesFrag);
         
+    }
+
+    private void requestUserAttention() {
+        Intent intent = new Intent(getBaseContext(), VibWearActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getApplication().startActivity(intent);
     }
 
 }
