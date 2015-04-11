@@ -7,12 +7,13 @@
     For more on layout aliases, see:
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
+
     <item name="activity_main" type="layout">
-        @layout/activity_main
+        @layout/activity_main_land
     </item>
 
     <item name="fragment_location" type="layout">
-        @layout/fragment_location
+        @layout/fragment_location_land
     </item>
 
 </resources>
