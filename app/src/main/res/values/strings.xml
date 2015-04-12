@@ -38,14 +38,13 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="refresh">Refresh</string>
     <string name="inboundsms">incoming sms</string>
     <string name="audiosensor">audio sensor</string>
-    <string name="label_change_board_name_msg">Change board name</string>
-    <string name="board_name_changed_msg">Board name changed</string>
+    <string name="label_change_board_name_msg">Device name</string>
     <string name="change">Change</string>
     <string name="test">Test</string>
     <string name="stop">Interrupt</string>
     <string name="alarm">Alarm</string>
     <string name="phone">Phone</string>
-    <string name="notify_me">Notify me</string>
+    <string name="notify_me">Alert me</string>
     <string name="label_low_battery">On Low Battery</string>
     <string name="factory_device_name">MetaWear</string>
     <string name="default_device_name">VibWear</string>
