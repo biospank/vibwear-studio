@@ -1,4 +1,4 @@
-package it.vibwear.app.utils;
+package it.vibwear.app.audio;
 
 /**
  * Created by biospank on 13/04/15.

@@ -1,4 +1,4 @@
-package it.vibwear.app.utils;
+package it.vibwear.app.audio.processing;
 
 /**
  * Created by biospank on 13/04/15.
@@ -14,8 +14,9 @@ public class ZeroCrossing {
             }
         }
 
-        float numSecondsRecorded = (float)numSamples/(float)sampleRate; float numCycles = numCrossing/2;
-        float frequency = numCycles/numSecondsRecorded;
+        float numSecondsRecorded = (float)numSamples / (float)sampleRate;
+        float numCycles = numCrossing / 2;
+        float frequency = numCycles / numSecondsRecorded;
 
         return (int)frequency;
     }
