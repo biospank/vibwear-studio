@@ -2,11 +2,18 @@ package it.vibwear.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+
+import it.lampwireless.vibwear.app.R;
 
 /**
  * Created by biospank on 13/04/15.
  */
-public class AudioPreference implements SwitchPreference {
+public class AudioPreference implements VibrationPreference, SwitchPreference {
+
+    public static final String AUDIO_PREFS_NAME = "AUDIO_DETAILS";
+    public static final String AUDIO_VIB_TIME = "audio_vib_time";
+    public static final String AUDIO_KEY_PREF = "pref_key_audio";
 
     protected Context context;
 
@@ -15,23 +22,75 @@ public class AudioPreference implements SwitchPreference {
         this.context = context;
     }
 
-    @Override
-    public boolean switchState() {
-        return false;
+    public int getVibrationTime() {
+        SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        return settings.getInt(AUDIO_VIB_TIME, DEFAULT_VIB_TIME);
+
+    }
+
+    public void setVibrationTime(int progress) {
+        SharedPreferences.Editor editor;
+        SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        editor = settings.edit();
+
+        editor.putInt(AUDIO_VIB_TIME, progress);
+
+        editor.commit();
+
     }
 
     @Override
-    public String getLabel() {
-        return null;
+    public boolean switchState() {
+        SharedPreferences.Editor editor;
+        boolean active;
+        SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        editor = settings.edit();
+
+        if(settings.getBoolean(AUDIO_KEY_PREF, false)) {
+            editor.putBoolean(AUDIO_KEY_PREF, false);
+            active = false;
+
+        } else {
+            editor.putBoolean(AUDIO_KEY_PREF, true);
+            active = true;
+
+        }
+
+        editor.apply();
+
+        return active;
+
     }
 
     @Override
     public boolean getState() {
-        return false;
+        SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        return settings.getBoolean(AUDIO_KEY_PREF, false);
+
+    }
+
+    @Override
+    public String getLabel() {
+        SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        if(settings.getBoolean(AUDIO_KEY_PREF, false))
+            return context.getString(R.string.activeCallServiceDesc);
+        else
+            return context.getString(R.string.callServiceDesc);
     }
 
     @Override
     public int getImage() {
-        return 0;
+        SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        if(settings.getBoolean(AUDIO_KEY_PREF, false))
+            return R.drawable.ic_call_active;
+        else
+            return R.drawable.ic_call;
     }
+
 }

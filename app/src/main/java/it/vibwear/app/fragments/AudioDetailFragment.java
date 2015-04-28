@@ -37,7 +37,7 @@ public class AudioDetailFragment extends Fragment {
             mListener = (OnAudioChangeListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnSettingsListener");
+                    + " must implement OnAudioChangeListener");
         }
     }
 

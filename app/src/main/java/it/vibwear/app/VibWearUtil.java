@@ -128,7 +128,21 @@ public class VibWearUtil {
         
 	}
 
-	public static Spannable getSmsSummarySpanText(String text) {
+    public static Spannable getAudioSummarySpanText(String text) {
+
+        Spannable sText = new SpannableString(text);
+        sText.setSpan(new RelativeSizeSpan(0.8f), 0, 12, 0);
+        sText.setSpan(new ForegroundColorSpan(Color.rgb(0, 25, 42)), 0, 12, 0);
+        sText.setSpan(new RelativeSizeSpan(1.2f), 12, text.length(), 0);
+
+//        String strDate = "<small>" + dateformatter.format(date) + "</small> at <br />" + timeformatter.format(date);
+//        Spanned sText = Html.fromHtml(strDate);
+
+        return sText;
+
+    }
+
+    public static Spannable getSmsSummarySpanText(String text) {
 		
         Spannable sText = new SpannableString(text);
         sText.setSpan(new RelativeSizeSpan(0.8f), 0, 10, 0); 

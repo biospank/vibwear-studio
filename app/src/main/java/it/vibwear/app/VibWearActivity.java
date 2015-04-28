@@ -202,6 +202,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		//vibrate(ModuleActivity.LOW_SIGNAL_VIB_MODE, null);
 	}
 
+    public void onHeard() {
+        if(mwController != null && mwController.isConnected()) {
+            vibrate(ModuleActivity.NOTIFY_VIB_MODE, null);
+        }
+    }
+
     @Override
     public void onLowBattery() {
         SharedPreferences settings = getSharedPreferences(SettingsDetailFragment.LOW_BATTERY_PREFS_NAME,
