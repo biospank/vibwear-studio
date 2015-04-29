@@ -38,7 +38,7 @@ public class AudioClipLoudNoiseTask extends AsyncTask<LoudNoiseDetector, Void, B
 
         AudioClipListener listener = listeners[0];
 
-        recorder =  new AudioClipRecorder(listener);
+        recorder =  new AudioClipRecorder(listener, this);
 
         // set to true if the recorder successfully detected something
         // false if it was canceled or otherwise stopped
@@ -59,6 +59,10 @@ public class AudioClipLoudNoiseTask extends AsyncTask<LoudNoiseDetector, Void, B
     }
 
 
+    public void notifyHeard() {
+        ((VibWearActivity)context).onHeard();
+    }
+
     @Override
     protected void onPostExecute(Boolean heard) {
         super.onPostExecute(heard);
@@ -72,7 +76,10 @@ public class AudioClipLoudNoiseTask extends AsyncTask<LoudNoiseDetector, Void, B
     protected void onCancelled() {
         super.onCancelled();
 
-        recorder.stopRecording();
+        if(recorder.isRecording()) {
+            recorder.stopRecording();
+            recorder.done();
+        }
     }
 
 }

@@ -199,11 +199,12 @@ public class AudioClipRecorder
 
                 if (heard)
                 {
-                    stopRecording();
+                    //stopRecording();
+                    ((AudioClipLoudNoiseTask)task).notifyHeard();
                 }
             }
         }
-        done();
+//        done();
 
         return heard;
     }

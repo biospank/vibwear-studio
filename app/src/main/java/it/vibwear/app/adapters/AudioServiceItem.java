@@ -41,8 +41,8 @@ public class AudioServiceItem extends ServiceItem {
                         audioTask = new AudioClipLoudNoiseTask(activity, "AudioClipLoudNoiseTask");
                         audioTask.execute(new LoudNoiseDetector());
                     } else {
-                        //if(audioTask != null)
-                          //  audioTask.cancel(true);
+                        if(audioTask != null)
+                            audioTask.cancel(true);
                     }
 
                     iconWidget.setImageResource(switchPref.getImage());
