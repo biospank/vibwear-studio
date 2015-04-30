@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,11 +39,9 @@ public class AudioServiceItem extends ServiceItem {
                 public void onClick(View v) {
 
                     if(switchPref.switchState()) {
-                        audioTask = new AudioClipLoudNoiseTask(activity, "AudioClipLoudNoiseTask");
-                        audioTask.execute(new LoudNoiseDetector());
+                        startNewAsyncTask();
                     } else {
-                        if(audioTask != null)
-                            audioTask.cancel(true);
+                        stopAsyncTask(false);
                     }
 
                     iconWidget.setImageResource(switchPref.getImage());
@@ -55,6 +54,25 @@ public class AudioServiceItem extends ServiceItem {
 
 		showUserIconSettings();
 	}
+
+    public void startNewAsyncTask() {
+        if(switchPref.getState()) {
+            audioTask = new AudioClipLoudNoiseTask(activity, "AudioClipLoudNoiseTask");
+            audioTask.execute(new LoudNoiseDetector());
+        }
+    }
+
+    public void stopAsyncTask(boolean changeState) {
+        if (audioTask != null && audioTask.getStatus() != AsyncTask.Status.FINISHED) {
+            audioTask.cancel(true);
+            audioTask = null;
+            if(changeState)
+                switchPref.switchState();
+        }
+
+        showUserIconSettings();
+        showUserTextSettings();
+    }
 	
 	public void setTextView(TextView text) {
 		this.textWidget = text;
@@ -70,7 +88,6 @@ public class AudioServiceItem extends ServiceItem {
                     ft.addToBackStack(null);
                     ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
                     ft.commit();
-
                 }
             });
         }
