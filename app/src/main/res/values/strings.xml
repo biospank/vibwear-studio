@@ -72,6 +72,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="chatServiceDesc">Chat alert off!</string>
     <string name="sosServiceDesc">S.O.S. alert off!</string>
     <string name="activeCallServiceDesc">Call alert on!</string>
+    <string name="activeAudioServiceDesc">audio alert on!</string>
+    <string name="audioServiceDesc">Audio alert off!</string>
     <string name="activeSmsServiceDesc">Sms alert on!</string>
     <string name="activeChatServiceDesc">Chat alert on!</string>
     <string name="activeSosServiceDesc">S.O.S. alert on!</string>

@@ -78,9 +78,9 @@ public class AudioPreference implements VibrationPreference, SwitchPreference {
         SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
                 Context.MODE_PRIVATE);
         if(settings.getBoolean(AUDIO_KEY_PREF, false))
-            return context.getString(R.string.activeCallServiceDesc);
+            return context.getString(R.string.activeAudioServiceDesc);
         else
-            return context.getString(R.string.callServiceDesc);
+            return context.getString(R.string.audioServiceDesc);
     }
 
     @Override
@@ -88,9 +88,9 @@ public class AudioPreference implements VibrationPreference, SwitchPreference {
         SharedPreferences settings = context.getSharedPreferences(AUDIO_PREFS_NAME,
                 Context.MODE_PRIVATE);
         if(settings.getBoolean(AUDIO_KEY_PREF, false))
-            return R.drawable.ic_call_active;
+            return R.drawable.ic_audio_active;
         else
-            return R.drawable.ic_call;
+            return R.drawable.ic_audio;
     }
 
 }
