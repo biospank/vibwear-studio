@@ -18,16 +18,30 @@ import it.vibwear.app.audio.ConsistentFrequencyDetector;
 import it.vibwear.app.audio.LoudNoiseDetector;
 import it.vibwear.app.fragments.AudioDetailFragment;
 import it.vibwear.app.fragments.SosDetailFragment;
+import it.vibwear.app.fragments.TaskFragment;
 import it.vibwear.app.utils.AudioPreference;
 import it.vibwear.app.utils.SosPreference;
 
 public class AudioServiceItem extends ServiceItem {
 
-    protected AudioClipLoudNoiseTask audioTask;
+    private TaskFragment mTaskFragment;
+    private static final String TAG_TASK_FRAGMENT = "task_fragment";
+
+    //protected AudioClipLoudNoiseTask audioTask;
 
 	public AudioServiceItem(Activity activity) {
 		super(activity);
 		this.switchPref = new AudioPreference(activity);
+
+        FragmentManager fm = activity.getFragmentManager();
+        mTaskFragment = (TaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (mTaskFragment == null) {
+            mTaskFragment = new TaskFragment();
+            fm.beginTransaction().add(mTaskFragment, TAG_TASK_FRAGMENT).commit();
+        }
 	}
 	
 	public void setIconView(ImageView icon) {
@@ -39,9 +53,9 @@ public class AudioServiceItem extends ServiceItem {
                 public void onClick(View v) {
 
                     if(switchPref.switchState()) {
-                        startNewAsyncTask();
+                        mTaskFragment.startNewAsyncTask();
                     } else {
-                        stopAsyncTask(false);
+                        mTaskFragment.stopAsyncTask();
                     }
 
                     iconWidget.setImageResource(switchPref.getImage());
@@ -55,25 +69,6 @@ public class AudioServiceItem extends ServiceItem {
 		showUserIconSettings();
 	}
 
-    public void startNewAsyncTask() {
-        if(switchPref.getState()) {
-            audioTask = new AudioClipLoudNoiseTask(activity, "AudioClipLoudNoiseTask");
-            audioTask.execute(new LoudNoiseDetector());
-        }
-    }
-
-    public void stopAsyncTask(boolean changeState) {
-        if (audioTask != null && audioTask.getStatus() != AsyncTask.Status.FINISHED) {
-            audioTask.cancel(true);
-            audioTask = null;
-            if(changeState)
-                switchPref.switchState();
-        }
-
-        showUserIconSettings();
-        showUserTextSettings();
-    }
-	
 	public void setTextView(TextView text) {
 		this.textWidget = text;
         if(isHardwareSupported(PackageManager.FEATURE_MICROPHONE)) {

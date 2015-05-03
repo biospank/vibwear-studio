@@ -140,7 +140,7 @@ public class ServicesFragment extends ListFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        audioService.stopAsyncTask(true);
+        // audioService.stopAsyncTask(true);
     }
 
 }
