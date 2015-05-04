@@ -6,6 +6,7 @@ import it.vibwear.app.adapters.Contact;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.scanner.ScannerFragment.OnDeviceSelectedListener;
 import it.vibwear.app.utils.AlarmPreference;
+import it.vibwear.app.utils.AudioPreference;
 import it.vibwear.app.utils.CallPreference;
 import it.vibwear.app.utils.ChatPreference;
 import it.vibwear.app.utils.DefaultPreference;
@@ -312,9 +313,13 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 				case ServicesFragment.ALARM_VIB_ACTION:
 					vibPref = new AlarmPreference(getApplicationContext());
 					break;
-	
-				default:
-					vibPref = new DefaultPreference(getApplicationContext());
+
+                case ServicesFragment.AUDIO_VIB_ACTION:
+                    vibPref = new AudioPreference(getApplicationContext());
+                    break;
+
+                default:
+                vibPref = new DefaultPreference(getApplicationContext());
 						
 				}
 	

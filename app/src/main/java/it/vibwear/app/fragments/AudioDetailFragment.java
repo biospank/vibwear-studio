@@ -16,7 +16,7 @@ import it.lampwireless.vibwear.app.R;
 public class AudioDetailFragment extends Fragment {
 
     private Fragment vibSliderFragment;
-    private OnAudioChangeListener mListener;
+//    private OnAudioChangeListener mListener;
 
     public static AudioDetailFragment newInstance(String boardName) {
         AudioDetailFragment fragment = new AudioDetailFragment();
@@ -33,12 +33,12 @@ public class AudioDetailFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnAudioChangeListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnAudioChangeListener");
-        }
+//        try {
+//            mListener = (OnAudioChangeListener) activity;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString()
+//                    + " must implement OnAudioChangeListener");
+//        }
     }
 
     @Override
@@ -69,9 +69,9 @@ public class AudioDetailFragment extends Fragment {
         getChildFragmentManager().putFragment(outState, "VibFrag", vibSliderFragment);
     }
 
-    public interface OnAudioChangeListener {
-        public void onVibSliderChange(String boardName);
-    }
+//    public interface OnAudioChangeListener {
+//        public void onVibSliderChange(String boardName);
+//    }
 
 
 }

@@ -48,9 +48,9 @@ public class AudioClipRecorder
     /**
      * records with some default parameters
      */
-    public boolean startRecording()
+    public void startRecording()
     {
-        return startRecording(RECORDER_SAMPLERATE_8000,
+        startRecording(RECORDER_SAMPLERATE_8000,
                 AudioFormat.ENCODING_PCM_16BIT);
     }
 
@@ -58,7 +58,7 @@ public class AudioClipRecorder
      * start recording: set the parameters that correspond to a buffer that
      * contains millisecondsPerAudioClip milliseconds of samples
      */
-    public boolean startRecordingForTime(int millisecondsPerAudioClip,
+    public void startRecordingForTime(int millisecondsPerAudioClip,
                                          int sampleRate, int encoding)
     {
         float percentOfASecond = (float) millisecondsPerAudioClip / 1000.0f;
@@ -67,7 +67,7 @@ public class AudioClipRecorder
                 determineCalculatedBufferSize(sampleRate, encoding,
                         numSamplesRequired);
 
-        return doRecording(sampleRate, encoding, bufferSize,
+        doRecording(sampleRate, encoding, bufferSize,
                 numSamplesRequired, DEFAULT_BUFFER_INCREASE_FACTOR);
     }
 
@@ -75,10 +75,10 @@ public class AudioClipRecorder
      * start recording: Use a minimum audio buffer and a read buffer of the same
      * size.
      */
-    public boolean startRecording(final int sampleRate, int encoding)
+    public void startRecording(final int sampleRate, int encoding)
     {
         int bufferSize = determineMinimumBufferSize(sampleRate, encoding);
-        return doRecording(sampleRate, encoding, bufferSize, bufferSize,
+        doRecording(sampleRate, encoding, bufferSize, bufferSize,
                 DEFAULT_BUFFER_INCREASE_FACTOR);
     }
 
@@ -139,19 +139,19 @@ public class AudioClipRecorder
      * @param bufferIncreaseFactor
      *            to increase recording buffer size beyond the minimum needed
      */
-    private boolean doRecording(final int sampleRate, int encoding,
+    private void doRecording(final int sampleRate, int encoding,
                                 int recordingBufferSize, int readBufferSize,
                                 int bufferIncreaseFactor)
     {
         if (recordingBufferSize == AudioRecord.ERROR_BAD_VALUE)
         {
             Log.e(TAG, "Bad encoding value, see logcat");
-            return false;
+            return;
         }
         else if (recordingBufferSize == AudioRecord.ERROR)
         {
             Log.e(TAG, "Error creating buffer size");
-            return false;
+            return;
         }
 
         // give it extra space to prevent overflow
@@ -199,14 +199,11 @@ public class AudioClipRecorder
 
                 if (heard)
                 {
-                    //stopRecording();
                     ((AudioClipLoudNoiseTask)task).notifyHeard();
                 }
             }
         }
-//        done();
 
-        return heard;
     }
 
     public boolean isRecording()

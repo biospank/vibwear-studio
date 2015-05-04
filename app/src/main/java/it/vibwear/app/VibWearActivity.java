@@ -202,11 +202,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		//vibrate(ModuleActivity.LOW_SIGNAL_VIB_MODE, null);
 	}
 
-    public void onHeard() {
-        if(mwController != null && mwController.isConnected()) {
-            vibrate(ModuleActivity.NOTIFY_VIB_MODE, null);
-        }
-    }
+//    public void onHeard() {
+//        if(mwController != null && mwController.isConnected()) {
+//            vibrate(ModuleActivity.NOTIFY_VIB_MODE, new Intent().se);
+//        }
+//    }
 
     @Override
     public void onLowBattery() {
@@ -256,7 +256,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		intentFilter.addAction(ServicesFragment.SMS_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.ALARM_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.CHAT_VIB_ACTION);
-		
+		intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
+
 //		registerReceiver(intentReceiver, intentFilter);
 		
 	}

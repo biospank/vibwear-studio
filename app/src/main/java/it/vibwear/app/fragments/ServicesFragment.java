@@ -136,11 +136,4 @@ public class ServicesFragment extends ListFragment {
         audioService.refresh();
 	}
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // audioService.stopAsyncTask(true);
-    }
-
 }

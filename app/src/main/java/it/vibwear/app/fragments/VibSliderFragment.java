@@ -3,6 +3,7 @@ package it.vibwear.app.fragments;
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.VibWearUtil;
 import it.vibwear.app.utils.AlarmPreference;
+import it.vibwear.app.utils.AudioPreference;
 import it.vibwear.app.utils.CallPreference;
 import it.vibwear.app.utils.ChatPreference;
 import it.vibwear.app.utils.SmsPreference;
@@ -88,6 +89,9 @@ public class VibSliderFragment extends Fragment {
             case "AlarmPreference":
                 this.vibPreference = new AlarmPreference(activity);
                 break;
+			case "AudioPreference":
+				this.vibPreference = new AudioPreference(activity);
+				break;
         }
 
 

@@ -4,23 +4,15 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.VibWearUtil;
-import it.vibwear.app.audio.AudioClipConsistentFrequencyTask;
-import it.vibwear.app.audio.AudioClipLoudNoiseTask;
-import it.vibwear.app.audio.AudioClipRecorder;
-import it.vibwear.app.audio.ConsistentFrequencyDetector;
-import it.vibwear.app.audio.LoudNoiseDetector;
 import it.vibwear.app.fragments.AudioDetailFragment;
-import it.vibwear.app.fragments.SosDetailFragment;
 import it.vibwear.app.fragments.TaskFragment;
 import it.vibwear.app.utils.AudioPreference;
-import it.vibwear.app.utils.SosPreference;
 
 public class AudioServiceItem extends ServiceItem {
 
