@@ -2,6 +2,7 @@ package it.vibwear.app.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,14 +17,11 @@ import it.lampwireless.vibwear.app.R;
 public class AudioDetailFragment extends Fragment {
 
     private Fragment vibSliderFragment;
+    private Fragment audioSliderFragment;
 //    private OnAudioChangeListener mListener;
 
-    public static AudioDetailFragment newInstance(String boardName) {
-        AudioDetailFragment fragment = new AudioDetailFragment();
-        Bundle args = new Bundle();
-
-        fragment.setArguments(args);
-        return fragment;
+    public static AudioDetailFragment newInstance() {
+        return new AudioDetailFragment();
     }
 
     public AudioDetailFragment() {
@@ -48,14 +46,19 @@ public class AudioDetailFragment extends Fragment {
         View layout = inflater.inflate(R.layout.fragment_detail, container, false);
 
         if(savedInstanceState != null) {
-            vibSliderFragment = getChildFragmentManager().getFragment(savedInstanceState, "VibFrag");
+            FragmentManager fm = getChildFragmentManager();
+            vibSliderFragment = fm.getFragment(savedInstanceState, "VibFrag");
+            audioSliderFragment = fm.getFragment(savedInstanceState, "AudioFrag");
         } else {
             vibSliderFragment = new VibSliderFragment();
+            audioSliderFragment = new AudioSliderFragment();
             Bundle preference = new Bundle();
             preference.putString("preference", "AudioPreference");
             vibSliderFragment.setArguments(preference);
+            audioSliderFragment.setArguments(preference);
             FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             transaction.add(R.id.rootDetailLayout, vibSliderFragment);
+            transaction.add(R.id.rootDetailLayout, audioSliderFragment);
             transaction.commit();
         }
 
@@ -66,7 +69,10 @@ public class AudioDetailFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        getChildFragmentManager().putFragment(outState, "VibFrag", vibSliderFragment);
+        FragmentManager fm = getChildFragmentManager();
+
+        fm.putFragment(outState, "VibFrag", vibSliderFragment);
+        fm.putFragment(outState, "AudioFrag", audioSliderFragment);
     }
 
 //    public interface OnAudioChangeListener {

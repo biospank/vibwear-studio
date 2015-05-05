@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import it.vibwear.app.audio.AudioClipLoudNoiseTask;
 import it.vibwear.app.audio.LoudNoiseDetector;
+import it.vibwear.app.utils.AudioPreference;
 
 /**
  * This Fragment manages a single background task and retains
@@ -71,7 +72,7 @@ public class TaskFragment extends Fragment {
     public void startNewAsyncTask() {
         // Create and execute the background task.
         mTask = new AudioClipLoudNoiseTask(mActivity, "AudioClipLoudNoiseTask");
-        mTask.execute(new LoudNoiseDetector());
+        mTask.execute(new LoudNoiseDetector(new AudioPreference(mActivity)));
     }
 
     public void stopAsyncTask() {

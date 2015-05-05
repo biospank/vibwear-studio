@@ -83,10 +83,14 @@ contact MbientLab Inc, at www.mbientlab.com.
    	<string name="label_sos_msg">S.O.S. message</string>
    	<string name="label_sos_contacts">S.O.S. contacts</string>
    	<string name="label_vib_slider">Vibration length</string>
+    <string name="label_audio_slider">Sensible treshold</string>
    	<string name="label_time_picker_alarm">Set alarm</string>
    	<string name="label_vib_zero_sec">0</string>
     <string name="label_vib_five_sec">5</string>
 	<string name="label_vib_ten_sec">10</string>
+    <string name="label_audio_low_level">100</string>
+    <string name="label_audio_mid_level">1500</string>
+    <string name="label_audio_high_level">3000</string>
 	<string name="not_available">n/a</string>
 	<string name="contact_with_number_msg">Only contacts with numbers will be added</string>
 	<string name="sos_msg_hint">Type here your message</string>
