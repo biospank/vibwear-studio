@@ -3,7 +3,9 @@ package it.vibwear.app.adapters;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,7 +46,7 @@ public class AudioServiceItem extends ServiceItem {
                 @Override
                 public void onClick(View v) {
 
-                    if(switchPref.switchState()) {
+                    if (switchPref.switchState()) {
                         mTaskFragment.startNewAsyncTask();
                     } else {
                         mTaskFragment.stopAsyncTask();
@@ -87,5 +89,17 @@ public class AudioServiceItem extends ServiceItem {
 		textWidget.setText(VibWearUtil.getSosSummarySpanText(switchPref.getLabel()));
 	
 	}
-	
+
+    @Override
+    public boolean consume(Intent intent) {
+        return switchPref.getState();
+    }
+
+    public void turnOffAudio() {
+        if (switchPref.getState()) {
+            mTaskFragment.stopAsyncTask();
+            switchPref.switchState();
+        }
+    }
+
 }

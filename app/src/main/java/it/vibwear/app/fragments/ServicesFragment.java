@@ -55,8 +55,16 @@ public class ServicesFragment extends ListFragment {
 		ServicesAdapter servicesAdapter = new ServicesAdapter(getActivity(), services);
 		setListAdapter(servicesAdapter);
 	}
-	
-//	@Override
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		if(getActivity().isFinishing())
+			audioService.turnOffAudio();
+	}
+
+	//	@Override
 //	public void onListItemClick(ListView l, View v, int position, long id) {
 //		// TODO Auto-generated method stub
 //		super.onListItemClick(l, v, position, id);

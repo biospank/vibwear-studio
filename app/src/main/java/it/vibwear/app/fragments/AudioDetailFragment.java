@@ -17,7 +17,7 @@ import it.lampwireless.vibwear.app.R;
 public class AudioDetailFragment extends Fragment {
 
     private Fragment vibSliderFragment;
-    private Fragment audioSliderFragment;
+    private Fragment micSliderFragment;
 //    private OnAudioChangeListener mListener;
 
     public static AudioDetailFragment newInstance() {
@@ -48,17 +48,17 @@ public class AudioDetailFragment extends Fragment {
         if(savedInstanceState != null) {
             FragmentManager fm = getChildFragmentManager();
             vibSliderFragment = fm.getFragment(savedInstanceState, "VibFrag");
-            audioSliderFragment = fm.getFragment(savedInstanceState, "AudioFrag");
+            micSliderFragment = fm.getFragment(savedInstanceState, "MicFrag");
         } else {
             vibSliderFragment = new VibSliderFragment();
-            audioSliderFragment = new AudioSliderFragment();
+            micSliderFragment = new MicSliderFragment();
             Bundle preference = new Bundle();
             preference.putString("preference", "AudioPreference");
             vibSliderFragment.setArguments(preference);
-            audioSliderFragment.setArguments(preference);
+            micSliderFragment.setArguments(preference);
             FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             transaction.add(R.id.rootDetailLayout, vibSliderFragment);
-            transaction.add(R.id.rootDetailLayout, audioSliderFragment);
+            transaction.add(R.id.rootDetailLayout, micSliderFragment);
             transaction.commit();
         }
 
@@ -72,7 +72,7 @@ public class AudioDetailFragment extends Fragment {
         FragmentManager fm = getChildFragmentManager();
 
         fm.putFragment(outState, "VibFrag", vibSliderFragment);
-        fm.putFragment(outState, "AudioFrag", audioSliderFragment);
+        fm.putFragment(outState, "MicFrag", micSliderFragment);
     }
 
 //    public interface OnAudioChangeListener {

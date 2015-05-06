@@ -14,12 +14,12 @@ import it.vibwear.app.utils.AudioPreference;
 /**
  * Created by biospank on 05/05/15.
  */
-public class AudioSliderFragment extends Fragment {
+public class MicSliderFragment extends Fragment {
 
     protected AudioPreference audioPreference;
     protected SeekBar sbAudio;
 
-    public AudioSliderFragment() {
+    public MicSliderFragment() {
 
     }
 
