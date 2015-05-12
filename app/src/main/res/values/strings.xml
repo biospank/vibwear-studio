@@ -89,8 +89,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="label_vib_five_sec">5</string>
 	<string name="label_vib_ten_sec">10</string>
     <string name="label_audio_low_level">100</string>
-    <string name="label_audio_mid_level">1500</string>
-    <string name="label_audio_high_level">3000</string>
+    <string name="label_audio_mid_level">5K</string>
+    <string name="label_audio_high_level">10K</string>
 	<string name="not_available">n/a</string>
 	<string name="contact_with_number_msg">Only contacts with numbers will be added</string>
 	<string name="sos_msg_hint">Type here your message</string>

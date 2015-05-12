@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:progress="100"
-        android:max="3000" />
+        android:max="10000" />
 
 
 </LinearLayout>
