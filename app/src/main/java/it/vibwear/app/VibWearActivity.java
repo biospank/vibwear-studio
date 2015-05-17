@@ -18,6 +18,10 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -110,8 +114,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	protected void onResume() {
 		// gestione audio
 		// startService(audioCaptureIntent);
-//		showNotificationIcon(false);
 		super.onResume();
+//		if(mwController != null && mwController.isConnected())
+//			showNotificationIcon(false);
+
 		startScheduledTimers();
 		registerReceiver(intentReceiver, intentFilter);
 	}
@@ -131,6 +137,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		// stopService(audioCaptureIntent);
 //		if(!isFinishing())
 //			showNotificationIcon(true);
+
 		super.onPause();
 		
 	}
@@ -140,6 +147,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if (mwController != null && mwController.isConnected()) {
 			if(getFragmentManager().getBackStackEntryCount() == 0) {
 				moveTaskToBack(true);
+				//showNotificationIcon(true);
 				return;
 			}
 		}
@@ -309,5 +317,49 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getApplication().startActivity(intent);
     }
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		showNotificationIcon(!hasFocus);
+	}
+
+	protected void showNotificationIcon(boolean show) {
+		NotificationManager mNotificationManager =
+			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		int mId = 9571;
+		if(show) {
+			Notification.Builder mBuilder =
+			        new Notification.Builder(this)
+			        .setSmallIcon(R.drawable.ic_notification)
+			        .setContentTitle("VibWear")
+			        .setContentText("Tap to show.");
+			Notification notif = mBuilder.build();
+			mwService.startForeground(mId, notif);
+//			// Creates an explicit intent for an Activity in your app
+//			Intent resultIntent = new Intent(this, VibWearActivity.class);
+//
+//			// The stack builder object will contain an artificial back stack for the
+//			// started Activity.
+//			// This ensures that navigating backward from the Activity leads out of
+//			// your application to the Home screen.
+//			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//			// Adds the back stack for the Intent (but not the Intent itself)
+//			stackBuilder.addParentStack(VibWearActivity.class);
+//			// Adds the Intent that starts the Activity to the top of the stack
+//			stackBuilder.addNextIntent(resultIntent);
+//			PendingIntent resultPendingIntent =
+//			        stackBuilder.getPendingIntent(
+//			            0,
+//			            PendingIntent.FLAG_UPDATE_CURRENT
+//			        );
+//			mBuilder.setContentIntent(resultPendingIntent);
+//			// mId allows you to update the notification later on.
+//			mNotificationManager.notify(mId , notif);
+		} else {
+//			mNotificationManager.cancel(mId);
+			mwService.stopForeground(true);
+		}
+	}
 
 }
