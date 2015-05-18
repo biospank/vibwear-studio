@@ -54,7 +54,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			
 			intent.putExtra("standBy", isStandBy());
 			
-			if(mwController != null && mwController.isConnected() && servicesFrag.consumeIntent(intent))
+			if(isDeviceConnected() && servicesFrag.consumeIntent(intent))
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
 			
 			servicesFrag.update(intent);
@@ -88,7 +88,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         switch (item.getItemId()) {
  
         case R.id.menu_test:
-            if (mwController != null && mwController.isConnected())
+            if (isDeviceConnected())
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, null);
             
             break;
@@ -124,8 +124,9 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	
 	@Override
 	public void onDestroy() {
-//		showNotificationIcon(false);
 		super.onDestroy();
+		if(isFinishing() && isDeviceConnected())
+			showNotificationIcon(false);
 		cancelScheduledTimers();
 		unregisterReceiver(intentReceiver);
 	}
@@ -144,7 +145,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	@Override
 	public void onBackPressed() {
-		if (mwController != null && mwController.isConnected()) {
+		if (isDeviceConnected()) {
 			if(getFragmentManager().getBackStackEntryCount() == 0) {
 				moveTaskToBack(true);
 				//showNotificationIcon(true);
@@ -159,7 +160,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     	// TODO Auto-generated method stub
     	super.invalidateOptionsMenu();
 
-		if (mwController != null && mwController.isConnected()) {
+		if (isDeviceConnected()) {
 			locationFrag.updateConnectionImageResource(true);
 		} else {
 			locationFrag.updateConnectionImageResource(false);
@@ -168,7 +169,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     
 	@Override
 	public void onLocationChange() {
-		if(mwController != null && mwController.isConnected()) {
+		if(isDeviceConnected()) {
 			unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
@@ -223,7 +224,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
     @Override
     public void onBoardNameChange(String boardName) {
-        if(mwController != null && mwController.isConnected()) {
+        if(isDeviceConnected()) {
             settingsController.setDeviceName(boardName);
             deviceName = boardName;
         }
@@ -314,7 +315,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-		showNotificationIcon(!hasFocus);
+		if(isDeviceConnected())
+			showNotificationIcon(!hasFocus);
 	}
 
 	protected void showNotificationIcon(boolean show) {
@@ -324,31 +326,30 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if(show) {
 			Notification.Builder mBuilder =
 			        new Notification.Builder(this)
-			        .setSmallIcon(R.drawable.ic_notification)
+			        .setSmallIcon(R.drawable.ic_launcher)
 			        .setContentTitle("VibWear")
 			        .setContentText("Tap to show.");
-			Notification notif = mBuilder.build();
-			mwService.startForeground(mId, notif);
-//			// Creates an explicit intent for an Activity in your app
-//			Intent resultIntent = new Intent(this, VibWearActivity.class);
-//
-//			// The stack builder object will contain an artificial back stack for the
-//			// started Activity.
-//			// This ensures that navigating backward from the Activity leads out of
-//			// your application to the Home screen.
-//			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-//			// Adds the back stack for the Intent (but not the Intent itself)
-//			stackBuilder.addParentStack(VibWearActivity.class);
-//			// Adds the Intent that starts the Activity to the top of the stack
-//			stackBuilder.addNextIntent(resultIntent);
-//			PendingIntent resultPendingIntent =
-//			        stackBuilder.getPendingIntent(
-//			            0,
-//			            PendingIntent.FLAG_UPDATE_CURRENT
-//			        );
-//			mBuilder.setContentIntent(resultPendingIntent);
-//			// mId allows you to update the notification later on.
-//			mNotificationManager.notify(mId , notif);
+			// Creates an explicit intent for an Activity in your app
+			Intent resultIntent = new Intent(this, VibWearActivity.class);
+
+			// The stack builder object will contain an artificial back stack for the
+			// started Activity.
+			// This ensures that navigating backward from the Activity leads out of
+			// your application to the Home screen.
+			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+			// Adds the back stack for the Intent (but not the Intent itself)
+			stackBuilder.addParentStack(VibWearActivity.class);
+			// Adds the Intent that starts the Activity to the top of the stack
+			stackBuilder.addNextIntent(resultIntent);
+			PendingIntent resultPendingIntent =
+			        stackBuilder.getPendingIntent(
+			            0,
+			            PendingIntent.FLAG_UPDATE_CURRENT
+			        );
+			mBuilder.setContentIntent(resultPendingIntent);
+			// mId allows you to update the notification later on.
+//			mNotificationManager.notify(mId, mBuilder.build());
+			mwService.startForeground(mId, mBuilder.build());
 		} else {
 //			mNotificationManager.cancel(mId);
 			mwService.stopForeground(true);
