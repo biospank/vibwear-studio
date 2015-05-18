@@ -72,7 +72,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     	
         @Override
         public void connected() {
-            if (mwController != null && mwController.isConnected()) {
+            if (isDeviceConnected()) {
                 mwController.readDeviceInformation();
                 settingsController.readDeviceName();
                 switchController.enableNotification();
@@ -191,7 +191,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
         
-        getApplicationContext().bindService(new Intent(this, MetaWearBleService.class), 
+        getApplicationContext().bindService(new Intent(this, MetaWearBleService.class),
                 this, Context.BIND_AUTO_CREATE);
         
         if (savedInstanceState != null) {
@@ -230,7 +230,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 
         if (device != null) {
         	initializeAndConnect();
-            if (mwController != null && mwController.isConnected()) {
+            if (isDeviceConnected()) {
                 mwController.readDeviceInformation();
                 settingsController.readDeviceName();
             }
@@ -250,7 +250,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
      */
     @Override
     public void onDeviceSelected(BluetoothDevice device, String name) {
-        if (mwController != null && mwController.isConnected()) {
+        if (isDeviceConnected()) {
             mwController.close(true);
             mwController = null;
         }
@@ -335,13 +335,13 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 	}
 
     protected void requestSignalLevel() {
-    	if(mwController != null && mwController.isConnected()) {
+    	if(isDeviceConnected()) {
     		mwController.readRemoteRSSI();
 		}
 	}
 
 	protected void requestBatteryLevel() {
-    	if(mwController != null && mwController.isConnected()) {
+    	if(isDeviceConnected()) {
     		mwController.readBatteryLevel();
 		}
 	}
@@ -386,6 +386,9 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         mwController.close(true);
         mwController= null;
     }
-    
+
+    public boolean isDeviceConnected() {
+        return (mwController != null && mwController.isConnected());
+    }
     
 }
