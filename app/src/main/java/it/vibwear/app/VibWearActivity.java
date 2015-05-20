@@ -30,7 +30,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
-	private static final String VERSION = "1.3.0";
+	private static final String VERSION = "1.3.1";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 5000;
 	private static final long BATTERY_START_DELAY = 60000;
