@@ -32,7 +32,7 @@ public class LocationFragment extends Fragment {
 //		public void onSignalRequest();
 //		public void onBatteryRequest();
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {

@@ -242,8 +242,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			FragmentTransaction ft = fm.beginTransaction();
 			locationFrag = new LocationFragment();
 			servicesFrag = new ServicesFragment();
-			ft.add(R.id.locationLayout, locationFrag, "locationFrag");
-			ft.add(R.id.servicesLayout, servicesFrag, "servicesFrag");
+			ft.add(R.id.locationLayout, locationFrag, "locationFragment");
+			ft.add(R.id.servicesLayout, servicesFrag, "servicesFragment");
 			ft.commit();
 		}
 		
@@ -303,7 +303,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
         getFragmentManager().putFragment(outState, "locationFragment", locationFrag);
         getFragmentManager().putFragment(outState, "servicesFragment", servicesFrag);
-        
+
     }
 
     private void requestUserAttention() {
