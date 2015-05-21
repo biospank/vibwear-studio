@@ -87,6 +87,14 @@ public class LocationFragment extends Fragment {
                 icSettings.setImageResource(R.drawable.ic_settings);
             }
 		}
+
+		Bundle props = getArguments();
+
+		if(props != null) {
+			updateConnectionImageResource(props.getBoolean("connected"));
+			updateBatteryLevelImageResource(props.getString("batteryLevel"));
+			updateSignalImageResource(props.getInt("signalLevel"));
+		}
 		
 //		icSignal.setOnClickListener(new View.OnClickListener() {
 //			
