@@ -8,6 +8,8 @@ import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
 import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.scanner.ScannerFragment;
+
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -72,7 +74,16 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		initializeView(savedInstanceState);
 
-    }
+		Bundle props = getIntent().getExtras();
+
+		if(props != null) {
+			locationFrag.setArguments(props);
+//			locationFrag.updateConnectionImageResource(props.getBoolean("connected"));
+//			locationFrag.updateBatteryLevelImageResource(props.getString("batteryLevel"));
+//			locationFrag.updateSignalImageResource(props.getInt("signalLevel"));
+		}
+
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -319,39 +330,66 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			showNotificationIcon(!hasFocus);
 	}
 
+//	protected void showNotificationIcon(boolean show) {
+//		NotificationManager mNotificationManager =
+//			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//		int mId = 9571;
+//		if(show) {
+//			Notification.Builder mBuilder =
+//			        new Notification.Builder(this)
+//			        .setSmallIcon(R.drawable.ic_launcher)
+//					.setTicker("Vibwear app listening")
+//			        .setContentTitle("VibWear")
+//			        .setContentText("Tap to show.");
+//			// Creates an explicit intent for an Activity in your app
+//			Intent resultIntent = new Intent(this, VibWearActivity.class);
+//
+//			// The stack builder object will contain an artificial back stack for the
+//			// started Activity.
+//			// This ensures that navigating backward from the Activity leads out of
+//			// your application to the Home screen.
+//			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//			// Adds the back stack for the Intent (but not the Intent itself)
+//			stackBuilder.addParentStack(VibWearActivity.class);
+//			// Adds the Intent that starts the Activity to the top of the stack
+//			stackBuilder.addNextIntent(resultIntent);
+//			PendingIntent resultPendingIntent =
+//			        stackBuilder.getPendingIntent(
+//			            0,
+//			            PendingIntent.FLAG_UPDATE_CURRENT
+//			        );
+//			mBuilder.setContentIntent(resultPendingIntent);
+//			mBuilder.setOngoing(true);
+//			mwService.startForeground(mId, mBuilder.build());
+//		} else {
+//			mwService.stopForeground(true);
+//		}
+//	}
+
 	protected void showNotificationIcon(boolean show) {
-		NotificationManager mNotificationManager =
-			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		int mId = 9571;
+		Random generator = new Random();
+		int i = 90686958 - generator.nextInt(92938);
 		if(show) {
 			Notification.Builder mBuilder =
-			        new Notification.Builder(this)
-			        .setSmallIcon(R.drawable.ic_launcher)
-			        .setContentTitle("VibWear")
-			        .setContentText("Tap to show.");
+					new Notification.Builder(this)
+							.setSmallIcon(R.drawable.ic_launcher)
+							.setTicker("Vibwear app listening")
+							.setContentTitle("VibWear")
+							.setContentText("Tap to show.");
 			// Creates an explicit intent for an Activity in your app
-			Intent resultIntent = new Intent(this, VibWearActivity.class);
+			Intent startIntent = new Intent(this, VibWearActivity.class);
 
-			// The stack builder object will contain an artificial back stack for the
-			// started Activity.
-			// This ensures that navigating backward from the Activity leads out of
-			// your application to the Home screen.
-			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-			// Adds the back stack for the Intent (but not the Intent itself)
-			stackBuilder.addParentStack(VibWearActivity.class);
-			// Adds the Intent that starts the Activity to the top of the stack
-			stackBuilder.addNextIntent(resultIntent);
-			PendingIntent resultPendingIntent =
-			        stackBuilder.getPendingIntent(
-			            0,
-			            PendingIntent.FLAG_UPDATE_CURRENT
-			        );
-			mBuilder.setContentIntent(resultPendingIntent);
-			// mId allows you to update the notification later on.
-//			mNotificationManager.notify(mId, mBuilder.build());
-			mwService.startForeground(mId, mBuilder.build());
+			startIntent.putExtra("connected", true);
+			startIntent.putExtra("batteryLevel", locationFrag.getCurrentBatteryLevel());
+			startIntent.putExtra("signalLevel", locationFrag.getCurrentSignalLevel());
+
+			PendingIntent startPendingIntent =
+					PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			mBuilder.setContentIntent(startPendingIntent);
+//			mBuilder.setOngoing(true);
+			mwService.startForeground(i, mBuilder.build());
 		} else {
-//			mNotificationManager.cancel(mId);
 			mwService.stopForeground(true);
 		}
 	}
