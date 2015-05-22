@@ -87,15 +87,22 @@ public class LocationFragment extends Fragment {
                 icSettings.setImageResource(R.drawable.ic_settings);
             }
 		}
+//		else {
+//			Bundle props = getArguments();
+//
+//			if(props != null) {
+//
+//				boolean connected = props.getBoolean("connected", false);
+//
+//				if (connected) {
+//					updateConnectionImageResource(connected);
+//					updateBatteryLevelImageResource(props.getString("batteryLevel"));
+//					updateSignalImageResource(props.getInt("signalLevel"));
+//				}
+//			}
+//		}
 
-		Bundle props = getArguments();
 
-		if(props != null) {
-			updateConnectionImageResource(props.getBoolean("connected"));
-			updateBatteryLevelImageResource(props.getString("batteryLevel"));
-			updateSignalImageResource(props.getInt("signalLevel"));
-		}
-		
 //		icSignal.setOnClickListener(new View.OnClickListener() {
 //			
 //			@Override
