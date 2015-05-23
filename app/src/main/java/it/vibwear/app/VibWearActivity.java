@@ -17,6 +17,8 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +40,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
+
+	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
 
@@ -140,6 +144,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		if (isDeviceConnected()) {
 			locationFrag.updateConnectionImageResource(true);
+			if(progress != null) progress.dismiss();
 		} else {
 			locationFrag.updateConnectionImageResource(false);
 		}
@@ -157,6 +162,15 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
             dialog.show(fm, "scan_fragment");
 		}
 
+	}
+
+	@Override
+	public void onDeviceSelected(BluetoothDevice device, String name) {
+		super.onDeviceSelected(device, name);
+		progress = new ProgressDialog(this);
+		progress.setTitle(R.string.progressTitle);
+		progress.setMessage(getResources().getString(R.string.progressMsg));
+		progress.show();
 	}
 
 //	@Override
@@ -227,6 +241,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			ft.add(R.id.locationLayout, locationFrag, "locationFragment");
 			ft.add(R.id.servicesLayout, servicesFrag, "servicesFragment");
 			ft.commit();
+
 		}
 		
 		powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
