@@ -57,7 +57,7 @@ public class LocationFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 VibWearActivity activity = (VibWearActivity) getActivity();
-                if(activity.isBoardConnected()) {
+                if(activity.isDeviceConnected()) {
                     FragmentManager fm = activity.getFragmentManager();
                     Fragment settingsFrag = fm.findFragmentByTag("settingsDetail");
                     if (settingsFrag == null) {

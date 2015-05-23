@@ -107,22 +107,20 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	@Override
 	protected void onResume() {
 		super.onResume();
-		startScheduledTimers();
 		registerReceiver(intentReceiver, intentFilter);
+        startScheduledTimers();
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if(isFinishing() && isDeviceConnected())
-			showNotificationIcon(false);
-		cancelScheduledTimers();
 		unregisterReceiver(intentReceiver);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		cancelScheduledTimers();
 	}
 
 	@Override
@@ -196,7 +194,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         SharedPreferences settings = getSharedPreferences(SettingsDetailFragment.LOW_BATTERY_PREFS_NAME,
                 Context.MODE_PRIVATE);
 
-        if(settings.getBoolean(SettingsDetailFragment.NOTIFY_ME_KEY, false)) {
+		if (settings.getBoolean(SettingsDetailFragment.NOTIFY_ME_KEY, false)) {
             vibrate(ModuleActivity.LOW_BATTERY_VIB_MODE, null);
 //            requestUserAttention();
         }
@@ -209,8 +207,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
             deviceName = boardName;
         }
     }
-
-    public boolean isBoardConnected() {return (mwController != null && mwController.isConnected());}
 
 	protected void initializeView(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
@@ -324,7 +320,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 					PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 			mBuilder.setContentIntent(startPendingIntent);
-//			mBuilder.setOngoing(true);
+			mBuilder.setOngoing(true);
 			mwService.startForeground(i, mBuilder.build());
 		} else {
 			mwService.stopForeground(true);
