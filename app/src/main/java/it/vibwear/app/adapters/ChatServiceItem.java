@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 public class ChatServiceItem extends ServiceItem {
 	public final String IMO_PACKAGE_NAME = "com.imo.android.imoim";
+	public final String SETTINGS_PACKAGE_NAME = "com.android.settings";
+	public final String VIBWEAR_PACKAGE_NAME = "it.lampwireless.vibwear.app";
 
 	public ChatServiceItem(Activity activity) {
 		super(activity);
@@ -81,7 +83,12 @@ public class ChatServiceItem extends ServiceItem {
 		if(sourcePackageName.equals(IMO_PACKAGE_NAME)) {
 			return switchPref.getState();
 		} else {
-			return super.consume(intent);
+			if(sourcePackageName.equals(SETTINGS_PACKAGE_NAME) ||
+					sourcePackageName.equals(VIBWEAR_PACKAGE_NAME)) {
+				return false;
+			} else {
+				return super.consume(intent);
+			}
 		}
 		
 	}

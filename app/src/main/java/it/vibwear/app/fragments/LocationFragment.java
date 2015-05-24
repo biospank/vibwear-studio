@@ -32,7 +32,7 @@ public class LocationFragment extends Fragment {
 //		public void onSignalRequest();
 //		public void onBatteryRequest();
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class LocationFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 VibWearActivity activity = (VibWearActivity) getActivity();
-                if(activity.isBoardConnected()) {
+                if(activity.isDeviceConnected()) {
                     FragmentManager fm = activity.getFragmentManager();
                     Fragment settingsFrag = fm.findFragmentByTag("settingsDetail");
                     if (settingsFrag == null) {
@@ -87,7 +87,22 @@ public class LocationFragment extends Fragment {
                 icSettings.setImageResource(R.drawable.ic_settings);
             }
 		}
-		
+//		else {
+//			Bundle props = getArguments();
+//
+//			if(props != null) {
+//
+//				boolean connected = props.getBoolean("connected", false);
+//
+//				if (connected) {
+//					updateConnectionImageResource(connected);
+//					updateBatteryLevelImageResource(props.getString("batteryLevel"));
+//					updateSignalImageResource(props.getInt("signalLevel"));
+//				}
+//			}
+//		}
+
+
 //		icSignal.setOnClickListener(new View.OnClickListener() {
 //			
 //			@Override

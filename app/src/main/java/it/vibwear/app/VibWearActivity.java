@@ -1,23 +1,24 @@
 package it.vibwear.app;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.fragments.CallDetailFragment;
 import it.vibwear.app.fragments.LocationFragment;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
 import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.scanner.ScannerFragment;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import com.mbientlab.metawear.api.GATT;
-import com.mbientlab.metawear.api.characteristic.DeviceInformation;
-
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,10 +28,9 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
-	private static final String VERSION = "1.3.0";
+	private static final String VERSION = "1.3.5";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
@@ -41,6 +41,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
 
+	protected ProgressDialog progress;
+
 	IntentFilter intentFilter;
 
 	private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
@@ -50,7 +52,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			
 			intent.putExtra("standBy", isStandBy());
 			
-			if(mwController != null && mwController.isConnected() && servicesFrag.consumeIntent(intent))
+			if(isDeviceConnected() && servicesFrag.consumeIntent(intent))
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
 			
 			servicesFrag.update(intent);
@@ -68,7 +70,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		initializeView(savedInstanceState);
 
-    }
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -84,7 +86,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         switch (item.getItemId()) {
  
         case R.id.menu_test:
-            if (mwController != null && mwController.isConnected())
+            if (isDeviceConnected())
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, null);
             
             break;
@@ -108,36 +110,26 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         
 	@Override
 	protected void onResume() {
-		// gestione audio
-		// startService(audioCaptureIntent);
-//		showNotificationIcon(false);
 		super.onResume();
-		startScheduledTimers();
 		registerReceiver(intentReceiver, intentFilter);
+        startScheduledTimers();
 	}
 	
 	@Override
 	public void onDestroy() {
-//		showNotificationIcon(false);
 		super.onDestroy();
-		cancelScheduledTimers();
 		unregisterReceiver(intentReceiver);
 	}
 
 	@Override
 	protected void onPause() {
-		//unregisterReceiver(intentReceiver);
-		// gestione audio
-		// stopService(audioCaptureIntent);
-//		if(!isFinishing())
-//			showNotificationIcon(true);
 		super.onPause();
-		
+		cancelScheduledTimers();
 	}
 
 	@Override
 	public void onBackPressed() {
-		if (mwController != null && mwController.isConnected()) {
+		if (isDeviceConnected()) {
 			if(getFragmentManager().getBackStackEntryCount() == 0) {
 				moveTaskToBack(true);
 				return;
@@ -148,11 +140,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	
     @Override
     public void invalidateOptionsMenu() {
-    	// TODO Auto-generated method stub
     	super.invalidateOptionsMenu();
 
-		if (mwController != null && mwController.isConnected()) {
+		if (isDeviceConnected()) {
 			locationFrag.updateConnectionImageResource(true);
+			if(progress != null) progress.dismiss();
 		} else {
 			locationFrag.updateConnectionImageResource(false);
 		}
@@ -160,7 +152,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     
 	@Override
 	public void onLocationChange() {
-		if(mwController != null && mwController.isConnected()) {
+		if(isDeviceConnected()) {
 			unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
@@ -170,6 +162,15 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
             dialog.show(fm, "scan_fragment");
 		}
 
+	}
+
+	@Override
+	public void onDeviceSelected(BluetoothDevice device, String name) {
+		super.onDeviceSelected(device, name);
+		progress = new ProgressDialog(this);
+		progress.setTitle(R.string.progressTitle);
+		progress.setMessage(getResources().getString(R.string.progressMsg));
+		progress.show();
 	}
 
 //	@Override
@@ -213,7 +214,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         SharedPreferences settings = getSharedPreferences(SettingsDetailFragment.LOW_BATTERY_PREFS_NAME,
                 Context.MODE_PRIVATE);
 
-        if(settings.getBoolean(SettingsDetailFragment.NOTIFY_ME_KEY, false)) {
+		if (settings.getBoolean(SettingsDetailFragment.NOTIFY_ME_KEY, false)) {
             vibrate(ModuleActivity.LOW_BATTERY_VIB_MODE, null);
 //            requestUserAttention();
         }
@@ -221,36 +222,36 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
     @Override
     public void onBoardNameChange(String boardName) {
-        if(mwController != null && mwController.isConnected()) {
+        if(isDeviceConnected()) {
             settingsController.setDeviceName(boardName);
             deviceName = boardName;
         }
     }
-
-    public boolean isBoardConnected() {return (mwController != null && mwController.isConnected());}
 
 	protected void initializeView(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
 			locationFrag = (LocationFragment) getFragmentManager().getFragment(savedInstanceState, "locationFragment");
 			servicesFrag = (ServicesFragment) getFragmentManager().getFragment(savedInstanceState, "servicesFragment");
 		} else {
-	//		locationFrag = (LocationFragment)getFragmentManager().findFragmentById(R.id.fragmentLocation);
 			FragmentManager fm = getFragmentManager();
 			FragmentTransaction ft = fm.beginTransaction();
 			locationFrag = new LocationFragment();
 			servicesFrag = new ServicesFragment();
-			ft.add(R.id.locationLayout, locationFrag, "locationFrag");
-			ft.add(R.id.servicesLayout, servicesFrag, "servicesFrag");
+
+//			// Intent launched by foreground notification
+//			Bundle props = getIntent().getExtras();
+//
+//			if(props != null)
+//				locationFrag.setArguments(props);
+
+			ft.add(R.id.locationLayout, locationFrag, "locationFragment");
+			ft.add(R.id.servicesLayout, servicesFrag, "servicesFragment");
 			ft.commit();
+
 		}
 		
 		powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		
-		// gestione audio
-//		chkAudio = (CheckBox) findViewById(R.id.chkAudio);
-//		audioCaptureIntent =  new Intent(this, AudioCaptureService.class);
-//        sCn = new ChatNotificationService(this);
-
 		intentFilter = new IntentFilter();
 		intentFilter.addAction(ServicesFragment.CALL_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.SMS_VIB_ACTION);
@@ -258,33 +259,36 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		intentFilter.addAction(ServicesFragment.CHAT_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
 
-//		registerReceiver(intentReceiver, intentFilter);
-		
 	}
 	
 	private void startScheduledTimers() {
-		signalTimer = new Timer();
-		batteryTimer = new Timer();
-		
-		signalTimer.scheduleAtFixedRate(new TimerTask() {
-		    @Override
-		    public void run() {
-		    	requestSignalLevel();
-	         }
-	    }, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
-		
-		batteryTimer.scheduleAtFixedRate(new TimerTask() {
-		    @Override
-		    public void run() {
-		    	requestBatteryLevel();
-	         }
-	    }, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
+		if (signalTimer == null) {
+			signalTimer = new Timer();
+			signalTimer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					requestSignalLevel();
+				}
+			}, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
+		}
+
+		if (batteryTimer == null) {
+			batteryTimer = new Timer();
+			batteryTimer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					requestBatteryLevel();
+				}
+			}, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
+		}
 		
 	}
 	
 	private void cancelScheduledTimers() {
 		batteryTimer.cancel();
 		signalTimer.cancel();
+		batteryTimer = null;
+		signalTimer = null;
 	}
 
 	public void onTimeAlarmChanged() {
@@ -301,7 +305,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
         getFragmentManager().putFragment(outState, "locationFragment", locationFrag);
         getFragmentManager().putFragment(outState, "servicesFragment", servicesFrag);
-        
+
     }
 
     private void requestUserAttention() {
@@ -309,5 +313,40 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getApplication().startActivity(intent);
     }
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if(isDeviceConnected())
+			showNotificationIcon(!hasFocus);
+	}
+
+	protected void showNotificationIcon(boolean show) {
+		Random generator = new Random();
+		int i = 9571;
+		if(show) {
+			Notification.Builder mBuilder =
+					new Notification.Builder(this)
+							.setSmallIcon(R.drawable.ic_launcher)
+							.setTicker("Vibwear app listening")
+							.setContentTitle("VibWear")
+							.setContentText("Tap to show.");
+			// Creates an explicit intent for an Activity in your app
+			Intent startIntent = new Intent(this, VibWearActivity.class);
+
+//			startIntent.putExtra("connected", true);
+//			startIntent.putExtra("batteryLevel", locationFrag.getCurrentBatteryLevel());
+//			startIntent.putExtra("signalLevel", locationFrag.getCurrentSignalLevel());
+
+			PendingIntent startPendingIntent =
+					PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			mBuilder.setContentIntent(startPendingIntent);
+			mBuilder.setOngoing(true);
+			mwService.startForeground(i, mBuilder.build());
+		} else {
+			mwService.stopForeground(true);
+		}
+	}
 
 }
