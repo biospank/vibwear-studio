@@ -174,7 +174,7 @@ public class DeviceListAdapter extends BaseAdapter {
 			final ExtendedBluetoothDevice device = (ExtendedBluetoothDevice) getItem(position);
 			final ViewHolder holder = (ViewHolder) view.getTag();
 			final String name = device.name;
-			holder.name.setText(name != null ? name : mContext.getString(R.string.not_available));
+			holder.name.setText(getBoardNameFor(name));
 			holder.address.setText(device.device.getAddress());
 			if (!device.isBonded || device.rssi != ScannerFragment.NO_RSSI) {
 				final int rssiPercent = (int) (100.0f * (127.0f + device.rssi) / (127.0f + 20.0f));
@@ -193,5 +193,21 @@ public class DeviceListAdapter extends BaseAdapter {
 		private TextView name;
 		private TextView address;
 		private ImageView rssi;
+	}
+
+	private String getBoardNameFor(String name) {
+		String actualName;
+
+		if(name != null) {
+			if (name.equalsIgnoreCase(mContext.getString(R.string.factory_device_name))) {
+				actualName = mContext.getString(R.string.default_device_name);
+			} else {
+				actualName = name;
+			}
+		} else {
+			actualName = mContext.getString(R.string.not_available);
+		}
+
+		return actualName;
 	}
 }
