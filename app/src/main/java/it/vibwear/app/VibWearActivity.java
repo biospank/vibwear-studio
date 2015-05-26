@@ -118,6 +118,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if(isFinishing())
+			showNotificationIcon(false);
 		unregisterReceiver(intentReceiver);
 	}
 
