@@ -14,10 +14,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
+
 public class ChatServiceItem extends ServiceItem {
 	public final String IMO_PACKAGE_NAME = "com.imo.android.imoim";
-	public final String SETTINGS_PACKAGE_NAME = "com.android.settings";
-	public final String VIBWEAR_PACKAGE_NAME = "it.lampwireless.vibwear.app";
+
+    protected String[] blockedPackages = {
+        "com.android.settings",
+        "com.android.systemui",
+        "it.lampwireless.vibwear.app"
+    };
 
 	public ChatServiceItem(Activity activity) {
 		super(activity);
@@ -27,20 +33,20 @@ public class ChatServiceItem extends ServiceItem {
 	public void setIconView(ImageView icon) {
 		this.iconWidget = icon;
 		this.iconWidget.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				switchPref.switchState();
-				
-				iconWidget.setImageResource(switchPref.getImage());
 
-				textWidget.setText(VibWearUtil.getChatSummarySpanText(switchPref.getLabel()));
+            @Override
+            public void onClick(View v) {
+
+                switchPref.switchState();
+
+                iconWidget.setImageResource(switchPref.getImage());
+
+                textWidget.setText(VibWearUtil.getChatSummarySpanText(switchPref.getLabel()));
 
 //				Toast.makeText(activity, formattedText, Toast.LENGTH_SHORT).show();
-				
-			}
-		});
+
+            }
+        });
 		
 		showUserIconSettings();
 	}
@@ -83,8 +89,7 @@ public class ChatServiceItem extends ServiceItem {
 		if(sourcePackageName.equals(IMO_PACKAGE_NAME)) {
 			return switchPref.getState();
 		} else {
-			if(sourcePackageName.equals(SETTINGS_PACKAGE_NAME) ||
-					sourcePackageName.equals(VIBWEAR_PACKAGE_NAME)) {
+			if(isBlockedNotification(sourcePackageName)) {
 				return false;
 			} else {
 				return super.consume(intent);
@@ -92,5 +97,15 @@ public class ChatServiceItem extends ServiceItem {
 		}
 		
 	}
+
+	private boolean isBlockedNotification(String packageName) {
+        for(String name : blockedPackages) {
+            if(name.equalsIgnoreCase(packageName))
+                return true;
+        }
+
+        return false;
+
+    }
 	
 }
