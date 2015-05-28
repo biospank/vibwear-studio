@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
@@ -30,17 +31,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
-	private static final String VERSION = "1.3.5";
+	private static final String VERSION = "1.3.9";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
+	private final int VIBWEAR_NOTIFICATION_ID = 9571;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
-
+	private Notification.Builder mBuilder;
 	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
@@ -52,8 +54,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			
 			intent.putExtra("standBy", isStandBy());
 			
-			if(isDeviceConnected() && servicesFrag.consumeIntent(intent))
+			if(isDeviceConnected() && servicesFrag.consumeIntent(intent)) {
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
+				updateNotificationTextWith(intent);
+			}
 			
 			servicesFrag.update(intent);
 
@@ -118,6 +122,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if(isFinishing())
+			showNotificationIcon(false);
 		unregisterReceiver(intentReceiver);
 	}
 
@@ -251,7 +257,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 		
 		powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		
+		mBuilder = new Notification.Builder(this);
+
 		intentFilter = new IntentFilter();
 		intentFilter.addAction(ServicesFragment.CALL_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.SMS_VIB_ACTION);
@@ -323,14 +330,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	protected void showNotificationIcon(boolean show) {
 		Random generator = new Random();
-		int i = 9571;
 		if(show) {
-			Notification.Builder mBuilder =
-					new Notification.Builder(this)
-							.setSmallIcon(R.drawable.ic_launcher)
-							.setTicker("Vibwear app listening")
-							.setContentTitle("VibWear")
-							.setContentText("Tap to show.");
+			mBuilder.setSmallIcon(R.drawable.ic_launcher)
+					.setTicker("Vibwear app listening")
+					.setContentTitle("VibWear")
+					.setContentText("Tap to show.");
 			// Creates an explicit intent for an Activity in your app
 			Intent startIntent = new Intent(this, VibWearActivity.class);
 
@@ -343,10 +347,25 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 			mBuilder.setContentIntent(startPendingIntent);
 			mBuilder.setOngoing(true);
-			mwService.startForeground(i, mBuilder.build());
+			mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 		} else {
 			mwService.stopForeground(true);
 		}
 	}
+
+	protected void updateNotificationTextWith(Intent intent) {
+		Bundle extraInfo = intent.getExtras();
+
+		String sourcePackageName = extraInfo.getString("sourcePackageName");
+
+		mBuilder.setContentText(sourcePackageName + " alert");
+		mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+
+//		NotificationManager notificationManager =
+//				(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//
+//		notificationManager.notify(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+	}
+
 
 }
