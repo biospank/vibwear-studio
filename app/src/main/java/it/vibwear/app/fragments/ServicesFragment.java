@@ -31,19 +31,62 @@ public class ServicesFragment extends ListFragment {
 	protected SosServiceItem sosService;
     protected AudioServiceItem audioService;
 
-	@Override
+    public AudioServiceItem getAudioService() {
+        if(audioService != null)
+            return audioService;
+        else
+            return new AudioServiceItem(getActivity());
+    }
+
+    public CallServiceItem getCallService() {
+        if(callService != null)
+            return callService;
+        else
+            return new CallServiceItem(getActivity());
+
+    }
+
+    public SmsServiceItem getSmsService() {
+        if(smsService != null)
+            return smsService;
+        else
+            return new SmsServiceItem(getActivity());
+    }
+
+    public ChatServiceItem getChatService() {
+        if(chatService != null)
+            return chatService;
+        else
+            return new ChatServiceItem(getActivity());
+    }
+
+    public AlarmServiceItem getAlarmService() {
+        if(alarmService != null)
+            return alarmService;
+        else
+            return new AlarmServiceItem(getActivity());
+    }
+
+    public SosServiceItem getSosService() {
+        if(sosService != null)
+            return sosService;
+        else
+            return new SosServiceItem(getActivity());
+    }
+
+    @Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
 		ArrayList<ServiceItem> services = new ArrayList<ServiceItem>();
 		Activity activity = getActivity();
 		
-		callService = new CallServiceItem(activity);
-		smsService = new SmsServiceItem(activity);
-		chatService = new ChatServiceItem(activity);
-		sosService = new SosServiceItem(activity);
-		alarmService = new AlarmServiceItem(activity);
-        audioService = new AudioServiceItem(activity);
+		callService = getCallService();
+		smsService = getSmsService();
+		chatService = getChatService();
+		sosService = getSosService();
+		alarmService = getAlarmService();
+        audioService = getAudioService();
 
 		services.add(callService);
 		services.add(smsService);
@@ -78,27 +121,27 @@ public class ServicesFragment extends ListFragment {
 		
 		switch (intent.getAction()) {
 		case CALL_VIB_ACTION:
-			result = callService.consume(intent);
+			result = getCallService().consume(intent);
 			break;
 
 		case SMS_VIB_ACTION:
-			result = smsService.consume(intent);
+			result = getSmsService().consume(intent);
 			break;
 				
 		case CHAT_VIB_ACTION:
-			result = chatService.consume(intent);
+			result = getChatService().consume(intent);
 			break;
 				
 		case ALARM_VIB_ACTION:
-			result = alarmService.consume(intent);
+			result = getAlarmService().consume(intent);
 			break;
 
         case SOS_VIB_ACTION:
-            result = sosService.consume(intent);
+            result = getSosService().consume(intent);
             break;
 
         case AUDIO_VIB_ACTION:
-            result = audioService.consume(intent);
+            result = getAudioService().consume(intent);
             break;
 
         }
@@ -109,27 +152,27 @@ public class ServicesFragment extends ListFragment {
 	public void update(Intent intent) {
 		switch (intent.getAction()) {
 		case CALL_VIB_ACTION:
-			callService.update();
+            getCallService().update();
 			break;
 
 		case SMS_VIB_ACTION:
-			smsService.update();
+            getSmsService().update();
 			break;
 				
 		case CHAT_VIB_ACTION:
-			chatService.update();
+            getChatService().update();
 			break;
 				
 		case ALARM_VIB_ACTION:
-			alarmService.update();
+			getAlarmService().update();
 			break;
 
 		case SOS_VIB_ACTION:
-			sosService.update();
+            getAlarmService().update();
 			break;
 
         case AUDIO_VIB_ACTION:
-            audioService.update();
+            getAudioService().update();
             break;
 
 		}
@@ -137,11 +180,12 @@ public class ServicesFragment extends ListFragment {
 	}
 
 	public void refresh() {
-		callService.refresh();
-		smsService.refresh();
-		alarmService.refresh();
-		sosService.refresh();
-        audioService.refresh();
+        getCallService().refresh();
+        getSmsService().refresh();
+        getChatService().refresh();
+        getAlarmService().refresh();
+		getSosService().refresh();
+        getAudioService().refresh();
 	}
 
 }
