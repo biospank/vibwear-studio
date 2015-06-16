@@ -5,6 +5,7 @@ import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.adapters.Contact;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.scanner.ScannerFragment.OnDeviceSelectedListener;
+import it.vibwear.app.services.BoundMwService;
 import it.vibwear.app.utils.AlarmPreference;
 import it.vibwear.app.utils.AudioPreference;
 import it.vibwear.app.utils.CallPreference;
@@ -42,7 +43,7 @@ import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 
-public class ModuleActivity extends Activity implements ServiceConnection, OnDeviceSelectedListener {
+public class ModuleActivity extends Activity implements OnDeviceSelectedListener {
     public static final String EXTRA_BLE_DEVICE = 
             "it.lampwireless.vibwear.app.ModuleActivity.EXTRA_BLE_DEVICE";
     protected static final String ARG_ITEM_ID = "item_id";
@@ -67,12 +68,15 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     protected Settings settingsController;
     protected String firmwareVersion;
     protected String deviceName;
+    protected boolean isMwServiceBound = false;
 
     
     private DeviceCallbacks dCallback= new MetaWearController.DeviceCallbacks() {
     	
         @Override
         public void connected() {
+            super.connected();
+
             if (isDeviceConnected()) {
                 mwController.readDeviceInformation();
                 settingsController.readDeviceName();
@@ -86,6 +90,8 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 
         @Override
         public void disconnected() {
+            super.disconnected();
+
             if (device != null && mwController != null) {
 //                mwController.setRetainState(true);
                 mwController.reconnect(false);
@@ -191,10 +197,9 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
             final Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
-        
-        getApplicationContext().bindService(new Intent(this, MetaWearBleService.class),
-                this, Context.BIND_AUTO_CREATE);
-        
+
+        bindMetaWearService();
+
         if (savedInstanceState != null) {
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
         }
@@ -218,34 +223,33 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /* (non-Javadoc)
-     * @see android.content.ServiceConnection#onServiceConnected(android.content.ComponentName, android.os.IBinder)
-     */
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        mwService = ((MetaWearBleService.LocalBinder) service).getService();
-        broadcastManager = LocalBroadcastManager.getInstance(mwService);
-        broadcastManager.registerReceiver(MetaWearBleService.getMetaWearBroadcastReceiver(),
-                MetaWearBleService.getMetaWearIntentFilter());
-        mwService.useLocalBroadcastManager(broadcastManager);
+    private ServiceConnection metaWearServiceConnection = new ServiceConnection() {
 
-        if (device != null) {
-        	initializeAndConnect();
-            if (isDeviceConnected()) {
-                mwController.readDeviceInformation();
-                settingsController.readDeviceName();
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mwService = ((MetaWearBleService.LocalBinder) service).getService();
+            broadcastManager = LocalBroadcastManager.getInstance(mwService);
+            broadcastManager.registerReceiver(MetaWearBleService.getMetaWearBroadcastReceiver(),
+                    MetaWearBleService.getMetaWearIntentFilter());
+            mwService.useLocalBroadcastManager(broadcastManager);
+
+            if (device != null) {
+                initializeAndConnect();
+                if (isDeviceConnected()) {
+                    mwController.readDeviceInformation();
+                    settingsController.readDeviceName();
+                }
             }
         }
-    }
-    
-    /* (non-Javadoc)
-     * @see android.content.ServiceConnection#onServiceDisconnected(android.content.ComponentName)
-     */
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-    	invalidateOptionsMenu();
-    }
-    
+
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            invalidateOptionsMenu();
+        }
+
+    };
+
     /* (non-Javadoc)
      * @see no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment.OnDeviceSelectedListener#onDeviceSelected(android.bluetooth.BluetoothDevice, java.lang.String)
      */
@@ -359,6 +363,8 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         if (broadcastManager != null) {
             broadcastManager.unregisterReceiver(MetaWearBleService.getMetaWearBroadcastReceiver());
         }
+
+        unbindMetaWearService();
 //        getApplicationContext().unbindService(this);
 //        mwController.removeDeviceCallback(dCallback);
 //        mwController.removeModuleCallback(mCallback);
@@ -394,6 +400,27 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
 
     public boolean isDeviceConnected() {
         return (mwController != null && mwController.isConnected());
+    }
+
+    private void bindMetaWearService() {
+        Intent intent = new Intent(this, BoundMwService.class);
+
+        startService(intent);
+
+        getApplicationContext().bindService(intent,
+                metaWearServiceConnection, Context.BIND_AUTO_CREATE);
+
+        isMwServiceBound = true;
+
+    }
+
+    private void unbindMetaWearService() {
+        try {
+            if(isMwServiceBound) {
+                unbindService(metaWearServiceConnection);
+                isMwServiceBound = false;
+            }
+        } catch(IllegalArgumentException iae) {}
     }
     
 }
