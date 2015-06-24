@@ -162,6 +162,9 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
+            if(bleScanner != null)
+                bleScanner.setKeepScanning(false);
+
             final FragmentManager fm = getFragmentManager();
             final ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this, 
                     new UUID[] {GATT.GATTService.METAWEAR.uuid()}, true);

@@ -7,6 +7,7 @@ import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.scanner.ScannerFragment.OnDeviceSelectedListener;
 import it.vibwear.app.utils.AlarmPreference;
 import it.vibwear.app.utils.AudioPreference;
+import it.vibwear.app.utils.BleScanner;
 import it.vibwear.app.utils.CallPreference;
 import it.vibwear.app.utils.ChatPreference;
 import it.vibwear.app.utils.DefaultPreference;
@@ -67,6 +68,7 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     protected Settings settingsController;
     protected String firmwareVersion;
     protected String deviceName;
+    protected BleScanner bleScanner;
 
     
     private DeviceCallbacks dCallback= new MetaWearController.DeviceCallbacks() {
@@ -88,9 +90,9 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
         public void disconnected() {
             if (device != null && mwController != null) {
 //                mwController.setRetainState(true);
-                mwController.reconnect(false);
+                tryReconnect();
             } else {
-            	switchController.disableNotification();
+                switchController.disableNotification();
             }
             invalidateOptionsMenu();
         }
@@ -178,6 +180,17 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
                 requestBatteryLevel();
             }
         }, 500);
+
+    }
+
+    protected void tryReconnect() {
+        Thread background = new Thread(new Runnable() {
+            public void run() {
+                scanAndConnect();
+            }
+        });
+
+        background.start();
 
     }
 
@@ -350,6 +363,29 @@ public class ModuleActivity extends Activity implements ServiceConnection, OnDev
     		mwController.readBatteryLevel();
 		}
 	}
+
+    protected void scanAndConnect() {
+        if(bleScanner == null)
+            bleScanner = new BleScanner(getApplicationContext(), device);
+
+        bleScanner.setKeepScanning(true);
+        bleScanner.setDeviceFound(false);
+
+        while (bleScanner.keepScanning()) {
+            bleScanner.startScan();
+            try {
+                Thread.sleep(bleScanner.SCAN_DURATION);
+                bleScanner.stopScan();
+            } catch (InterruptedException e) {e.printStackTrace();}
+
+            if(bleScanner.deviceFound()) {
+                mwController.reconnect(false);
+                break;
+            }
+        }
+
+
+    }
 
     public String getDeviceName() { return deviceName; }
 
