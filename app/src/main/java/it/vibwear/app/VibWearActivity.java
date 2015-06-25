@@ -164,7 +164,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		} else {
             if(bleScanner != null && bleScanner.keepScanning()) {
                 bleScanner.setKeepScanning(false);
-                unbindDevice();
+                if(mwController != null)
+                    unbindDevice();
             }
 
             final FragmentManager fm = getFragmentManager();
@@ -363,7 +364,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		String sourcePackageName = extraInfo.getString("sourcePackageName");
 
-		mBuilder.setContentText(sourcePackageName + " alert");
+		mBuilder.setContentText(sourcePackageName);
+        mBuilder.setOngoing(true);
 		mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 
 //		NotificationManager notificationManager =

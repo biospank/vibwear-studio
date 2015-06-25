@@ -77,8 +77,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     	
         @Override
         public void connected() {
-            super.connected();
-
             if (isDeviceConnected()) {
                 mwController.readDeviceInformation();
                 settingsController.readDeviceName();
@@ -92,8 +90,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         @Override
         public void disconnected() {
-            super.disconnected();
-
             if (device != null && mwController != null) {
 //                mwController.setRetainState(true);
                 tryReconnect();
@@ -400,7 +396,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             broadcastManager.unregisterReceiver(MetaWearBleService.getMetaWearBroadcastReceiver());
         }
 
-        unbindMetaWearService();
+        //unbindMetaWearService();
 //        getApplicationContext().unbindService(this);
 //        mwController.removeDeviceCallback(dCallback);
 //        mwController.removeModuleCallback(mCallback);
@@ -453,7 +449,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     private void unbindMetaWearService() {
         try {
             if(isMwServiceBound) {
-                unbindService(metaWearServiceConnection);
+                getApplicationContext().unbindService(metaWearServiceConnection);
                 isMwServiceBound = false;
             }
         } catch(IllegalArgumentException iae) {}
