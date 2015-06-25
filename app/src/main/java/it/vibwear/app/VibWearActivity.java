@@ -162,8 +162,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
-            if(bleScanner != null)
+            if(bleScanner != null && bleScanner.keepScanning()) {
                 bleScanner.setKeepScanning(false);
+                unbindDevice();
+            }
 
             final FragmentManager fm = getFragmentManager();
             final ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this, 
