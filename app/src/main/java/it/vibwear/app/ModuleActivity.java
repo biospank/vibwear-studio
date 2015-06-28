@@ -71,6 +71,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     protected String deviceName;
     protected BleScanner bleScanner;
     protected boolean isMwServiceBound = false;
+    private Thread bgtReconnect;
 
     
     private DeviceCallbacks dCallback= new MetaWearController.DeviceCallbacks() {
@@ -186,14 +187,13 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     }
 
     protected void tryReconnect() {
-        Thread background = new Thread(new Runnable() {
+        bgtReconnect = new Thread(new Runnable() {
             public void run() {
                 scanAndConnect();
             }
         });
 
-        background.start();
-
+        bgtReconnect.start();
     }
 
     @Override
@@ -213,7 +213,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
         }
     }
-    
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
@@ -366,21 +366,22 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
     protected void scanAndConnect() {
         if(bleScanner == null)
-            bleScanner = new BleScanner(getApplicationContext(), device);
+            bleScanner = new BleScanner(this, device);
 
         bleScanner.setKeepScanning(true);
         bleScanner.setDeviceFound(false);
 
         while (bleScanner.keepScanning()) {
-            bleScanner.startScan();
             try {
+                Thread.sleep(bleScanner.SCAN_RETRY_DELAY);
+                bleScanner.startScan();
                 Thread.sleep(bleScanner.SCAN_DURATION);
                 bleScanner.stopScan();
-            } catch (InterruptedException e) {e.printStackTrace();}
+            } catch (InterruptedException e) {}
 
             if(bleScanner.deviceFound()) {
+                bleScanner.setKeepScanning(false);
                 mwController.reconnect(false);
-                break;
             }
         }
 

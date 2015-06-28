@@ -140,7 +140,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 				moveTaskToBack(true);
 				return;
 			}
-		}
+		} else {
+            if(bleScanner != null && bleScanner.keepScanning()) {
+                moveTaskToBack(true);
+                return;
+            }
+        }
 		super.onBackPressed();
 	}
 	

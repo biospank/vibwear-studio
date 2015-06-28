@@ -14,7 +14,8 @@ import com.mbientlab.metawear.api.MetaWearController;
 public class BleScanner {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mIsCustomUUID;
-    public final long SCAN_DURATION = 5000;
+    public final long SCAN_RETRY_DELAY = 2000;
+    public final long SCAN_DURATION = 500;
     private final short RSSI_MIN_THRESHOLD = 20;
     private BluetoothDevice mDevice;
     private static boolean found;
@@ -54,6 +55,8 @@ public class BleScanner {
             if(device.getAddress().equals(mDevice.getAddress())) {
                 if(rssiPercent > RSSI_MIN_THRESHOLD) {
                     setDeviceFound(true);
+                } else {
+                    setDeviceFound(false);
                 }
             }
         }
