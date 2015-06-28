@@ -141,7 +141,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 				return;
 			}
 		} else {
-            if(bleScanner != null && bleScanner.keepScanning()) {
+            if(reconnectTaskFragment != null && reconnectTaskFragment.isRunning()) {
                 moveTaskToBack(true);
                 return;
             }
@@ -167,8 +167,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
-            if(bleScanner != null && bleScanner.keepScanning()) {
-                bleScanner.setKeepScanning(false);
+            if(reconnectTaskFragment != null && reconnectTaskFragment.isRunning()) {
+                reconnectTaskFragment.stopAsyncTask();
                 if(mwController != null)
                     unbindDevice();
             }
@@ -303,8 +303,15 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	}
 	
 	private void cancelScheduledTimers() {
-		batteryTimer.cancel();
-		signalTimer.cancel();
+
+        if (batteryTimer == null) {
+            batteryTimer.cancel();
+        }
+
+        if (signalTimer == null) {
+            signalTimer.cancel();
+        }
+
 		batteryTimer = null;
 		signalTimer = null;
 	}

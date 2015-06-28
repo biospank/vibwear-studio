@@ -32,15 +32,7 @@ public class BleScanner {
      * using class ScannerServiceParser
      */
     public void startScan() {
-
-        //mIsCustomUUID = true; // Samsung Note II with Android 4.3 build JSS15J.N7100XXUEMK9 is not filtering by UUID at all. We have to disable it
-
-//        if (mIsCustomUUID) {
-            mBluetoothAdapter.startLeScan(mLEScanCallback);
-//        } else {
-//            mBluetoothAdapter.startLeScan(mUuid, mLEScanCallback);
-//        }
-
+        mBluetoothAdapter.startLeScan(mLEScanCallback);
     }
 
     public void stopScan() {

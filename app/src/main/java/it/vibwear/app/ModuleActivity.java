@@ -3,6 +3,7 @@ package it.vibwear.app;
 import java.util.List;
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.adapters.Contact;
+import it.vibwear.app.fragments.ReconnectTaskFragment;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.scanner.ScannerFragment.OnDeviceSelectedListener;
 import it.vibwear.app.services.BoundMwService;
@@ -29,6 +30,7 @@ import com.mbientlab.metawear.api.controller.MechanicalSwitch;
 import com.mbientlab.metawear.api.controller.Settings;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -58,6 +60,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     private static final Short LOW_SIGNAL_VIBRATION_TIME = 3;
     private static final Short LOW_SIGNAL_VIBRATION_LENGHT = 300;
     private static final Short LOW_SIGNAL_VIBRATION_GAP = 500;
+    private static final String TAG_TASK_FRAGMENT = "reconnect_task_fragment";
 
     //private final BroadcastReceiver metaWearUpdateReceiver= MetaWearBleService.getMetaWearBroadcastReceiver();
     private LocalBroadcastManager broadcastManager= null;
@@ -69,9 +72,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     protected Settings settingsController;
     protected String firmwareVersion;
     protected String deviceName;
-    protected BleScanner bleScanner;
     protected boolean isMwServiceBound = false;
-    private Thread bgtReconnect;
+    protected ReconnectTaskFragment reconnectTaskFragment;
 
     
     private DeviceCallbacks dCallback= new MetaWearController.DeviceCallbacks() {
@@ -187,13 +189,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     }
 
     protected void tryReconnect() {
-        bgtReconnect = new Thread(new Runnable() {
-            public void run() {
-                scanAndConnect();
-            }
-        });
-
-        bgtReconnect.start();
+        if(reconnectTaskFragment != null && !reconnectTaskFragment.isRunning())
+            reconnectTaskFragment.startNewAsyncTask(device);
     }
 
     @Override
@@ -211,6 +208,16 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         if (savedInstanceState != null) {
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
+        }
+
+        FragmentManager fm = getFragmentManager();
+        reconnectTaskFragment = (ReconnectTaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (reconnectTaskFragment == null) {
+            reconnectTaskFragment = new ReconnectTaskFragment();
+            fm.beginTransaction().add(reconnectTaskFragment, TAG_TASK_FRAGMENT).commit();
         }
     }
 
@@ -364,30 +371,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 		}
 	}
 
-    protected void scanAndConnect() {
-        if(bleScanner == null)
-            bleScanner = new BleScanner(this, device);
-
-        bleScanner.setKeepScanning(true);
-        bleScanner.setDeviceFound(false);
-
-        while (bleScanner.keepScanning()) {
-            try {
-                Thread.sleep(bleScanner.SCAN_RETRY_DELAY);
-                bleScanner.startScan();
-                Thread.sleep(bleScanner.SCAN_DURATION);
-                bleScanner.stopScan();
-            } catch (InterruptedException e) {}
-
-            if(bleScanner.deviceFound()) {
-                bleScanner.setKeepScanning(false);
-                mwController.reconnect(false);
-            }
-        }
-
-
-    }
-
     public String getDeviceName() { return deviceName; }
 
     @Override
@@ -455,5 +438,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             }
         } catch(IllegalArgumentException iae) {}
     }
-    
+
+    public MetaWearController getMwController() {
+        return mwController;
+    }
 }

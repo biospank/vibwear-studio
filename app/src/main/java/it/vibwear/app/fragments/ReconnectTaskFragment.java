@@ -1,23 +1,23 @@
 package it.vibwear.app.fragments;
 
-/**
- * Created by biospank on 03/05/15.
- */
-
 import android.app.Activity;
 import android.app.Fragment;
+import android.bluetooth.BluetoothDevice;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import it.vibwear.app.audio.AudioClipLoudNoiseTask;
-import it.vibwear.app.audio.LoudNoiseDetector;
-import it.vibwear.app.utils.AudioPreference;
+import it.vibwear.app.ModuleActivity;
+import it.vibwear.app.utils.BleScanner;
+import it.vibwear.app.utils.ReconnectTask;
 
 /**
- * This Fragment manages a single background task and retains
- * itself across configuration changes.
+ * Created by biospank on 28/06/15.
  */
-public class TaskFragment extends Fragment {
+public class ReconnectTaskFragment extends Fragment {
+
+    // private TaskCallbacks mCallbacks;
+    private ReconnectTask mTask;
+    private ModuleActivity mActivity;
 
     /**
      * Callback interface through which the fragment will report the
@@ -30,10 +30,6 @@ public class TaskFragment extends Fragment {
         void onPostExecute();
     }
 
-    // private TaskCallbacks mCallbacks;
-    private AudioClipLoudNoiseTask mTask;
-    private Activity mActivity;
-
     /**
      * Hold a reference to the parent Activity so we can report the
      * task's current progress and results. The Android framework
@@ -43,7 +39,7 @@ public class TaskFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.mActivity =  activity;
+        this.mActivity =  (ModuleActivity)activity;
     }
 
     /**
@@ -69,10 +65,10 @@ public class TaskFragment extends Fragment {
         //mCallbacks = null;
     }
 
-    public void startNewAsyncTask() {
+    public void startNewAsyncTask(BluetoothDevice device) {
         // Create and execute the background task.
-        mTask = new AudioClipLoudNoiseTask(mActivity, "AudioClipLoudNoiseTask");
-        mTask.execute(new LoudNoiseDetector(new AudioPreference(mActivity)));
+        mTask = new ReconnectTask(mActivity.getMwController());
+        mTask.execute(new BleScanner(mActivity, device));
     }
 
     public void stopAsyncTask() {
@@ -82,6 +78,11 @@ public class TaskFragment extends Fragment {
         }
     }
 
+    public boolean isRunning() {
+        return ((mTask != null) &&
+                (mTask.getStatus() == AsyncTask.Status.RUNNING ||
+                        mTask.getStatus() == AsyncTask.Status.PENDING));
+    }
 
 
 }
