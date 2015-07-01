@@ -304,11 +304,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	
 	private void cancelScheduledTimers() {
 
-        if (batteryTimer == null) {
+        if (batteryTimer != null) {
             batteryTimer.cancel();
         }
 
-        if (signalTimer == null) {
+        if (signalTimer != null) {
             signalTimer.cancel();
         }
 
