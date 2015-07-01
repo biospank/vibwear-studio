@@ -22,7 +22,8 @@ public class ChatServiceItem extends ServiceItem {
     protected String[] blockedPackages = {
         "com.android.settings",
         "com.android.systemui",
-        "it.lampwireless.vibwear.app"
+        "it.lampwireless.vibwear.app",
+        "com.avast.android.mobilesecurity"
     };
 
 	public ChatServiceItem(Activity activity) {
