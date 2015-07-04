@@ -84,6 +84,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
                 mwController.readDeviceInformation();
                 settingsController.readDeviceName();
                 switchController.enableNotification();
+                reconnectTaskFragment.dismissDialog();
             }
 
             invalidateOptionsMenu();
@@ -210,6 +211,11 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
         }
 
+        attachReconnectTask();
+
+    }
+
+    protected void attachReconnectTask() {
         FragmentManager fm = getFragmentManager();
         reconnectTaskFragment = (ReconnectTaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
 
@@ -218,7 +224,11 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         if (reconnectTaskFragment == null) {
             reconnectTaskFragment = new ReconnectTaskFragment();
             fm.beginTransaction().add(reconnectTaskFragment, TAG_TASK_FRAGMENT).commit();
+        } else {
+            if(reconnectTaskFragment.isRunning())
+                reconnectTaskFragment.showDialog();
         }
+
     }
 
     @Override
@@ -405,7 +415,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         }
     }
     
-    protected void unbindDevice() {
+    public void unbindDevice() {
 //        getApplicationContext().unbindService(this);
     	switchController.disableNotification();
     	device = null;

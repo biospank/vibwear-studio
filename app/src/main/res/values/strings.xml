@@ -80,6 +80,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="tapAlarmDesc">Tap to set alarm</string>
     <string name="progressTitle">Device connection</string>
     <string name="progressMsg">please wait...</string>
+    <string name="reconnectProgressTitle">Connection lost</string>
+    <string name="reconnectProgressMsg">trying to reconnect...</string>
 
     <string name="pick_contact_label">Browse</string>
    	<string name="label_sos_msg">S.O.S. message</string>

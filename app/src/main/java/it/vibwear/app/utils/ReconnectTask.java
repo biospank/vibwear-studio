@@ -1,5 +1,7 @@
 package it.vibwear.app.utils;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -8,7 +10,7 @@ import com.mbientlab.metawear.api.MetaWearController;
 /**
  * Created by biospank on 28/06/15.
  */
-public class ReconnectTask extends AsyncTask<BleScanner, Void, Boolean> {
+public class ReconnectTask extends AsyncTask<BleScanner, Boolean, Boolean> {
 
     private MetaWearController mwController;
     private BleScanner bleScanner;
@@ -33,7 +35,7 @@ public class ReconnectTask extends AsyncTask<BleScanner, Void, Boolean> {
                 bleScanner.stopScan();
             } catch (InterruptedException e) {}
 
-            if(bleScanner.deviceFound()) {
+            if(bleScanner.deviceFound() || isCancelled()) {
                 bleScanner.setKeepScanning(false);
             }
         }
@@ -58,4 +60,5 @@ public class ReconnectTask extends AsyncTask<BleScanner, Void, Boolean> {
         super.onCancelled();
 
     }
+
 }
