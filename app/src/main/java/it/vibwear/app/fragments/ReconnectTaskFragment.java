@@ -22,16 +22,14 @@ public class ReconnectTaskFragment extends Fragment {
     private ReconnectTask mTask;
     private ModuleActivity mActivity;
     private ProgressDialog mProgressDialog;
+    private OnReconnectTaskCallbacks mCallbacks;
 
     /**
      * Callback interface through which the fragment will report the
      * task's progress and results back to the Activity.
      */
-    interface TaskCallbacks {
-        void onPreExecute();
-        void onProgressUpdate(int percent);
-        void onCancelled();
-        void onPostExecute();
+    public interface OnReconnectTaskCallbacks {
+        void onReconnectCancelled();
     }
 
     /**
@@ -44,6 +42,7 @@ public class ReconnectTaskFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.mActivity =  (ModuleActivity)activity;
+        this.mCallbacks = (OnReconnectTaskCallbacks)activity;
     }
 
     /**
@@ -66,7 +65,8 @@ public class ReconnectTaskFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        //mCallbacks = null;
+        dismissDialog();
+        mCallbacks = null;
     }
 
     public void startNewAsyncTask(BluetoothDevice device) {
@@ -95,16 +95,14 @@ public class ReconnectTaskFragment extends Fragment {
         mProgressDialog.setTitle(R.string.reconnectProgressTitle);
         mProgressDialog.setMessage(getResources().getString(R.string.reconnectProgressMsg));
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setCancelable(false); // set to true and enable the following to make it cancelable
-//        mProgressDialog.setCanceledOnTouchOutside(false);
-//        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//            @Override
-//            public void onCancel(DialogInterface dialog) {
-//                stopAsyncTask();
-//                if(mActivity.getMwController() != null)
-//                    mActivity.unbindDevice();
-//            }
-//        });
+        mProgressDialog.setCancelable(true);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                mCallbacks.onReconnectCancelled();
+            }
+        });
         mProgressDialog.show();
     }
 

@@ -46,7 +46,7 @@ import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 
-public class ModuleActivity extends Activity implements OnDeviceSelectedListener {
+public class ModuleActivity extends Activity implements OnDeviceSelectedListener, ReconnectTaskFragment.OnReconnectTaskCallbacks {
     public static final String EXTRA_BLE_DEVICE = 
             "it.lampwireless.vibwear.app.ModuleActivity.EXTRA_BLE_DEVICE";
     protected static final String ARG_ITEM_ID = "item_id";
@@ -451,5 +451,11 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
     public MetaWearController getMwController() {
         return mwController;
+    }
+
+    @Override
+    public void onReconnectCancelled() {
+        reconnectTaskFragment.stopAsyncTask();
+        unbindDevice();
     }
 }
