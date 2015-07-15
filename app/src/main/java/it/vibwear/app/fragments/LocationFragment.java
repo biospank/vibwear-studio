@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 public class LocationFragment extends Fragment {
@@ -24,6 +26,10 @@ public class LocationFragment extends Fragment {
 	private String batteryLevel = null;
 	private int signalLevel = -1;
 	private boolean connected = false;
+
+    public static final int DEVICE_STATE_CONNECTED = 1;
+    public static final int DEVICE_STATE_DISCONNECTED = 2;
+    public static final int DEVICE_STATE_RECONNECTING = 3;
 
 	public interface OnLocationChangeListener {
 		public void onLocationChange();
@@ -77,13 +83,14 @@ public class LocationFragment extends Fragment {
 
         if(savedInstanceState != null) {
 			boolean connected = savedInstanceState.getBoolean("connected");
-			updateConnectionImageResource(connected);
 
 			if(connected) {
+                updateConnectionImageResource(DEVICE_STATE_CONNECTED);
 				updateBatteryLevelImageResource(savedInstanceState.getString("batteryLevel"));
 				updateSignalImageResource(savedInstanceState.getInt("signalLevel"));
                 icSettings.setImageResource(R.drawable.ic_settings_active);
 			} else {
+                updateConnectionImageResource(DEVICE_STATE_DISCONNECTED);
                 icSettings.setImageResource(R.drawable.ic_settings);
             }
 		}
@@ -136,24 +143,45 @@ public class LocationFragment extends Fragment {
         }
 	}
 
-	public void updateConnectionImageResource(boolean connected) {
-		this.connected = connected;
+	public void updateConnectionImageResource(int status) {
+        switch (status) {
+            case DEVICE_STATE_CONNECTED:
+                this.connected = true;
+                icLocation.clearAnimation();
+                icLocation.setImageResource(R.drawable.ic_connection_on);
+                icSettings.setImageResource(R.drawable.ic_settings_active);
+                if(isAdded())
+                    layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOn));
+
+                break;
+            case DEVICE_STATE_DISCONNECTED:
+                this.connected = false;
+                icLocation.clearAnimation();
+                icLocation.setImageResource(R.drawable.ic_connection);
+                icSettings.setImageResource(R.drawable.ic_settings);
+                icSignal.setImageResource(R.drawable.ic_signal);
+                icBattery.setImageResource(R.drawable.ic_battery);
+                if(isAdded())
+                    layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOff));
+
+                break;
+            case DEVICE_STATE_RECONNECTING:
+                this.connected = false;
+                Animation rotation = AnimationUtils.loadAnimation(getActivity(),
+                        R.anim.reconnect_refresh);
+                rotation.setRepeatCount(Animation.INFINITE);
+                icLocation.setImageResource(R.drawable.ic_reconnect);
+                icLocation.startAnimation(rotation);
+                icSettings.setImageResource(R.drawable.ic_settings);
+                icSignal.setImageResource(R.drawable.ic_signal);
+                icBattery.setImageResource(R.drawable.ic_battery);
+                if(isAdded())
+                    layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOff));
+
+        }
 		
-		if(connected) {
-			icLocation.setImageResource(R.drawable.ic_connection_on);
-            icSettings.setImageResource(R.drawable.ic_settings_active);
-            if(isAdded())
-                layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOn));
-		} else {
-			icLocation.setImageResource(R.drawable.ic_connection);
-            icSettings.setImageResource(R.drawable.ic_settings);
-			icSignal.setImageResource(R.drawable.ic_signal);
-			icBattery.setImageResource(R.drawable.ic_battery);
-            if(isAdded())
-                layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOff));
-		}
 	}
-	
+
 	public void updateSignalImageResource(int rssiPercent) {
 		this.signalLevel = rssiPercent;
 		

@@ -2,6 +2,7 @@ package it.vibwear.app;
 
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.fragments.LocationFragment;
+import it.vibwear.app.fragments.ReconnectTaskFragment;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
@@ -30,12 +31,14 @@ import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
+public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener,
+        SettingsDetailFragment.OnSettingsChangeListener, AlarmListner, ReconnectTaskFragment.OnReconnectTaskCallbacks {
 	private static final String VERSION = "1.5.1";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
+    private static final String TAG_TASK_FRAGMENT = "reconnect_task_fragment";
 	private final int VIBWEAR_NOTIFICATION_ID = 9571;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
@@ -74,9 +77,27 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		initializeView(savedInstanceState);
 
+        attachReconnectTask();
+
 	}
 
-	@Override
+    protected void attachReconnectTask() {
+        FragmentManager fm = getFragmentManager();
+        reconnectTaskFragment = (ReconnectTaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (reconnectTaskFragment == null) {
+            reconnectTaskFragment = new ReconnectTaskFragment();
+            fm.beginTransaction().add(reconnectTaskFragment, TAG_TASK_FRAGMENT).commit();
+        } else {
+            //if(reconnectTaskFragment.isRunning())
+                //locationFrag.updateConnectionImageResource(LocationFragment.DEVICE_STATE_RECONNECTING);
+        }
+
+    }
+
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -154,10 +175,13 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     	super.invalidateOptionsMenu();
 
 		if (isDeviceConnected()) {
-			locationFrag.updateConnectionImageResource(true);
+			locationFrag.updateConnectionImageResource(LocationFragment.DEVICE_STATE_CONNECTED);
 			if(progress != null) progress.dismiss();
 		} else {
-			locationFrag.updateConnectionImageResource(false);
+            if(reconnectTaskFragment != null && reconnectTaskFragment.isRunning())
+                locationFrag.updateConnectionImageResource(LocationFragment.DEVICE_STATE_RECONNECTING);
+            else
+                locationFrag.updateConnectionImageResource(LocationFragment.DEVICE_STATE_DISCONNECTED);
 		}
     }
     
@@ -165,10 +189,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	public void onLocationChange() {
 		if(isDeviceConnected()) {
 			unbindDevice();
-            locationFrag.updateConnectionImageResource(false);
+            locationFrag.updateConnectionImageResource(LocationFragment.DEVICE_STATE_DISCONNECTED);
 		} else {
             if(reconnectTaskFragment != null && reconnectTaskFragment.isRunning()) {
                 reconnectTaskFragment.stopAsyncTask();
+                locationFrag.updateConnectionImageResource(LocationFragment.DEVICE_STATE_DISCONNECTED);
                 if(mwController != null)
                     unbindDevice();
             }
@@ -293,11 +318,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if (batteryTimer == null) {
 			batteryTimer = new Timer();
 			batteryTimer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					requestBatteryLevel();
-				}
-			}, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
+                @Override
+                public void run() {
+                    requestBatteryLevel();
+                }
+            }, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
 		}
 		
 	}
@@ -386,5 +411,20 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 //		notificationManager.notify(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 	}
 
+    @Override
+    public void onReconnectStart() {
+
+    }
+
+    @Override
+    public void onReconnectCancelled() {
+//        reconnectTaskFragment.stopAsyncTask();
+//        unbindDevice();
+    }
+
+    @Override
+    public void onReconnectStop() {
+
+    }
 
 }

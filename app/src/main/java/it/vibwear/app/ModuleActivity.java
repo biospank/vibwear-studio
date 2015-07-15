@@ -46,7 +46,7 @@ import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 
-public class ModuleActivity extends Activity implements OnDeviceSelectedListener, ReconnectTaskFragment.OnReconnectTaskCallbacks {
+public class ModuleActivity extends Activity implements OnDeviceSelectedListener {
     public static final String EXTRA_BLE_DEVICE = 
             "it.lampwireless.vibwear.app.ModuleActivity.EXTRA_BLE_DEVICE";
     protected static final String ARG_ITEM_ID = "item_id";
@@ -60,7 +60,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     private static final Short LOW_SIGNAL_VIBRATION_TIME = 3;
     private static final Short LOW_SIGNAL_VIBRATION_LENGHT = 300;
     private static final Short LOW_SIGNAL_VIBRATION_GAP = 500;
-    private static final String TAG_TASK_FRAGMENT = "reconnect_task_fragment";
 
     //private final BroadcastReceiver metaWearUpdateReceiver= MetaWearBleService.getMetaWearBroadcastReceiver();
     private LocalBroadcastManager broadcastManager= null;
@@ -75,7 +74,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     protected boolean isMwServiceBound = false;
     protected ReconnectTaskFragment reconnectTaskFragment;
 
-    
+
     private DeviceCallbacks dCallback= new MetaWearController.DeviceCallbacks() {
     	
         @Override
@@ -84,7 +83,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
                 mwController.readDeviceInformation();
                 settingsController.readDeviceName();
                 switchController.enableNotification();
-                reconnectTaskFragment.dismissDialog();
             }
 
             invalidateOptionsMenu();
@@ -209,24 +207,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         if (savedInstanceState != null) {
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
-        }
-
-        attachReconnectTask();
-
-    }
-
-    protected void attachReconnectTask() {
-        FragmentManager fm = getFragmentManager();
-        reconnectTaskFragment = (ReconnectTaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (reconnectTaskFragment == null) {
-            reconnectTaskFragment = new ReconnectTaskFragment();
-            fm.beginTransaction().add(reconnectTaskFragment, TAG_TASK_FRAGMENT).commit();
-        } else {
-            if(reconnectTaskFragment.isRunning())
-                reconnectTaskFragment.showDialog();
         }
 
     }
@@ -453,9 +433,4 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         return mwController;
     }
 
-    @Override
-    public void onReconnectCancelled() {
-        reconnectTaskFragment.stopAsyncTask();
-        unbindDevice();
-    }
 }

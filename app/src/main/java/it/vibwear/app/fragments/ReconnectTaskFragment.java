@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.ModuleActivity;
+import it.vibwear.app.VibWearActivity;
 import it.vibwear.app.utils.BleScanner;
 import it.vibwear.app.utils.ReconnectTask;
 
@@ -20,7 +21,7 @@ public class ReconnectTaskFragment extends Fragment {
 
     // private TaskCallbacks mCallbacks;
     private ReconnectTask mTask;
-    private ModuleActivity mActivity;
+    private VibWearActivity mActivity;
     private ProgressDialog mProgressDialog;
     private OnReconnectTaskCallbacks mCallbacks;
 
@@ -29,7 +30,9 @@ public class ReconnectTaskFragment extends Fragment {
      * task's progress and results back to the Activity.
      */
     public interface OnReconnectTaskCallbacks {
+        void onReconnectStart();
         void onReconnectCancelled();
+        void onReconnectStop();
     }
 
     /**
@@ -41,7 +44,7 @@ public class ReconnectTaskFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.mActivity =  (ModuleActivity)activity;
+        this.mActivity =  (VibWearActivity)activity;
         this.mCallbacks = (OnReconnectTaskCallbacks)activity;
     }
 
@@ -65,7 +68,7 @@ public class ReconnectTaskFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        dismissDialog();
+        //mCallbacks.onReconnectStop();
         mCallbacks = null;
     }
 
@@ -73,14 +76,14 @@ public class ReconnectTaskFragment extends Fragment {
         // Create and execute the background task.
         mTask = new ReconnectTask(mActivity.getMwController());
         mTask.execute(new BleScanner(mActivity, device));
-        showDialog();
+        //mCallbacks.onReconnectStart();
     }
 
     public void stopAsyncTask() {
         if (mTask != null && mTask.getStatus() != AsyncTask.Status.FINISHED) {
             mTask.cancel(true);
             mTask = null;
-            mProgressDialog.dismiss();
+            //mCallbacks.onReconnectStop();
         }
     }
 
