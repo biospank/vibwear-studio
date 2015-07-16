@@ -16,7 +16,6 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
@@ -53,12 +52,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		public void onReceive(Context context, Intent intent) {
 			
 			intent.putExtra("standBy", isStandBy());
-			
+
 			if(isDeviceConnected() && servicesFrag.consumeIntent(intent)) {
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
 				updateNotificationTextWith(intent);
 			}
-			
+
 			servicesFrag.update(intent);
 
 		}
@@ -141,7 +140,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 				return;
 			}
 		} else {
-            if(reconnectTaskFragment != null && reconnectTaskFragment.isRunning()) {
+            if(isReconnectTaskRunning()) {
                 moveTaskToBack(true);
                 return;
             }
@@ -167,16 +166,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
-            if(reconnectTaskFragment != null && reconnectTaskFragment.isRunning()) {
-                reconnectTaskFragment.stopAsyncTask();
-                if(mwController != null)
-                    unbindDevice();
+            if(isReconnectTaskRunning()) {
+                stopReconnectTaskAndUnbindDevice();
             }
 
-            final FragmentManager fm = getFragmentManager();
-            final ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this, 
-                    new UUID[] {GATT.GATTService.METAWEAR.uuid()}, true);
-            dialog.show(fm, "scan_fragment");
+            if(!startBluetoothAdapter())
+                startDeviceScanner();
 		}
 
 	}
@@ -220,12 +215,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		//vibrate(ModuleActivity.LOW_SIGNAL_VIB_MODE, null);
 	}
 
-//    public void onHeard() {
-//        if(mwController != null && mwController.isConnected()) {
-//            vibrate(ModuleActivity.NOTIFY_VIB_MODE, new Intent().se);
-//        }
-//    }
-
     @Override
     public void onLowBattery() {
         SharedPreferences settings = getSharedPreferences(SettingsDetailFragment.LOW_BATTERY_PREFS_NAME,
@@ -255,12 +244,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			locationFrag = new LocationFragment();
 			servicesFrag = new ServicesFragment();
 
-//			// Intent launched by foreground notification
-//			Bundle props = getIntent().getExtras();
-//
-//			if(props != null)
-//				locationFrag.setArguments(props);
-
 			ft.add(R.id.locationLayout, locationFrag, "locationFragment");
 			ft.add(R.id.servicesLayout, servicesFrag, "servicesFragment");
 			ft.commit();
@@ -283,11 +266,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if (signalTimer == null) {
 			signalTimer = new Timer();
 			signalTimer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					requestSignalLevel();
-				}
-			}, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
+                @Override
+                public void run() {
+                    requestSignalLevel();
+                }
+            }, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
 		}
 
 		if (batteryTimer == null) {
@@ -356,10 +339,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			// Creates an explicit intent for an Activity in your app
 			Intent startIntent = new Intent(this, VibWearActivity.class);
 
-//			startIntent.putExtra("connected", true);
-//			startIntent.putExtra("batteryLevel", locationFrag.getCurrentBatteryLevel());
-//			startIntent.putExtra("signalLevel", locationFrag.getCurrentSignalLevel());
-
 			PendingIntent startPendingIntent =
 					PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -380,11 +359,14 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         mBuilder.setOngoing(true);
 		mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 
-//		NotificationManager notificationManager =
-//				(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//
-//		notificationManager.notify(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 	}
+
+    protected void startDeviceScanner() {
+        FragmentManager fm = getFragmentManager();
+        ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this,
+                new UUID[]{GATT.GATTService.METAWEAR.uuid()}, true);
+        dialog.show(fm, "scan_fragment");
+    }
 
 
 }
