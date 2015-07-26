@@ -60,7 +60,6 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="pref_dialog_negative_button_text">Cancel</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_test">Test</string>
-    <string name="menu_reset">Reset</string>
     <string name="menu_about">About</string>
     <string name="delete">Delete</string>
 
