@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.lang.reflect.Array;
+import java.util.Locale;
 
 public class ChatServiceItem extends ServiceItem {
 	public final String IMO_PACKAGE_NAME = "com.imo.android.imoim";
@@ -42,9 +43,7 @@ public class ChatServiceItem extends ServiceItem {
 
                 iconWidget.setImageResource(switchPref.getImage());
 
-                textWidget.setText(VibWearUtil.getChatSummarySpanText(switchPref.getLabel()));
-
-//				Toast.makeText(activity, formattedText, Toast.LENGTH_SHORT).show();
+                setLocalizedText();
 
             }
         });
@@ -73,12 +72,7 @@ public class ChatServiceItem extends ServiceItem {
 	}
 
 	public void showUserTextSettings() {
-		if (! ChatNotificationService.isAccessibilitySettingsOn(activity)) {
-			textWidget.setText(VibWearUtil.getChatSummarySpanText(activity.getResources().getString(R.string.chatServiceDesc)));
-			if(switchPref.getState()) { switchPref.switchState(); }
-		} else {
-			textWidget.setText(VibWearUtil.getChatSummarySpanText(switchPref.getLabel()));
-		}
+		setLocalizedText();
 	}
 	
 	@Override
@@ -108,5 +102,29 @@ public class ChatServiceItem extends ServiceItem {
         return false;
 
     }
-	
+
+    private void setLocalizedText() {
+        String lang = Locale.getDefault().getLanguage();
+
+        if(lang == "en") {
+            if (!ChatNotificationService.isAccessibilitySettingsOn(activity)) {
+                textWidget.setText(VibWearUtil.getChatSummarySpanText(activity.getResources().getString(R.string.chatServiceDesc)));
+                if (switchPref.getState()) {
+                    switchPref.switchState();
+                }
+            } else {
+                textWidget.setText(VibWearUtil.getChatSummarySpanText(switchPref.getLabel()));
+            }
+        } else {
+            if (!ChatNotificationService.isAccessibilitySettingsOn(activity)) {
+                textWidget.setText(activity.getResources().getString(R.string.chatServiceDesc));
+                if (switchPref.getState()) {
+                    switchPref.switchState();
+                }
+            } else {
+                textWidget.setText(switchPref.getLabel());
+            }
+        }
+    }
+
 }

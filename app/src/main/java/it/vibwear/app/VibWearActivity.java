@@ -97,7 +97,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         case R.id.menu_about:
         	AlertDialog.Builder builder=new AlertDialog.Builder(this);
         	builder.setIcon(R.drawable.ic_launcher);
-        	builder.setTitle("About");
+        	builder.setTitle(R.string.menu_about);
         	if(firmwareVersion != null) {
             	builder.setMessage("VibWear v. " + VERSION + "\nFirmware v. " + firmwareVersion);
         	} else {

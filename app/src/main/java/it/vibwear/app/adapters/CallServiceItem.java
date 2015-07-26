@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 public class CallServiceItem extends ServiceItem {
 	
 	public CallServiceItem(Activity activity) {
@@ -32,10 +34,11 @@ public class CallServiceItem extends ServiceItem {
 					switchPref.switchState();
 					
 					iconWidget.setImageResource(switchPref.getImage());
-	
-					textWidget.setText(VibWearUtil.getCallSummarySpanText(switchPref.getLabel()));
-	
-				}
+
+                    setLocalizedText();
+
+
+                }
 				
 			});
 		}
@@ -69,9 +72,18 @@ public class CallServiceItem extends ServiceItem {
 
 
 	public void showUserTextSettings() {
-        
-		textWidget.setText(VibWearUtil.getCallSummarySpanText(switchPref.getLabel()));
+
+        setLocalizedText();
 	
 	}
+
+    private void setLocalizedText() {
+        String lang = Locale.getDefault().getLanguage();
+
+        if(lang == "en")
+            textWidget.setText(VibWearUtil.getCallSummarySpanText(switchPref.getLabel()));
+        else
+            textWidget.setText(switchPref.getLabel());
+    }
 	
 }

@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 public class SosServiceItem extends ServiceItem {
 
 	public SosServiceItem(Activity activity) {
@@ -31,9 +33,7 @@ public class SosServiceItem extends ServiceItem {
 
                     iconWidget.setImageResource(switchPref.getImage());
 
-                    textWidget.setText(VibWearUtil.getSosSummarySpanText(switchPref.getLabel()));
-
-                    //				Toast.makeText(activity, formattedText, Toast.LENGTH_SHORT).show();
+                    setLocalizedText();
 
                 }
             });
@@ -65,9 +65,18 @@ public class SosServiceItem extends ServiceItem {
 	}
 
 	public void showUserTextSettings() {
-        
-		textWidget.setText(VibWearUtil.getSosSummarySpanText(switchPref.getLabel()));
+
+        setLocalizedText();
 	
 	}
-	
+
+    private void setLocalizedText() {
+        String lang = Locale.getDefault().getLanguage();
+
+        if(lang == "en")
+            textWidget.setText(VibWearUtil.getSosSummarySpanText(switchPref.getLabel()));
+        else
+            textWidget.setText(switchPref.getLabel());
+    }
+
 }

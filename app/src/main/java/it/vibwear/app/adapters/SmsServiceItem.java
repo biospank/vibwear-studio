@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 public class SmsServiceItem extends ServiceItem {
 	
 	public SmsServiceItem(Activity activity) {
@@ -31,8 +33,8 @@ public class SmsServiceItem extends ServiceItem {
 					switchPref.switchState();
 					
 					iconWidget.setImageResource(switchPref.getImage());
-	
-					textWidget.setText(VibWearUtil.getSmsSummarySpanText(switchPref.getLabel()));
+
+                    setLocalizedText();
 	
 				}
 				
@@ -66,10 +68,18 @@ public class SmsServiceItem extends ServiceItem {
 	}
 
 	public void showUserTextSettings() {
-        
-		textWidget.setText(VibWearUtil.getSmsSummarySpanText(switchPref.getLabel()));
+
+        setLocalizedText();
 	
 	}
-	
+
+    private void setLocalizedText() {
+        String lang = Locale.getDefault().getLanguage();
+
+        if(lang == "en")
+            textWidget.setText(VibWearUtil.getSmsSummarySpanText(switchPref.getLabel()));
+        else
+            textWidget.setText(switchPref.getLabel());
+    }
 
 }

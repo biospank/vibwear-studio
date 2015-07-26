@@ -26,7 +26,7 @@ public abstract class ServiceItem {
 	public void setIconView(ImageView icon) {
 		
 	}
-	
+
 	public boolean consume(Intent intent) {
 		Bundle extraInfo = intent.getExtras();
 		

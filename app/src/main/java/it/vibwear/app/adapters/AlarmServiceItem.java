@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
+import java.util.Locale;
+
 public class AlarmServiceItem extends ServiceItem {
 
 	private Intent alarmIntent;
@@ -35,29 +37,29 @@ public class AlarmServiceItem extends ServiceItem {
 		pendingAlarm = PendingIntent.getBroadcast(activity, 0, alarmIntent, 0);
 		
 		this.iconWidget.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				if(switchPref.switchState()) {
-					TimePreference alarmPref = (TimePreference) switchPref;
-		            long timeSet = alarmPref.getTimeSet();
-		    		long timeAlarm = VibWearUtil.getTimeAlarmFor(timeSet);
-		    		activateAlarm(pendingAlarm, timeAlarm);
-		    		alarmPref.setTimeSet(timeAlarm);
-				} else {
-		    		deactivateAlarm(pendingAlarm);
 
-				}
-				
-				iconWidget.setImageResource(switchPref.getImage());
+            @Override
+            public void onClick(View v) {
+
+                if (switchPref.switchState()) {
+                    TimePreference alarmPref = (TimePreference) switchPref;
+                    long timeSet = alarmPref.getTimeSet();
+                    long timeAlarm = VibWearUtil.getTimeAlarmFor(timeSet);
+                    activateAlarm(pendingAlarm, timeAlarm);
+                    alarmPref.setTimeSet(timeAlarm);
+                } else {
+                    deactivateAlarm(pendingAlarm);
+
+                }
+
+                iconWidget.setImageResource(switchPref.getImage());
 
 //				textWidget.setText(VibWearUtil.getAlarmSummarySpanText(switchPref.getLabel()), BufferType.SPANNABLE);
 
 //				Toast.makeText(activity, formattedText, Toast.LENGTH_SHORT).show();
-				
-			}
-		});
+
+            }
+        });
 		
 		showUserIconSettings();
 	}
@@ -117,15 +119,8 @@ public class AlarmServiceItem extends ServiceItem {
 	}
 
     public void showUserTextSettings() {
-        
-        long timeSet = ((TimePreference)switchPref).getTimeSet();
-		if(timeSet > 0) {
-    		long timeAlarm = VibWearUtil.getTimeAlarmFor(timeSet);
-			String formattedDate = VibWearUtil.getFullFormattedDateFor(timeAlarm, activity);
-			textWidget.setText(VibWearUtil.getAlarmSummarySpanText(formattedDate), BufferType.SPANNABLE);
-        } else {
-        	textWidget.setText(VibWearUtil.getAlarmDescSpanText(switchPref.getLabel()), BufferType.SPANNABLE);
-        }
+
+        setLocalizedText();
 
 	}
 	
@@ -149,5 +144,29 @@ public class AlarmServiceItem extends ServiceItem {
 
 		showUserTextSettings();
 	}
-	
+
+    private void setLocalizedText() {
+        String lang = Locale.getDefault().getLanguage();
+
+        if(lang == "en") {
+            long timeSet = ((TimePreference) switchPref).getTimeSet();
+            if (timeSet > 0) {
+                long timeAlarm = VibWearUtil.getTimeAlarmFor(timeSet);
+                String formattedDate = VibWearUtil.getFullFormattedDateFor(timeAlarm, activity);
+                textWidget.setText(VibWearUtil.getAlarmSummarySpanText(formattedDate), BufferType.SPANNABLE);
+            } else {
+                textWidget.setText(VibWearUtil.getAlarmDescSpanText(switchPref.getLabel()), BufferType.SPANNABLE);
+            }
+        } else {
+            long timeSet = ((TimePreference) switchPref).getTimeSet();
+            if (timeSet > 0) {
+                long timeAlarm = VibWearUtil.getTimeAlarmFor(timeSet);
+                String formattedDate = VibWearUtil.getFullFormattedDateFor(timeAlarm, activity);
+                textWidget.setText(VibWearUtil.getAlarmSummarySpanText(formattedDate), BufferType.SPANNABLE);
+            } else {
+                textWidget.setText(switchPref.getLabel());
+            }
+        }
+    }
+
 }

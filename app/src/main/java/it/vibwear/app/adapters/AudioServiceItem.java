@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.VibWearUtil;
 import it.vibwear.app.fragments.AudioDetailFragment;
@@ -53,7 +55,7 @@ public class AudioServiceItem extends ServiceItem {
 
                     iconWidget.setImageResource(switchPref.getImage());
 
-                    textWidget.setText(VibWearUtil.getAudioSummarySpanText(switchPref.getLabel()));
+                    setLocalizedText();
 
                 }
             });
@@ -84,8 +86,8 @@ public class AudioServiceItem extends ServiceItem {
 	}
 
 	public void showUserTextSettings() {
-        
-		textWidget.setText(VibWearUtil.getSosSummarySpanText(switchPref.getLabel()));
+
+        setLocalizedText();
 	
 	}
 
@@ -99,6 +101,15 @@ public class AudioServiceItem extends ServiceItem {
             mTaskFragment.stopAsyncTask();
             switchPref.switchState();
         }
+    }
+
+    private void setLocalizedText() {
+        String lang = Locale.getDefault().getLanguage();
+
+        if(lang == "en")
+            textWidget.setText(VibWearUtil.getAudioSummarySpanText(switchPref.getLabel()));
+        else
+            textWidget.setText(switchPref.getLabel());
     }
 
 }
