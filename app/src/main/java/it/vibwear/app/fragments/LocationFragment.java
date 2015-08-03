@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class LocationFragment extends Fragment {
 	private View layout;
@@ -29,8 +30,8 @@ public class LocationFragment extends Fragment {
 		public void onLocationChange();
 		public void onLowSignal();
         public void onLowBattery();
-//		public void onSignalRequest();
-//		public void onBatteryRequest();
+		public void onSignalRequest();
+		public void onBatteryRequest();
 	}
 
 	@Override
@@ -103,23 +104,23 @@ public class LocationFragment extends Fragment {
 //		}
 
 
-//		icSignal.setOnClickListener(new View.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				mCallback.onSignalRequest();
-//			}
-//			
-//		});
+		icSignal.setOnClickListener(new View.OnClickListener() {
 
-//		icBattery.setOnClickListener(new View.OnClickListener() {
-//
-//			@Override
-//			public void onClick(View v) {
-//				mCallback.onBatteryRequest();
-//			}
-//
-//		});
+			@Override
+			public void onClick(View v) {
+                mCallback.onSignalRequest();
+            }
+
+		});
+
+		icBattery.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+                mCallback.onBatteryRequest();
+			}
+
+		});
 
 		return layout;
 	}

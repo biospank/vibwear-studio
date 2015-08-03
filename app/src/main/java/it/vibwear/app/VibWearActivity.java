@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.5.3";
@@ -185,20 +186,23 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		progress.show();
 	}
 
-//	@Override
-//	public void onSignalRequest() {
-//		if(mwController.isConnected()) {
-//			boolean res = mBluetoothGatt.readRemoteRssi();
-//			Log.d("remote rssi", "result: " + res);
-//		}
-//	}
+	@Override
+	public void onSignalRequest() {
+		if(isDeviceConnected()) {
+            Toast.makeText(this,
+                    getString(R.string.signal_level_msg,
+                            (locationFrag.getCurrentSignalLevel() * 2)), Toast.LENGTH_SHORT).show();
+		}
+	}
 	
-//	@Override
-//	public void onBatteryRequest() {
-//		if (mwController.isConnected()) {
-//			mwController.readBatteryLevel();
-//		}
-//	}
+	@Override
+	public void onBatteryRequest() {
+		if (isDeviceConnected()) {
+            Toast.makeText(this,
+                    getString(R.string.battery_level_msg,
+                            locationFrag.getCurrentBatteryLevel()), Toast.LENGTH_SHORT).show();
+		}
+	}
 
 	@Override
 	protected void updateSignalLevel(int rssiPercent) {

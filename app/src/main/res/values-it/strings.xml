@@ -62,6 +62,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="menu_test">Test</string>
     <string name="menu_about">Info</string>
     <string name="delete">Elimina</string>
+    <string name="signal_level_msg">Segnale %d%%</string>
+    <string name="battery_level_msg">Batteria %s%%</string>
 
     <string name="accessibility_dialog_title">Accessibilità</string>
     <string name="accessibility_dialog_msg">Vuoi abilitare VibWear per ricevere notifiche?</string>
