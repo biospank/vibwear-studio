@@ -6,6 +6,8 @@ import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
 import it.vibwear.app.fragments.SettingsDetailFragment;
+import it.vibwear.app.fragments.StopNotificationDialog;
+import it.vibwear.app.handlers.StopDialogHandler;
 import it.vibwear.app.scanner.ScannerFragment;
 import java.util.Random;
 import java.util.Timer;
@@ -13,6 +15,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import com.mbientlab.metawear.api.GATT;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
@@ -25,6 +28,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +41,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
 	private final int VIBWEAR_NOTIFICATION_ID = 9571;
+    private final int DISMISS_DIALOG_MSG = 0;
+    private final int DISMISS_DIALOG_TIMEOUT = 5000;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
@@ -57,6 +63,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			if(isDeviceConnected() && servicesFrag.consumeIntent(intent)) {
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
 				updateNotificationTextWith(intent);
+                showStopNotificationDialog(intent);
 			}
 
 			servicesFrag.update(intent);
@@ -280,11 +287,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if (batteryTimer == null) {
 			batteryTimer = new Timer();
 			batteryTimer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					requestBatteryLevel();
-				}
-			}, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
+                @Override
+                public void run() {
+                    requestBatteryLevel();
+                }
+            }, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
 		}
 		
 	}
@@ -365,12 +372,24 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	}
 
+    protected void showStopNotificationDialog(Intent intent) {
+        String sourcePackageName = intent.getExtras().getString("sourcePackageName");
+
+        if(sourcePackageName != null) {
+            DialogFragment stopNotificationDialog = new StopNotificationDialog();
+            stopNotificationDialog.setArguments(intent.getExtras());
+            stopNotificationDialog.show(getFragmentManager(), "stopNotificationDialog");
+
+            StopDialogHandler stopDialogHandler = new StopDialogHandler(stopNotificationDialog);
+            stopDialogHandler.sendEmptyMessageDelayed(DISMISS_DIALOG_MSG, DISMISS_DIALOG_TIMEOUT);
+        }
+    }
+
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
         ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this,
                 new UUID[]{GATT.GATTService.METAWEAR.uuid()}, true);
         dialog.show(fm, "scan_fragment");
     }
-
 
 }

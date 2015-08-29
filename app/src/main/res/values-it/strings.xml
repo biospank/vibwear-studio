@@ -84,6 +84,12 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="reconnectProgressTitle">Connessione persa</string>
     <string name="reconnectProgressMsg">riconnessione in corso...</string>
 
+    <string name="stop_notification_dialog_msg">
+        Vuoi bloccare questa notifica?
+    </string>
+    <string name="stop_notification_dialog_btn_stop">Blocca</string>
+    <string name="stop_notification_dialog_btn_cancel">Annulla</string>
+
     <string name="pick_contact_label">Sfoglia</string>
    	<string name="label_sos_msg">Messaggio S.O.S.</string>
    	<string name="label_sos_contacts">Contatti S.O.S.</string>
