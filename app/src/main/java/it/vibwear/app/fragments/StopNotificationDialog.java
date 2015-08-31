@@ -33,13 +33,13 @@ public class StopNotificationDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setIcon(sourcePackageIcon).setTitle(sourcePackageName)
-                .setMessage(R.string.stop_notification_dialog_msg)
-                .setPositiveButton(R.string.stop_notification_dialog_btn_stop, new DialogInterface.OnClickListener() {
+                .setMessage(R.string.stop_notification_msg)
+                .setPositiveButton(R.string.stop_notification_btn_confirm, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
                     }
                 })
-                .setNegativeButton(R.string.stop_notification_dialog_btn_cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.stop_notification_btn_cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
                     }

@@ -39,6 +39,7 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+        <receiver android:name="it.vibwear.app.receivers.StopNotificationReceiver" />
         <service android:name="it.vibwear.app.ChatNotificationService"
 		    android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
 		    android:label="@string/app_name" android:enabled="true" 

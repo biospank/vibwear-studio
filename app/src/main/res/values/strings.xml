@@ -84,11 +84,11 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="reconnectProgressTitle">Connection lost</string>
     <string name="reconnectProgressMsg">trying to reconnect...</string>
 
-    <string name="stop_notification_dialog_msg">
-        Do you want to stop this notification?
+    <string name="stop_notification_msg">
+        Do you want to stop Vibwear alert you for this notification?
     </string>
-    <string name="stop_notification_dialog_btn_stop">Stop</string>
-    <string name="stop_notification_dialog_btn_cancel">Cancel</string>
+    <string name="stop_notification_btn_confirm">Stop</string>
+    <string name="stop_notification_btn_cancel">Continue</string>
 
     <string name="pick_contact_label">Browse</string>
    	<string name="label_sos_msg">S.O.S. message</string>

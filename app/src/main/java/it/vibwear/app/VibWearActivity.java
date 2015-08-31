@@ -8,6 +8,7 @@ import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
 import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.fragments.StopNotificationDialog;
 import it.vibwear.app.handlers.StopDialogHandler;
+import it.vibwear.app.receivers.StopNotificationReceiver;
 import it.vibwear.app.scanner.ScannerFragment;
 import java.util.Random;
 import java.util.Timer;
@@ -27,6 +28,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -63,7 +66,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			if(isDeviceConnected() && servicesFrag.consumeIntent(intent)) {
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
 				updateNotificationTextWith(intent);
-                showStopNotificationDialog(intent);
+                //showStopNotificationDialog(intent);
 			}
 
 			servicesFrag.update(intent);
@@ -366,24 +369,41 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		String sourcePackageName = extraInfo.getString("sourcePackageName");
 
-		mBuilder.setContentText(sourcePackageName);
-        mBuilder.setOngoing(true);
-		mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+        if(sourcePackageName != null) {
+            Drawable packageIcon = null;
+
+            try {
+                packageIcon = getPackageManager().getApplicationIcon(sourcePackageName);
+            } catch (PackageManager.NameNotFoundException e) {
+                //e.printStackTrace();
+            }
+
+            Intent stopIntent = new Intent(this, StopNotificationReceiver.class);
+            stopIntent.putExtra("sourcePackageName", sourcePackageName);
+            PendingIntent stopPendingIntent = PendingIntent.getActivity(this, 0, stopIntent, 0);
+
+            //mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC)
+            mBuilder.setContentText(getResources().getString(R.string.stop_notification_msg));
+            mBuilder.addAction(R.drawable.ic_menu_reset,
+                    getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
+            mBuilder.setOngoing(true);
+            mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+        }
 
 	}
 
-    protected void showStopNotificationDialog(Intent intent) {
-        String sourcePackageName = intent.getExtras().getString("sourcePackageName");
-
-        if(sourcePackageName != null) {
-            DialogFragment stopNotificationDialog = new StopNotificationDialog();
-            stopNotificationDialog.setArguments(intent.getExtras());
-            stopNotificationDialog.show(getFragmentManager(), "stopNotificationDialog");
-
-            StopDialogHandler stopDialogHandler = new StopDialogHandler(stopNotificationDialog);
-            stopDialogHandler.sendEmptyMessageDelayed(DISMISS_DIALOG_MSG, DISMISS_DIALOG_TIMEOUT);
-        }
-    }
+//    protected void showStopNotificationDialog(Intent intent) {
+//        String sourcePackageName = intent.getExtras().getString("sourcePackageName");
+//
+//        if(sourcePackageName != null) {
+//            DialogFragment stopNotificationDialog = new StopNotificationDialog();
+//            stopNotificationDialog.setArguments(intent.getExtras());
+//            stopNotificationDialog.show(getFragmentManager(), "stopNotificationDialog");
+//
+//            StopDialogHandler stopDialogHandler = new StopDialogHandler(stopNotificationDialog);
+//            stopDialogHandler.sendEmptyMessageDelayed(DISMISS_DIALOG_MSG, DISMISS_DIALOG_TIMEOUT);
+//        }
+//    }
 
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
