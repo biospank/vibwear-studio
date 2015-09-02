@@ -89,6 +89,7 @@ contact MbientLab Inc, at www.mbientlab.com.
     </string>
     <string name="stop_notification_btn_confirm">Blocca</string>
     <string name="stop_notification_btn_cancel">Annulla</string>
+    <string name="label_chat_notifications">Notifiche bloccate</string>
 
     <string name="pick_contact_label">Sfoglia</string>
    	<string name="label_sos_msg">Messaggio S.O.S.</string>

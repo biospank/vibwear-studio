@@ -89,6 +89,7 @@ contact MbientLab Inc, at www.mbientlab.com.
     </string>
     <string name="stop_notification_btn_confirm">Stop</string>
     <string name="stop_notification_btn_cancel">Continue</string>
+    <string name="label_chat_notifications">Notification black list</string>
 
     <string name="pick_contact_label">Browse</string>
    	<string name="label_sos_msg">S.O.S. message</string>
