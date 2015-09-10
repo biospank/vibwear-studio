@@ -85,7 +85,7 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="reconnectProgressMsg">trying to reconnect...</string>
 
     <string name="stop_notification_msg">
-        Do you want to stop Vibwear alert you for this notification?
+        Do you want Vibwear to stop alert you for this notification?
     </string>
     <string name="stop_notification_btn_confirm">Stop</string>
     <string name="stop_notification_btn_cancel">Continue</string>

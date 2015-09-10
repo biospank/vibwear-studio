@@ -35,7 +35,7 @@ public class NotificationListFragment extends Fragment {
 
         context = container.getContext();
 
-        View layout = inflater.inflate(R.layout.notification_list_item, container, false);
+        View layout = inflater.inflate(R.layout.fragment_notification_list, container, false);
 
         lvNotification = (ListView)layout.findViewById(R.id.lv_chat_notifications);
 

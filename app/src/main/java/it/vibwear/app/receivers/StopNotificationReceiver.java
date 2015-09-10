@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import it.vibwear.app.VibWearActivity;
 import it.vibwear.app.adapters.Notification;
 import it.vibwear.app.utils.NotificationPreference;
 

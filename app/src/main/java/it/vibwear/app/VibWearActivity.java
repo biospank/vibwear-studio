@@ -6,20 +6,19 @@ import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
 import it.vibwear.app.fragments.SettingsDetailFragment;
-import it.vibwear.app.fragments.StopNotificationDialog;
-import it.vibwear.app.handlers.StopDialogHandler;
+import it.vibwear.app.handlers.StopNotificationHandler;
 import it.vibwear.app.receivers.StopNotificationReceiver;
 import it.vibwear.app.scanner.ScannerFragment;
-import java.util.Random;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import com.mbientlab.metawear.api.GATT;
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
@@ -28,14 +27,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.5.4";
@@ -44,14 +39,15 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
 	private final int VIBWEAR_NOTIFICATION_ID = 9571;
-    private final int DISMISS_DIALOG_MSG = 0;
-    private final int DISMISS_DIALOG_TIMEOUT = 5000;
+    private final int DISMISS_NOTIFICATION_MSG = 0;
+    private final int DISMISS_NOTIFICATION_TIMEOUT = 5000;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
 	private Notification.Builder mBuilder;
+    private boolean firstShow = true;
 	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
@@ -65,8 +61,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 			if(isDeviceConnected() && servicesFrag.consumeIntent(intent)) {
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
-				updateNotificationTextWith(intent);
-                //showStopNotificationDialog(intent);
+                updateNotificationWith(intent);
 			}
 
 			servicesFrag.update(intent);
@@ -121,11 +116,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
  
 		return true;
     }
-        
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		registerReceiver(intentReceiver, intentFilter);
+
         startScheduledTimers();
 	}
 	
@@ -133,7 +129,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	public void onDestroy() {
 		super.onDestroy();
 		if(isFinishing())
-			showNotificationIcon(false);
+			showNotification(false);
 		unregisterReceiver(intentReceiver);
 	}
 
@@ -198,20 +194,24 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	@Override
 	public void onSignalRequest() {
-		if(isDeviceConnected()) {
-            Toast.makeText(this,
-                    getString(R.string.signal_level_msg,
-                            (locationFrag.getCurrentSignalLevel() * 2)), Toast.LENGTH_SHORT).show();
-		}
+        showNotification(true);
+//		if(isDeviceConnected()) {
+//            Toast.makeText(this,
+//                    getString(R.string.signal_level_msg,
+//                            (locationFrag.getCurrentSignalLevel() * 2)), Toast.LENGTH_SHORT).show();
+//		}
 	}
 	
 	@Override
 	public void onBatteryRequest() {
-		if (isDeviceConnected()) {
-            Toast.makeText(this,
-                    getString(R.string.battery_level_msg,
-                            locationFrag.getCurrentBatteryLevel()), Toast.LENGTH_SHORT).show();
-		}
+        Intent intent = new Intent();
+        intent.putExtra("sourcePackageName", "ciccio.pasticcio");
+        updateNotificationWith(intent);
+//		if (isDeviceConnected()) {
+//            Toast.makeText(this,
+//                    getString(R.string.battery_level_msg,
+//                            locationFrag.getCurrentBatteryLevel()), Toast.LENGTH_SHORT).show();
+//		}
 	}
 
 	@Override
@@ -340,11 +340,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if(isDeviceConnected())
-			showNotificationIcon(!hasFocus);
+			showNotification(!hasFocus);
 	}
 
-	protected void showNotificationIcon(boolean show) {
-		Random generator = new Random();
+	public void showNotification(boolean show) {
 		if(show) {
 			mBuilder.setSmallIcon(R.drawable.ic_launcher)
 					.setTicker("Vibwear app listening")
@@ -357,40 +356,87 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 					PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 			mBuilder.setContentIntent(startPendingIntent);
-			mBuilder.setOngoing(true);
+            mBuilder.setOngoing(true);
 			mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 		} else {
 			mwService.stopForeground(true);
 		}
 	}
 
-	protected void updateNotificationTextWith(Intent intent) {
+    protected void showMyNotification() {
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent startIntent = new Intent(this, VibWearActivity.class);
+
+        PendingIntent activatePendingIntent =
+                PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
+        stopIntent.setAction("MY_INTENT");
+
+        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
+                getApplicationContext(),
+                0,
+                stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder builder = new Notification.Builder(this);
+
+        builder.setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle("Stop")
+                .setContentText(getResources().getString(R.string.stop_notification_msg))
+                .setTicker("New message");
+
+        builder.addAction(R.drawable.ic_chat, "Stop", stopPendingIntent);
+
+        builder.setContentIntent(activatePendingIntent);
+
+        notificationManager.notify(1234, builder.build());
+
+    }
+
+	protected void updateNotificationWith(Intent intent) {
 		Bundle extraInfo = intent.getExtras();
 
 		String sourcePackageName = extraInfo.getString("sourcePackageName");
 
         if(sourcePackageName != null) {
-            Drawable packageIcon = null;
-
-            try {
-                packageIcon = getPackageManager().getApplicationIcon(sourcePackageName);
-            } catch (PackageManager.NameNotFoundException e) {
-                //e.printStackTrace();
-            }
-
-            Intent stopIntent = new Intent(this, StopNotificationReceiver.class);
+            Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
             stopIntent.putExtra("sourcePackageName", sourcePackageName);
-            PendingIntent stopPendingIntent = PendingIntent.getActivity(this, 0, stopIntent, 0);
+            stopIntent.setAction("STOP_INTENT");
 
-            //mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC)
+            PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
+                    getApplicationContext(),
+                    0,
+                    stopIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
             mBuilder.setContentText(getResources().getString(R.string.stop_notification_msg));
-            mBuilder.addAction(R.drawable.ic_menu_reset,
-                    getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
+            mBuilder.setContentInfo(sourcePackageName);
+            if(firstShow) {
+                mBuilder.addAction(R.drawable.ic_menu_reset,
+                        getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
+                firstShow = false;
+            }
             mBuilder.setOngoing(true);
             mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+
+            StopNotificationHandler stopHandler = new StopNotificationHandler(this);
+            stopHandler.sendEmptyMessageDelayed(DISMISS_NOTIFICATION_MSG, DISMISS_NOTIFICATION_TIMEOUT);
         }
 
 	}
+
+    public void dismissNotification() {
+        mwService.stopForeground(true);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.cancel(VIBWEAR_NOTIFICATION_ID);
+        showNotification(true);
+    }
 
 //    protected void showStopNotificationDialog(Intent intent) {
 //        String sourcePackageName = intent.getExtras().getString("sourcePackageName");
