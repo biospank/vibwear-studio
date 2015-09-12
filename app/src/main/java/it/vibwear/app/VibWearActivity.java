@@ -45,7 +45,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
 	private Notification.Builder mBuilder;
-    private boolean showNotificationButton = true;
 	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
@@ -387,11 +386,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
             mBuilder.setContentText(getResources().getString(R.string.stop_notification_msg));
             mBuilder.setContentInfo(sourcePackageName);
 
-            if(showNotificationButton) {
-                mBuilder.addAction(R.drawable.ic_menu_reset,
-                        getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
-                showNotificationButton = false;
-            }
+            mBuilder.addAction(R.drawable.ic_menu_reset,
+                    getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
 
             mBuilder.setOngoing(true);
 
