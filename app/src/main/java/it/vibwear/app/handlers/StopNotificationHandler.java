@@ -36,7 +36,7 @@ public class StopNotificationHandler extends Handler {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.cancel(VibWearActivity.VIBWEAR_NOTIFICATION_ID);
-        
+
         ((VibWearActivity) context).showNotification(true);
     }
 

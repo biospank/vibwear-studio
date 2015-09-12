@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.5.4";
@@ -193,24 +194,24 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	@Override
 	public void onSignalRequest() {
-        showNotification(true);
-//		if(isDeviceConnected()) {
-//            Toast.makeText(this,
-//                    getString(R.string.signal_level_msg,
-//                            (locationFrag.getCurrentSignalLevel() * 2)), Toast.LENGTH_SHORT).show();
-//		}
+        //showNotification(true);
+		if(isDeviceConnected()) {
+            Toast.makeText(this,
+                    getString(R.string.signal_level_msg,
+                            (locationFrag.getCurrentSignalLevel() * 2)), Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	@Override
 	public void onBatteryRequest() {
-        Intent intent = new Intent();
-        intent.putExtra("sourcePackageName", "ciccio.pasticcio");
-        updateNotificationWith(intent);
-//		if (isDeviceConnected()) {
-//            Toast.makeText(this,
-//                    getString(R.string.battery_level_msg,
-//                            locationFrag.getCurrentBatteryLevel()), Toast.LENGTH_SHORT).show();
-//		}
+        //Intent intent = new Intent();
+        //intent.putExtra("sourcePackageName", "ciccio.pasticcio");
+        //updateNotificationWith(intent);
+		if (isDeviceConnected()) {
+            Toast.makeText(this,
+                    getString(R.string.battery_level_msg,
+                            locationFrag.getCurrentBatteryLevel()), Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@Override
@@ -347,7 +348,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if(show) {
             mBuilder = new Notification.Builder(this);
 
-            mBuilder.setSmallIcon(R.drawable.ic_launcher)
+            mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
 					.setTicker("Vibwear app listening")
 					.setContentTitle("VibWear")
 					.setContentText("Tap to show.");
@@ -373,6 +374,21 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         if(sourcePackageName != null) {
             showNotification(false);
 
+            mBuilder = new Notification.Builder(this);
+
+            mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
+                    .setContentTitle("VibWear")
+                    .setContentText(sourcePackageName)
+                    //.setContentInfo(sourcePackageName)
+                    .setStyle(new Notification.BigTextStyle().bigText(getResources().getString(R.string.stop_notification_msg)));
+
+            Intent startIntent = new Intent(this, VibWearActivity.class);
+
+            PendingIntent startPendingIntent =
+                    PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            mBuilder.setContentIntent(startPendingIntent);
+
             Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
             stopIntent.putExtra("sourcePackageName", sourcePackageName);
             stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
@@ -383,13 +399,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
                     stopIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            mBuilder.setContentText(getResources().getString(R.string.stop_notification_msg));
-            mBuilder.setContentInfo(sourcePackageName);
-
-            mBuilder.addAction(R.drawable.ic_menu_reset,
+            mBuilder.addAction(R.drawable.ic_lock,
                     getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
-
-            mBuilder.setOngoing(true);
 
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -404,14 +415,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         }
 
 	}
-
-    public void dismissNotification() {
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.cancel(VIBWEAR_NOTIFICATION_ID);
-        showNotification(true);
-    }
 
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
