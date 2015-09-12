@@ -41,7 +41,7 @@
         </receiver>
         <receiver android:name="it.vibwear.app.receivers.StopNotificationReceiver">
             <intent-filter>
-                <action android:name="STOP_INTENT" />
+                <action android:name="STOP_ACTION" />
             </intent-filter>
         </receiver>
         <service android:name="it.vibwear.app.ChatNotificationService"

@@ -11,6 +11,8 @@ import it.vibwear.app.VibWearActivity;
  * Created by biospank on 29/08/15.
  */
 public class StopNotificationHandler extends Handler {
+    public static final int DISMISS_NOTIFICATION_MSG = 0;
+    public static final int DISMISS_NOTIFICATION_TIMEOUT = 10000;
     private VibWearActivity activity;
 
     public StopNotificationHandler(VibWearActivity activity) {
@@ -19,7 +21,7 @@ public class StopNotificationHandler extends Handler {
 
     public void handleMessage(android.os.Message msg) {
         switch (msg.what) {
-            case 0:
+            case DISMISS_NOTIFICATION_MSG:
                 activity.dismissNotification();
                 break;
 

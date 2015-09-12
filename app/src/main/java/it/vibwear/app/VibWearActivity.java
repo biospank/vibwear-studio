@@ -38,16 +38,14 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
-	private final int VIBWEAR_NOTIFICATION_ID = 9571;
-    private final int DISMISS_NOTIFICATION_MSG = 0;
-    private final int DISMISS_NOTIFICATION_TIMEOUT = 5000;
+	public static final int VIBWEAR_NOTIFICATION_ID = 9571;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
 	private Notification.Builder mBuilder;
-    private boolean firstShow = true;
+    private boolean showNotificationButton = true;
 	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
@@ -130,8 +128,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		super.onDestroy();
 		if(isFinishing())
 			showNotification(false);
+
 		unregisterReceiver(intentReceiver);
-	}
+
+    }
 
 	@Override
 	protected void onPause() {
@@ -265,7 +265,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 		
 		powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		mBuilder = new Notification.Builder(this);
 
 		intentFilter = new IntentFilter();
 		intentFilter.addAction(ServicesFragment.CALL_VIB_ACTION);
@@ -325,8 +324,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        getFragmentManager().putFragment(outState, "locationFragment", locationFrag);
-        getFragmentManager().putFragment(outState, "servicesFragment", servicesFrag);
+        FragmentManager fm = getFragmentManager();
+
+        fm.putFragment(outState, "locationFragment", locationFrag);
+        fm.putFragment(outState, "servicesFragment", servicesFrag);
 
     }
 
@@ -345,11 +346,13 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	public void showNotification(boolean show) {
 		if(show) {
-			mBuilder.setSmallIcon(R.drawable.ic_launcher)
+            mBuilder = new Notification.Builder(this);
+
+            mBuilder.setSmallIcon(R.drawable.ic_launcher)
 					.setTicker("Vibwear app listening")
 					.setContentTitle("VibWear")
 					.setContentText("Tap to show.");
-			// Creates an explicit intent for an Activity in your app
+
 			Intent startIntent = new Intent(this, VibWearActivity.class);
 
 			PendingIntent startPendingIntent =
@@ -363,49 +366,17 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 	}
 
-    protected void showMyNotification() {
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Intent startIntent = new Intent(this, VibWearActivity.class);
-
-        PendingIntent activatePendingIntent =
-                PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
-        stopIntent.setAction("MY_INTENT");
-
-        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
-                getApplicationContext(),
-                0,
-                stopIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification.Builder builder = new Notification.Builder(this);
-
-        builder.setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("Stop")
-                .setContentText(getResources().getString(R.string.stop_notification_msg))
-                .setTicker("New message");
-
-        builder.addAction(R.drawable.ic_chat, "Stop", stopPendingIntent);
-
-        builder.setContentIntent(activatePendingIntent);
-
-        notificationManager.notify(1234, builder.build());
-
-    }
-
 	protected void updateNotificationWith(Intent intent) {
 		Bundle extraInfo = intent.getExtras();
 
 		String sourcePackageName = extraInfo.getString("sourcePackageName");
 
         if(sourcePackageName != null) {
+            showNotification(false);
+
             Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
             stopIntent.putExtra("sourcePackageName", sourcePackageName);
-            stopIntent.setAction("STOP_INTENT");
+            stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
 
             PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
                     getApplicationContext(),
@@ -415,41 +386,36 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
             mBuilder.setContentText(getResources().getString(R.string.stop_notification_msg));
             mBuilder.setContentInfo(sourcePackageName);
-            if(firstShow) {
+
+            if(showNotificationButton) {
                 mBuilder.addAction(R.drawable.ic_menu_reset,
                         getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
-                firstShow = false;
+                showNotificationButton = false;
             }
+
             mBuilder.setOngoing(true);
-            mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.notify(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 
             StopNotificationHandler stopHandler = new StopNotificationHandler(this);
-            stopHandler.sendEmptyMessageDelayed(DISMISS_NOTIFICATION_MSG, DISMISS_NOTIFICATION_TIMEOUT);
+            stopHandler.sendEmptyMessageDelayed(
+                    StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
+                    StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
+            );
         }
 
 	}
 
     public void dismissNotification() {
-        mwService.stopForeground(true);
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.cancel(VIBWEAR_NOTIFICATION_ID);
         showNotification(true);
     }
-
-//    protected void showStopNotificationDialog(Intent intent) {
-//        String sourcePackageName = intent.getExtras().getString("sourcePackageName");
-//
-//        if(sourcePackageName != null) {
-//            DialogFragment stopNotificationDialog = new StopNotificationDialog();
-//            stopNotificationDialog.setArguments(intent.getExtras());
-//            stopNotificationDialog.show(getFragmentManager(), "stopNotificationDialog");
-//
-//            StopDialogHandler stopDialogHandler = new StopDialogHandler(stopNotificationDialog);
-//            stopDialogHandler.sendEmptyMessageDelayed(DISMISS_DIALOG_MSG, DISMISS_DIALOG_TIMEOUT);
-//        }
-//    }
 
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
