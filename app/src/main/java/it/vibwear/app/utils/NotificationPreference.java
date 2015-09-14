@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import it.vibwear.app.adapters.Notification;
@@ -51,10 +52,16 @@ public class NotificationPreference {
         saveBlackList(notifications);
     }
 
-    public void removeFromBlackList(Notification notification) {
+    public void removeFromBlackList(Notification other) {
         ArrayList<Notification> notifications = getBlackList();
         if (notifications != null) {
-            notifications.remove(notification);
+            for (Iterator<Notification> it = notifications.iterator(); it.hasNext(); ) {
+                Notification notification = it.next();
+                if (notification.getPackageName().equals(other.getPackageName())) {
+                    it.remove();
+                    break;
+                }
+            }
             saveBlackList(notifications);
         }
     }
@@ -79,6 +86,5 @@ public class NotificationPreference {
 
         return (ArrayList<Notification>) notifications;
     }
-
 
 }

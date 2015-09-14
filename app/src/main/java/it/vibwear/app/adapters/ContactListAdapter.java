@@ -73,7 +73,7 @@ public class ContactListAdapter extends ArrayAdapter<Contact> {
         final Contact contact = (Contact) getItem(position);
         holder.contactNameTxt.setText(contact.getName());
         holder.contactPhoneTxt.setText(contact.getPhone());
-        holder.deleteImg.setImageResource(R.drawable.ic_remove_contact);
+        holder.deleteImg.setImageResource(R.drawable.ic_delete);
         
         holder.deleteImg.setOnClickListener(new OnClickListener() {
 			

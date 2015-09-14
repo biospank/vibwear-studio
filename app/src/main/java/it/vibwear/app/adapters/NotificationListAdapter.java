@@ -2,6 +2,8 @@ package it.vibwear.app.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +34,9 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
     }
 
     private class ViewHolder {
-        TextView contactNameTxt;
-        TextView contactPhoneTxt;
+        ImageView notificationAppImg;
+        TextView notificationNameTxt;
+        TextView notificationDateTxt;
         ImageView deleteImg;
     }
 
@@ -58,12 +61,14 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.contact_list_item, null);
+            convertView = inflater.inflate(R.layout.notification_list_item, null);
             holder = new ViewHolder();
-            holder.contactNameTxt = (TextView) convertView
-                    .findViewById(R.id.txt_contact_name);
-            holder.contactPhoneTxt = (TextView) convertView
-                    .findViewById(R.id.txt_contact_phone);
+            holder.notificationAppImg = (ImageView) convertView
+                    .findViewById(R.id.img_notification_app);
+            holder.notificationNameTxt = (TextView) convertView
+                    .findViewById(R.id.txt_notification_name);
+            holder.notificationDateTxt = (TextView) convertView
+                    .findViewById(R.id.txt_notification_date);
             holder.deleteImg = (ImageView) convertView
                     .findViewById(R.id.imgbtn_delete);
 
@@ -73,9 +78,15 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         }
 
         final Notification notification = (Notification) getItem(position);
-        holder.contactNameTxt.setText(notification.getPackageName());
+        holder.notificationNameTxt.setText(notification.getPackageName());
+
+        Drawable icon = getIconAppFor(notification.getPackageName());
+
+        if(icon != null)
+            holder.notificationAppImg.setImageDrawable(icon);
+
         //holder.contactPhoneTxt.setText(notification.getPhone());
-        holder.deleteImg.setImageResource(R.drawable.ic_remove_contact);
+        holder.deleteImg.setImageResource(R.drawable.ic_delete);
 
         holder.deleteImg.setOnClickListener(new View.OnClickListener() {
 
@@ -90,7 +101,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
     }
 
     /*Checks whether a particular contact exists in SharedPreferences*/
-    public boolean hasContact(Notification other) {
+    public boolean hasNotification(Notification other) {
         boolean check = false;
         List<Notification> notifications = notificationPreference.getBlackList();
         if (notifications != null) {
@@ -105,18 +116,23 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
     }
 
     @Override
-    public void add(Notification notification) {
-//        super.add(contact);
-        notifications.add(notification);
-        notificationPreference.addToBlackList(notification);
-        notifyDataSetChanged();
-    }
-
-    @Override
     public void remove(Notification notification) {
-//        super.remove(contact);
+        //super.remove(notification);
         notifications.remove(notification);
         notificationPreference.removeFromBlackList(notification);
         notifyDataSetChanged();
+    }
+
+
+    private Drawable getIconAppFor(String packageName) {
+        Drawable icon = null;
+        try {
+            icon = context.getPackageManager().getApplicationIcon(packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            //e.printStackTrace();
+        }
+
+        return icon;
+
     }
 }
