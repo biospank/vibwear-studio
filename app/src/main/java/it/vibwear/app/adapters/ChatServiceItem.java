@@ -5,6 +5,9 @@ import it.vibwear.app.ChatNotificationService;
 import it.vibwear.app.VibWearUtil;
 import it.vibwear.app.fragments.ChatDetailFragment;
 import it.vibwear.app.utils.ChatPreference;
+import it.vibwear.app.utils.NotificationPreference;
+import it.vibwear.app.utils.VersionPreference;
+
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -15,21 +18,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class ChatServiceItem extends ServiceItem {
 	public final String IMO_PACKAGE_NAME = "com.imo.android.imoim";
+    private NotificationPreference notificationPref;
 
-    protected String[] blockedPackages = {
-        "com.android.settings",
-        "com.android.systemui",
-        "it.lampwireless.vibwear.app",
-        "com.avast.android.mobilesecurity"
-    };
+    protected final String VIBWEAR_PACKAGE_NAME = "it.lampwireless.vibwear.app";
 
 	public ChatServiceItem(Activity activity) {
 		super(activity);
 		this.switchPref = new ChatPreference(activity);
+        this.notificationPref = new NotificationPreference(activity);
+
 	}
 	
 	public void setIconView(ImageView icon) {
@@ -94,8 +96,13 @@ public class ChatServiceItem extends ServiceItem {
 	}
 
 	private boolean isBlockedNotification(String packageName) {
-        for(String name : blockedPackages) {
-            if(name.equalsIgnoreCase(packageName))
+        if(packageName.equalsIgnoreCase(VIBWEAR_PACKAGE_NAME))
+            return true;
+
+        ArrayList<Notification> blockedNotifications = notificationPref.getBlackList();
+
+        for(Notification notification : blockedNotifications) {
+            if(notification.getPackageName().equalsIgnoreCase(packageName))
                 return true;
         }
 

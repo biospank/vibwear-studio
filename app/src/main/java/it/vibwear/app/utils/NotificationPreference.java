@@ -44,11 +44,11 @@ public class NotificationPreference {
         editor.commit();
     }
 
-    public void addToBlackList(Notification contact) {
+    public void addToBlackList(Notification notification) {
         List<Notification> notifications = getBlackList();
         if (notifications == null)
             notifications = new ArrayList<Notification>();
-        notifications.add(contact);
+        notifications.add(notification);
         saveBlackList(notifications);
     }
 

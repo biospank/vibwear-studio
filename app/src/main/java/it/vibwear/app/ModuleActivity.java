@@ -64,7 +64,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     private static final Short LOW_SIGNAL_VIBRATION_GAP = 500;
     private static final String TAG_TASK_FRAGMENT = "reconnect_task_fragment";
 
-    //private final BroadcastReceiver metaWearUpdateReceiver= MetaWearBleService.getMetaWearBroadcastReceiver();
     private LocalBroadcastManager broadcastManager = null;
     protected MetaWearBleService mwService;
     protected MetaWearController mwController;

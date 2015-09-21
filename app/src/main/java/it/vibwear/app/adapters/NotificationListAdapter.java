@@ -1,7 +1,10 @@
 package it.vibwear.app.adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -67,8 +70,8 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
                     .findViewById(R.id.img_notification_app);
             holder.notificationNameTxt = (TextView) convertView
                     .findViewById(R.id.txt_notification_name);
-            holder.notificationDateTxt = (TextView) convertView
-                    .findViewById(R.id.txt_notification_date);
+//            holder.notificationDateTxt = (TextView) convertView
+//                    .findViewById(R.id.txt_notification_date);
             holder.deleteImg = (ImageView) convertView
                     .findViewById(R.id.imgbtn_delete);
 
@@ -92,8 +95,20 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 
             @Override
             public void onClick(View v) {
-
-                remove(notification);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(context.getString(R.string.reenable_notification_msg, notification.getPackageName()))
+                        .setIcon(R.drawable.ic_vibwear_notification)
+                        .setTitle(R.string.reenable_notification_title)
+                        .setPositiveButton(R.string.reenable_notification_confirm, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                remove(notification);
+                            }
+                        })
+                        .setNegativeButton(R.string.reenable_notification_cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        }).show();
             }
         });
 
