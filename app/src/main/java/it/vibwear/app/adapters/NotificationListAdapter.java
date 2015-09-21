@@ -70,8 +70,6 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
                     .findViewById(R.id.img_notification_app);
             holder.notificationNameTxt = (TextView) convertView
                     .findViewById(R.id.txt_notification_name);
-//            holder.notificationDateTxt = (TextView) convertView
-//                    .findViewById(R.id.txt_notification_date);
             holder.deleteImg = (ImageView) convertView
                     .findViewById(R.id.imgbtn_delete);
 
@@ -88,7 +86,6 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         if(icon != null)
             holder.notificationAppImg.setImageDrawable(icon);
 
-        //holder.contactPhoneTxt.setText(notification.getPhone());
         holder.deleteImg.setImageResource(R.drawable.ic_delete);
 
         holder.deleteImg.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +94,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(context.getString(R.string.reenable_notification_msg, notification.getPackageName()))
-                        .setIcon(R.drawable.ic_vibwear_notification)
+                        .setIcon(R.drawable.ic_launcher)
                         .setTitle(R.string.reenable_notification_title)
                         .setPositiveButton(R.string.reenable_notification_confirm, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
