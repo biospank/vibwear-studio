@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -79,12 +80,13 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         }
 
         final Notification notification = (Notification) getItem(position);
-        holder.notificationNameTxt.setText(notification.getPackageName());
 
         Drawable icon = getIconAppFor(notification.getPackageName());
 
         if(icon != null)
             holder.notificationAppImg.setImageDrawable(icon);
+
+        holder.notificationNameTxt.setText(getAppNameFor(notification.getPackageName()));
 
         holder.deleteImg.setImageResource(R.drawable.ic_delete);
 
@@ -145,6 +147,22 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         }
 
         return icon;
+
+    }
+
+    private String getAppNameFor(String packageName) {
+        ApplicationInfo applicationInfo = null;
+
+        try {
+            applicationInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            //e.printStackTrace();
+        }
+
+        if(applicationInfo != null)
+            return ((String) context.getPackageManager().getApplicationLabel(applicationInfo));
+        else
+            return packageName;
 
     }
 }
