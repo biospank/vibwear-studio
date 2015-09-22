@@ -9,6 +9,7 @@ import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.handlers.StopNotificationHandler;
 import it.vibwear.app.receivers.StopNotificationReceiver;
 import it.vibwear.app.scanner.ScannerFragment;
+import it.vibwear.app.utils.AppManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -205,7 +206,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	@Override
 	public void onBatteryRequest() {
         //Intent intent = new Intent();
-        //intent.putExtra("sourcePackageName", "ciccio.pasticcio");
+        //intent.putExtra("sourcePackageName", "com.viber.voip");
         //updateNotificationWith(intent);
 		if (isDeviceConnected()) {
             Toast.makeText(this,
@@ -374,11 +375,13 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         if(sourcePackageName != null) {
             showNotification(false);
 
+            AppManager appManager = new AppManager(this, sourcePackageName);
+
             mBuilder = new Notification.Builder(this);
 
             mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
-                    .setContentTitle("VibWear")
-                    .setContentText(sourcePackageName)
+                    .setContentTitle(appManager.getAppName())
+                    //.setContentText(appManager.getAppName())
                     //.setContentInfo(sourcePackageName)
                     .setStyle(new Notification.BigTextStyle().bigText(getResources().getString(R.string.stop_notification_msg)));
 

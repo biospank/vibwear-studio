@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import it.lampwireless.vibwear.app.R;
+import it.vibwear.app.utils.AppManager;
 import it.vibwear.app.utils.NotificationPreference;
 
 /**
@@ -81,12 +82,14 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 
         final Notification notification = (Notification) getItem(position);
 
-        Drawable icon = getIconAppFor(notification.getPackageName());
+        final AppManager appManager = new AppManager(context, notification.getPackageName());
+
+        Drawable icon = appManager.getIconApp();
 
         if(icon != null)
             holder.notificationAppImg.setImageDrawable(icon);
 
-        holder.notificationNameTxt.setText(getAppNameFor(notification.getPackageName()));
+        holder.notificationNameTxt.setText(appManager.getAppName());
 
         holder.deleteImg.setImageResource(R.drawable.ic_delete);
 
@@ -95,7 +98,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(context.getString(R.string.reenable_notification_msg, getAppNameFor(notification.getPackageName())))
+                builder.setMessage(context.getString(R.string.reenable_notification_msg, appManager.getAppName()))
                         .setIcon(R.drawable.ic_launcher)
                         .setTitle(R.string.reenable_notification_title)
                         .setPositiveButton(R.string.reenable_notification_confirm, new DialogInterface.OnClickListener() {
@@ -137,32 +140,4 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
         notifyDataSetChanged();
     }
 
-
-    private Drawable getIconAppFor(String packageName) {
-        Drawable icon = null;
-        try {
-            icon = context.getPackageManager().getApplicationIcon(packageName);
-        } catch (PackageManager.NameNotFoundException e) {
-            //e.printStackTrace();
-        }
-
-        return icon;
-
-    }
-
-    private String getAppNameFor(String packageName) {
-        ApplicationInfo applicationInfo = null;
-
-        try {
-            applicationInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            //e.printStackTrace();
-        }
-
-        if(applicationInfo != null)
-            return ((String) context.getPackageManager().getApplicationLabel(applicationInfo));
-        else
-            return packageName;
-
-    }
 }
