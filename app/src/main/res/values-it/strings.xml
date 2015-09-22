@@ -92,7 +92,7 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="label_chat_notifications">Notifiche bloccate</string>
 
     <string name="reenable_notification_title">Notifica</string>
-    <string name="reenable_notification_msg">Vuoi riabilitare\n%s?</string>
+    <string name="reenable_notification_msg">Vuoi riattivare le notifiche da %s?</string>
     <string name="reenable_notification_confirm">Conferma</string>
     <string name="reenable_notification_cancel">Annulla</string>
     <string name="pick_contact_label">Sfoglia</string>

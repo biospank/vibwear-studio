@@ -95,7 +95,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(context.getString(R.string.reenable_notification_msg, notification.getPackageName()))
+                builder.setMessage(context.getString(R.string.reenable_notification_msg, getAppNameFor(notification.getPackageName())))
                         .setIcon(R.drawable.ic_launcher)
                         .setTitle(R.string.reenable_notification_title)
                         .setPositiveButton(R.string.reenable_notification_confirm, new DialogInterface.OnClickListener() {

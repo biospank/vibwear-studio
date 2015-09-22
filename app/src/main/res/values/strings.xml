@@ -92,7 +92,7 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="label_chat_notifications">Notification black list</string>
 
     <string name="reenable_notification_title">Notification</string>
-    <string name="reenable_notification_msg">Do you want to restore\n%s?</string>
+    <string name="reenable_notification_msg">Do you want to restore notifications from %s?</string>
     <string name="reenable_notification_confirm">Confirm</string>
     <string name="reenable_notification_cancel">Cancel</string>
     <string name="pick_contact_label">Browse</string>
