@@ -83,18 +83,20 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="progressMsg">attendere...</string>
     <string name="reconnectProgressTitle">Connessione persa</string>
     <string name="reconnectProgressMsg">riconnessione in corso...</string>
-
     <string name="stop_notification_msg">
         Vuoi bloccare questa notifica su Vibwear?
     </string>
     <string name="stop_notification_btn_confirm">Blocca</string>
     <string name="stop_notification_btn_cancel">Annulla</string>
     <string name="label_chat_notifications">Notifiche bloccate</string>
-
     <string name="reenable_notification_title">Notifica</string>
     <string name="reenable_notification_msg">Vuoi riattivare le notifiche da %s?</string>
     <string name="reenable_notification_confirm">Conferma</string>
     <string name="reenable_notification_cancel">Annulla</string>
+    <string name="delete_sos_contact_title">Contatto</string>
+    <string name="delete_sos_contact_msg">Vuoi rimuovere %s tra i contatti S.O.S.?</string>
+    <string name="delete_sos_contact_confirm">Conferma</string>
+    <string name="delete_sos_contact_cancel">Annulla</string>
     <string name="pick_contact_label">Sfoglia</string>
    	<string name="label_sos_msg">Messaggio S.O.S.</string>
    	<string name="label_sos_contacts">Contatti S.O.S.</string>

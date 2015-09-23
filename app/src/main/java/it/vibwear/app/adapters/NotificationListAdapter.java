@@ -91,7 +91,7 @@ public class NotificationListAdapter extends ArrayAdapter<Notification> {
 
         holder.notificationNameTxt.setText(appManager.getAppName());
 
-        holder.deleteImg.setImageResource(R.drawable.ic_delete);
+        holder.deleteImg.setImageResource(R.drawable.ic_unlock);
 
         holder.deleteImg.setOnClickListener(new View.OnClickListener() {
 

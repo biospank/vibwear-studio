@@ -6,7 +6,9 @@ import it.vibwear.app.utils.SosPreference;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -79,8 +81,20 @@ public class ContactListAdapter extends ArrayAdapter<Contact> {
 			
 			@Override
 			public void onClick(View v) {
-				
-				remove(contact);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(context.getString(R.string.delete_sos_contact_msg, contact.getName()))
+                        .setIcon(R.drawable.ic_launcher)
+                        .setTitle(R.string.delete_sos_contact_title)
+                        .setPositiveButton(R.string.delete_sos_contact_confirm, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                remove(contact);
+                            }
+                        })
+                        .setNegativeButton(R.string.delete_sos_contact_cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        }).show();
 			}
 		});
 
