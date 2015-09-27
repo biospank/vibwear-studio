@@ -13,7 +13,7 @@ import it.vibwear.app.VibWearActivity;
  */
 public class StopNotificationHandler extends Handler {
     public static final int DISMISS_NOTIFICATION_MSG = 0;
-    public static final int DISMISS_NOTIFICATION_TIMEOUT = 10000;
+    public static final int DISMISS_NOTIFICATION_TIMEOUT = 15000;
     private Context context;
 
     public StopNotificationHandler(Context context) {
