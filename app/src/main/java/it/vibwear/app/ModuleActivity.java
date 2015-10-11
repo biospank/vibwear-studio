@@ -155,6 +155,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             if (msg.isEmpty())
                 msg = getString(R.string.sos_default_msg);
 
+            msg += " " + getLocationUrlMap();
+
             for (Contact contact : contacts) {
                 smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
             }
@@ -169,15 +171,11 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         }
     };
 
-    protected void updateSignalLevel(int rssiPercent) {
-    }
+    protected void updateSignalLevel(int rssiPercent) {};
 
-    ;
+    protected void updateBatteryLevel(String batteryLevel) {};
 
-    protected void updateBatteryLevel(String batteryLevel) {
-    }
-
-    ;
+    protected String getLocationUrlMap() { return null; };
 
     protected void getRemoteSignals() {
         Handler handler = new Handler();

@@ -11,9 +11,17 @@ import it.vibwear.app.receivers.StopNotificationReceiver;
 import it.vibwear.app.scanner.ScannerFragment;
 import it.vibwear.app.utils.AppManager;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.mbientlab.metawear.api.GATT;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
@@ -28,13 +36,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
+public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener,
+        SettingsDetailFragment.OnSettingsChangeListener, AlarmListner,
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
+        LocationListener {
 	private static final String VERSION = "1.6.1";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
@@ -46,7 +59,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
-	private Notification.Builder mBuilder;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+    private Notification.Builder mBuilder;
 	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
@@ -139,6 +155,20 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		super.onPause();
 		cancelScheduledTimers();
 	}
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Connect the client.
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        // Disconnecting the client invalidates it.
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
 
 	@Override
 	public void onBackPressed() {
@@ -273,6 +303,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		intentFilter.addAction(ServicesFragment.ALARM_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.CHAT_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
+
+        buildGoogleApiClient();
 
 	}
 	
@@ -424,6 +456,89 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this,
                 new UUID[]{GATT.GATTService.METAWEAR.uuid()}, true);
         dialog.show(fm, "scan_fragment");
+    }
+
+    @Override
+    protected String getLocationUrlMap() {
+//		return servicesFrag.getLocationUrlMap();
+
+        String query = "";
+        String url = "";
+        try {
+            if(mLastLocation != null) {
+                Log.i("Location", "latitude: " + mLastLocation.getLatitude());
+                Log.i("Location", "longitude: " + mLastLocation.getLongitude());
+                query = URLEncoder.encode(mLastLocation.getLatitude() + "N," + mLastLocation.getLongitude() + "W", "utf-8");
+                url = "http://maps.google.com/maps?q=" + query;
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+//			e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult arg0) {
+        // TODO Auto-generated method stub
+        Toast.makeText(this, "connection failded", Toast.LENGTH_LONG).show();
+        Log.i("Vibwear", "GoogleApiClient connection has failed");
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.i("Vibwear", "GoogleApiClient connection established");
+//		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+//        if (mLastLocation != null) {
+//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+//        }
+
+//		if (mRequestingLocationUpdates) {
+//			mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        createLocationRequest();
+        startLocationUpdates();
+//	    }
+    }
+
+    @Override
+    public void onConnectionSuspended(int arg0) {
+        Log.i("Vibwear", "GoogleApiClient connection has been suspend");
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        Log.i("Vibwear", "Location received: " + location.toString());
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
     }
 
 }
