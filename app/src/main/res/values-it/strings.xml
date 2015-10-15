@@ -86,6 +86,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="stop_notification_msg">
         Vuoi bloccare questa notifica su Vibwear?
     </string>
+    <string name="my_position">Nel messaggio</string>
+    <string name="label_geolocation">La mia posizione</string>
     <string name="stop_notification_btn_confirm">Blocca</string>
     <string name="stop_notification_btn_cancel">Annulla</string>
     <string name="label_chat_notifications">Notifiche bloccate</string>

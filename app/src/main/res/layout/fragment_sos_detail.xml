@@ -1,94 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:scrollbars="vertical" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
 
-    <LinearLayout 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-		android:background="@color/sectionColor" >
-	    <TextView
-	        android:labelFor="@+id/et_sos_msg"
-	        android:text="@string/label_sos_msg"
-	        android:background="@color/sectionColor"
-	        android:layout_marginLeft="15dp"
-	        android:layout_marginRight="15dp"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:fontFamily="sans-serif-light"
-	        android:textStyle="normal"
-	        android:textSize="25sp"
-	        />
-    </LinearLayout>
-
-    <EditText 
-        android:id="@+id/et_sos_msg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:inputType="textMultiLine"
-        android:hint="@string/sos_msg_hint"
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:scrollbars="vertical" >
 
-        <!-- 
-           <requestFocus />
-         -->
-        
-    </EditText>
-
-    <LinearLayout 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-		android:background="@color/sectionColor" >
-   	    <TextView
-	        android:labelFor="@+id/lv_sos_contacts"
-	        android:text="@string/label_sos_contacts"
-	        android:layout_marginLeft="15dp"
-	        android:layout_marginRight="15dp"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:fontFamily="sans-serif-light"
-	        android:textStyle="normal"
-	        android:textSize="25sp"
-	        android:layout_weight="1"
-	        />
-        <ImageButton 
-            android:id="@+id/bt_sos_contacts"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-	        android:layout_weight="3"
-	        android:layout_marginRight="10dp"
-            android:clickable="true"
-            android:textAlignment="viewEnd"
-            android:src="@drawable/ic_contacts"/>
-        
+            android:orientation="horizontal"
+            android:background="@color/sectionColor" >
+            <TextView
+                android:labelFor="@+id/et_sos_msg"
+                android:text="@string/label_sos_msg"
+                android:background="@color/sectionColor"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textSize="25sp"
+                />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_sos_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:inputType="textMultiLine"
+            android:hint="@string/sos_msg_hint"
+            android:scrollbars="vertical" >
+
+            <!--
+               <requestFocus />
+             -->
+
+        </EditText>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/sectionColor" >
+            <TextView
+                android:labelFor="@+id/lv_sos_contacts"
+                android:text="@string/label_sos_contacts"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textSize="25sp"
+                android:layout_weight="1"
+                />
+            <ImageButton
+                android:id="@+id/bt_sos_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:layout_marginRight="10dp"
+                android:clickable="true"
+                android:textAlignment="viewEnd"
+                android:src="@drawable/ic_contacts"/>
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/lv_sos_contacts"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" >
+        </ListView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/sectionColor" >
+            <TextView
+                android:labelFor="@+id/cb_my_position"
+                android:text="@string/label_geolocation"
+                android:background="@color/sectionColor"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textSize="25sp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/my_position"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="20dp"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textSize="20sp"
+                />
+
+            <CheckBox
+                android:id="@+id/cb_my_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="30dp" />
+
+        </LinearLayout>
+
+        <!--
+            <fragment android:name="it.lampwireless.vibwear.app.fragments.VibSliderFragment"
+            android:id="@+id/fragmentVibSlider"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+
+        </fragment>
+
+          -->
     </LinearLayout>
-    
-    <ListView 
-        android:id="@+id/lv_sos_contacts"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" >
-    </ListView>
-
-    <!-- 
-        <fragment android:name="it.lampwireless.vibwear.app.fragments.VibSliderFragment"
-        android:id="@+id/fragmentVibSlider"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >    
-
-  	</fragment>
-  	
-      --> 
-    
-</LinearLayout>
+</ScrollView>

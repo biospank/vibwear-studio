@@ -10,14 +10,18 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -26,6 +30,8 @@ import android.widget.Toast;
 public class SosDetailFragment extends Fragment {
 	// Declare
 	static final int PICK_CONTACT=1;
+    public static final String MY_POSTITION_PREFS_NAME = "MY_POSTITION_DETAILS";
+    public static final String MY_POSTITION_KEY = "my_position";
 	protected Context context;
 	protected SosPreference contactPreference;
 	protected ContactListAdapter adapter;
@@ -64,7 +70,22 @@ public class SosDetailFragment extends Fragment {
 		
 		etSosMsg.setText(contactPreference.getSosMessage());
 
-		return sosDetail;
+        CheckBox cbMyPosition = (CheckBox)sosDetail.findViewById(R.id.cb_my_position);
+
+        cbMyPosition.setChecked(getMyPositionPref());
+
+        cbMyPosition.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setMyPositionPref(isChecked);
+            }
+        });
+
+        setListViewHeightBasedOnChildren(lvSosContacts);
+
+        unsetParentScrollFor(lvSosContacts);
+
+        return sosDetail;
 	}
 
 	@Override
@@ -127,5 +148,67 @@ public class SosDetailFragment extends Fragment {
 			break;
 		}
 	}
-	
+
+    public boolean getMyPositionPref() {
+        SharedPreferences settings = getActivity().getSharedPreferences(MY_POSTITION_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        return settings.getBoolean(MY_POSTITION_KEY, false);
+
+    }
+
+    public void setMyPositionPref(boolean newValue) {
+        SharedPreferences.Editor editor;
+        SharedPreferences settings = getActivity().getSharedPreferences(MY_POSTITION_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        editor = settings.edit();
+
+        editor.putBoolean(MY_POSTITION_KEY, newValue);
+
+        editor.commit();
+
+    }
+
+    /**** Method for Setting the Height of the ListView dynamically.
+     **** Hack to fix the issue of not showing all the items of the ListView
+     **** when placed inside a ScrollView  ****/
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+//        ListAdapter listAdapter = listView.getAdapter();
+//        if (listAdapter == null)
+//            return;
+//
+//        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+//        int totalHeight = 0;
+//        View view = null;
+//        for (int i = 0; i < listAdapter.getCount(); i++) {
+//            view = listAdapter.getView(i, view, listView);
+//            if (i == 0)
+//                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+//
+//            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+//            totalHeight += view.getMeasuredHeight();
+//        }
+//        ViewGroup.LayoutParams params = listView.getLayoutParams();
+//        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+//        listView.setLayoutParams(params);
+//        listView.requestLayout();
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = 350;
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+
+    private void unsetParentScrollFor(ListView listView) {
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            // Setting on Touch Listener for handling the touch inside ScrollView
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // Disallow the touch request for parent scroll on touch of child view
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+    }
+
+
 }

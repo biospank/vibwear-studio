@@ -86,6 +86,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="stop_notification_msg">
         Do you want Vibwear to stop alert you for this notification?
     </string>
+    <string name="my_position">Into message</string>
+    <string name="label_geolocation">My position</string>
     <string name="stop_notification_btn_confirm">Stop</string>
     <string name="stop_notification_btn_cancel">Continue</string>
     <string name="label_chat_notifications">Notification black list</string>
