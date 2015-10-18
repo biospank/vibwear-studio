@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
 
-import com.mbientlab.metawear.api.MetaWearBleService;
+import com.mbientlab.metawear.MetaWearBleService;
 
 /**
  * Created by biospank on 16/06/15.
