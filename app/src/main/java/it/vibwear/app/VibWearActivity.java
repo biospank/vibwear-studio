@@ -14,7 +14,6 @@ import it.vibwear.app.utils.AppManager;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import com.mbientlab.metawear.api.GATT;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -33,6 +32,8 @@ import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.mbientlab.metawear.MetaWearBoard;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.6.1";
@@ -244,7 +245,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     @Override
     public void onBoardNameChange(String boardName) {
         if(isDeviceConnected()) {
-            settingsController.setDeviceName(boardName);
+            //settingsController.setDeviceName(boardName);
             deviceName = boardName;
         }
     }
@@ -361,9 +362,9 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 			mBuilder.setContentIntent(startPendingIntent);
             mBuilder.setOngoing(true);
-			mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+			//mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
 		} else {
-			mwService.stopForeground(true);
+			//mwService.stopForeground(true);
 		}
 	}
 
@@ -422,7 +423,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
         ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this,
-                new UUID[]{GATT.GATTService.METAWEAR.uuid()}, true);
+                new UUID[]{MetaWearBoard.METAWEAR_SERVICE_UUID}, true);
         dialog.show(fm, "scan_fragment");
     }
 

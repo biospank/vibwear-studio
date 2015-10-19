@@ -79,6 +79,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         public void connected() {
             if (isDeviceConnected()) {
                 readDeviceInfo();
+                readDeviceName();
                 reconnectTaskFragment.dismissDialog();
             }
 
@@ -109,6 +110,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     }
 
     public void readDeviceInfo() {
+
         AsyncOperation<MetaWearBoard.DeviceInformation> result = mwBoard.readDeviceInformation();
 
         result.onComplete(new AsyncOperation.CompletionHandler<MetaWearBoard.DeviceInformation>() {
@@ -120,6 +122,22 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             @Override
             public void failure(Throwable error) {
                 Log.e("readDeviceInfo", "Error reading device info", error);
+            }
+        });
+    }
+
+    public void readDeviceName() {
+        AsyncOperation<Settings.AdvertisementConfig> result = settingsController.readAdConfig();
+
+        result.onComplete(new AsyncOperation.CompletionHandler<Settings.AdvertisementConfig>() {
+            @Override
+            public void success(final Settings.AdvertisementConfig deviceInfo) {
+                deviceName = deviceInfo.deviceName();
+            }
+
+            @Override
+            public void failure(Throwable error) {
+                Log.e("readDeviceName", "Error reading device name", error);
             }
         });
     }
@@ -145,7 +163,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
             @Override
             public void failure(Throwable error) {
-                Log.e("AsyncOperation updateRssi", "Error reading RSSI value", error);
+                Log.e("UpdateRssi", "Error reading RSSI value", error);
             }
         });
     }
@@ -341,7 +359,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mwService = (MetaWearBleService.LocalBinder) service;
-            initializeAndConnect();
 
 //            broadcastManager = LocalBroadcastManager.getInstance(mwService);
 //            broadcastManager.registerReceiver(MetaWearBleService.getMetaWearBroadcastReceiver(),
@@ -370,10 +387,11 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
      */
     @Override
     public void onDeviceSelected(BluetoothDevice device, String name) {
-//        if (isDeviceConnected()) {
-//            mwBoard.close(true);
-//            mwController = null;
-//        }
+        if (isDeviceConnected()) {
+            mwBoard.disconnect();
+            mwBoard = null;
+        }
+
         ModuleActivity.device = device;
         initializeAndConnect();
     }
@@ -593,5 +611,9 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         } else {
             return false;
         }
+    }
+
+    public MetaWearBoard getMwBoard() {
+        return mwBoard;
     }
 }

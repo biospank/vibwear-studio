@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.mbientlab.metawear.api.MetaWearBleService;
-
 import it.vibwear.app.VibWearActivity;
 import it.vibwear.app.adapters.Notification;
 import it.vibwear.app.utils.NotificationPreference;
