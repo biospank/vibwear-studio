@@ -40,7 +40,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
-	public static final int VIBWEAR_NOTIFICATION_ID = 9571;
+	public static final int VIBWEAR_PERSISTENT_NOTIFICATION_ID = 9571;
+    public static final int VIBWEAR_TEMPORARY_NOTIFICATION_ID = 9572;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
@@ -60,7 +61,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 			if(isDeviceConnected() && servicesFrag.consumeIntent(intent)) {
 				vibrate(ModuleActivity.NOTIFY_VIB_MODE, intent);
-                updateNotificationWith(intent);
+                showTemporaryNotification(intent);
 			}
 
 			servicesFrag.update(intent);
@@ -128,7 +129,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	public void onDestroy() {
 		super.onDestroy();
 		if(isFinishing())
-			showNotification(false);
+            showPermanentNotification(false);
 
 		unregisterReceiver(intentReceiver);
 
@@ -162,8 +163,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 		if (isDeviceConnected()) {
 			locationFrag.updateConnectionImageResource(true);
-			if(progress != null) progress.dismiss();
-		} else {
+			if(progress != null)
+                progress.dismiss();
+
+            showPermanentNotification(true);
+        } else {
 			locationFrag.updateConnectionImageResource(false);
 		}
     }
@@ -195,7 +199,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	@Override
 	public void onSignalRequest() {
-        //showNotification(true);
+        //showPermanentNotification(true);
 		if(isDeviceConnected()) {
             Toast.makeText(this,
                     getString(R.string.signal_level_msg,
@@ -207,7 +211,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	public void onBatteryRequest() {
         //Intent intent = new Intent();
         //intent.putExtra("sourcePackageName", "com.viber.voip");
-        //updateNotificationWith(intent);
+        //showTemporaryNotification(intent);
 		if (isDeviceConnected()) {
             Toast.makeText(this,
                     getString(R.string.battery_level_msg,
@@ -272,7 +276,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		intentFilter.addAction(ServicesFragment.SMS_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.ALARM_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.CHAT_VIB_ACTION);
-		intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
+        intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
 
 	}
 	
@@ -338,14 +342,14 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         getApplication().startActivity(intent);
     }
 
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		if(isDeviceConnected())
-			showNotification(!hasFocus);
-	}
+	//@Override
+	//public void onWindowFocusChanged(boolean hasFocus) {
+	//	super.onWindowFocusChanged(hasFocus);
+	//	if(isDeviceConnected())
+	//		showNotification(!hasFocus);
+	//}
 
-	public void showNotification(boolean show) {
+	public void showPermanentNotification(boolean show) {
 		if(show) {
             mBuilder = new Notification.Builder(this);
 
@@ -361,20 +365,18 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 			mBuilder.setContentIntent(startPendingIntent);
             mBuilder.setOngoing(true);
-			mwService.startForeground(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+            mwService.startForeground(VIBWEAR_PERSISTENT_NOTIFICATION_ID, mBuilder.build());
 		} else {
 			mwService.stopForeground(true);
 		}
 	}
 
-	protected void updateNotificationWith(Intent intent) {
+	protected void showTemporaryNotification(Intent intent) {
 		Bundle extraInfo = intent.getExtras();
 
 		String sourcePackageName = extraInfo.getString("sourcePackageName");
 
         if(sourcePackageName != null) {
-            showNotification(false);
-
             AppManager appManager = new AppManager(this, sourcePackageName);
 
             mBuilder = new Notification.Builder(this);
@@ -408,7 +410,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            notificationManager.notify(VIBWEAR_NOTIFICATION_ID, mBuilder.build());
+            notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, mBuilder.build());
 
             StopNotificationHandler stopHandler = new StopNotificationHandler(this);
             stopHandler.sendEmptyMessageDelayed(
@@ -418,6 +420,52 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         }
 
 	}
+
+//    public void showCustomNotification() {
+//        // Using RemoteViews to bind custom layouts into Notification
+//        RemoteViews remoteViews = new RemoteViews(getPackageName(),
+//                R.layout.custom_notification);
+//
+//        // Set Notification Title
+//        String strtitle = getString(R.string.customnotificationtitle);
+//        // Set Notification Text
+//        String strtext = getString(R.string.customnotificationtext);
+//
+//        // Open NotificationView Class on Notification Click
+//        Intent intent = new Intent(this, NotificationView.class);
+//        // Send data to NotificationView Class
+//        intent.putExtra("title", strtitle);
+//        intent.putExtra("text", strtext);
+//        // Open NotificationView.java Activity
+//        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        Notification.Builder builder = new Notification.Builder(this)
+//                // Set Icon
+//                .setSmallIcon(R.drawable.logosmall)
+//                        // Set Ticker Message
+//                .setTicker(getString(R.string.customnotificationticker))
+//                        // Dismiss Notification
+//                .setAutoCancel(true)
+//                        // Set PendingIntent into Notification
+//                .setContentIntent(pIntent)
+//                        // Set RemoteViews into Notification
+//                .setContent(remoteViews);
+//
+//        // Locate and set the Image into customnotificationtext.xml ImageViews
+//        remoteViews.setImageViewResource(R.id.imagenotileft,R.drawable.ic_launcher);
+//        remoteViews.setImageViewResource(R.id.imagenotiright,R.drawable.androidhappy);
+//
+//        // Locate and set the Text into customnotificationtext.xml TextViews
+//        remoteViews.setTextViewText(R.id.title,getString(R.string.customnotificationtitle));
+//        remoteViews.setTextViewText(R.id.text,getString(R.string.customnotificationtext));
+//
+//        // Create Notification Manager
+//        NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//        // Build Notification with Notification Manager
+//        notificationmanager.notify(0, builder.build());
+//
+//    }
 
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
