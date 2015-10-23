@@ -9,6 +9,7 @@ import com.mbientlab.metawear.api.MetaWearBleService;
 
 import it.vibwear.app.VibWearActivity;
 import it.vibwear.app.adapters.Notification;
+import it.vibwear.app.notifications.TemporaryNotification;
 import it.vibwear.app.utils.NotificationPreference;
 
 /**
@@ -29,6 +30,6 @@ public class StopNotificationReceiver extends BroadcastReceiver {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.cancel(VibWearActivity.VIBWEAR_TEMPORARY_NOTIFICATION_ID);
+        notificationManager.cancel(TemporaryNotification.VIBWEAR_TEMPORARY_NOTIFICATION_ID);
     }
 }

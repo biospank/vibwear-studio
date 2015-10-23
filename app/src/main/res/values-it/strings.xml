@@ -79,6 +79,8 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="activeChatServiceDesc">Chat attivo!</string>
     <string name="activeSosServiceDesc">S.O.S. attivo!</string>
     <string name="tapAlarmDesc">Impostazioni sveglia</string>
+    <string name="tap_to_show">Mostra</string>
+    <string name="notification_ticker">VibWear in ascolto</string>
     <string name="progressTitle">Connessione Dispositivo</string>
     <string name="progressMsg">attendere...</string>
     <string name="reconnectProgressTitle">Connessione persa</string>
@@ -113,7 +115,8 @@ contact MbientLab Inc, at www.mbientlab.com.
 	<string name="contact_with_number_msg">Solo contatti con numero</string>
 	<string name="sos_msg_hint">Scrivi il tuo messaggio</string>
 	<string name="sos_default_msg">Vibwear: scrivi il tuo messaggio nelle impostazioni s.o.s.</string>
-				
+    <string name="tap_to_block_notification">Blocca qusta notifica</string>
+
     <string name="scanner_title">Seleziona dispositivo:</string>
     <string name="scanner_empty">Nessun dispositivo</string>
     <string name="scanner_action_scan">Scansione</string>

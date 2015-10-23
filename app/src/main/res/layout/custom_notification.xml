@@ -1,30 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                style="@android:style/TextAppearance.StatusBar.EventContent">
 
     <ImageView
-        android:id="@+id/img_notification_block"
+        android:id="@+id/imagenotileft"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:padding="10dp" />
+        android:layout_margin="5dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_launcher" />
 
-    <TextView
-        android:id="@+id/txt_notification_msg"
-        android:layout_width="match_parent"
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/img_notification_block"
-        android:padding="10dp" />
+        android:layout_alignParentBottom="false"
+        android:layout_margin="5dp"
+        android:layout_toRightOf="@+id/imagenotileft"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="first text"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="second text to show"
+            android:textColor="@android:color/secondary_text_light"
+            />
+    </LinearLayout>
 
     <ImageView
-        android:id="@+id/img_notification_lock"
+        android:id="@+id/imagenotiright"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="3dp"
-        android:background="@null"
-        android:contentDescription="@string/delete" />
+        android:contentDescription="@string/app_name" />
 
 </RelativeLayout>

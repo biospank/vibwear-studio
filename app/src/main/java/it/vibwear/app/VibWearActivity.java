@@ -6,11 +6,9 @@ import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
 import it.vibwear.app.fragments.LocationFragment.OnLocationChangeListener;
 import it.vibwear.app.fragments.SettingsDetailFragment;
-import it.vibwear.app.handlers.StopNotificationHandler;
-import it.vibwear.app.receivers.StopNotificationReceiver;
+import it.vibwear.app.notifications.PermanentNotification;
+import it.vibwear.app.notifications.TemporaryNotification;
 import it.vibwear.app.scanner.ScannerFragment;
-import it.vibwear.app.utils.AppManager;
-
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -19,8 +17,6 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -32,7 +28,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
@@ -41,8 +36,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
-	public static final int VIBWEAR_PERSISTENT_NOTIFICATION_ID = 9571;
-    public static final int VIBWEAR_TEMPORARY_NOTIFICATION_ID = 9572;
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
@@ -352,181 +345,16 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	public void showPermanentNotification(boolean show) {
 		if(show) {
-            mBuilder = new Notification.Builder(this);
-
-            mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
-					.setTicker("Vibwear app listening")
-					.setContentTitle("VibWear")
-					.setContentText("Tap to show.");
-
-			Intent startIntent = new Intent(this, VibWearActivity.class);
-
-			PendingIntent startPendingIntent =
-					PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-			mBuilder.setContentIntent(startPendingIntent);
-            mBuilder.setOngoing(true);
-            mwService.startForeground(VIBWEAR_PERSISTENT_NOTIFICATION_ID, mBuilder.build());
+            mBuilder = new PermanentNotification(this).create();
+            mwService.startForeground(PermanentNotification.VIBWEAR_PERSISTENT_NOTIFICATION_ID, mBuilder.build());
 		} else {
 			mwService.stopForeground(true);
 		}
 	}
 
-//	protected void showTemporaryNotification(Intent intent) {
-//		Bundle extraInfo = intent.getExtras();
-//
-//		String sourcePackageName = extraInfo.getString("sourcePackageName");
-//
-//        if(sourcePackageName != null) {
-//            AppManager appManager = new AppManager(this, sourcePackageName);
-//
-//            mBuilder = new Notification.Builder(this);
-//
-//            mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
-//                    .setContentTitle(appManager.getAppName())
-//                    //.setContentText(appManager.getAppName())
-//                    //.setContentInfo(sourcePackageName)
-//                    .setStyle(new Notification.BigTextStyle().bigText(getResources().getString(R.string.stop_notification_msg)));
-//
-//            Intent startIntent = new Intent(this, VibWearActivity.class);
-//
-//            PendingIntent startPendingIntent =
-//                    PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//            mBuilder.setContentIntent(startPendingIntent);
-//
-//            Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
-//            stopIntent.putExtra("sourcePackageName", sourcePackageName);
-//            stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
-//
-//            PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
-//                    getApplicationContext(),
-//                    0,
-//                    stopIntent,
-//                    PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//            mBuilder.addAction(R.drawable.ic_lock,
-//                    getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
-//
-//            NotificationManager notificationManager =
-//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, mBuilder.build());
-//
-//            StopNotificationHandler stopHandler = new StopNotificationHandler(this);
-//            stopHandler.sendEmptyMessageDelayed(
-//                    StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
-//                    StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
-//            );
-//        }
-//
-//	}
-
-    protected void showTemporaryNotification(Intent intent) {
-        Bundle extraInfo = intent.getExtras();
-
-        String sourcePackageName = extraInfo.getString("sourcePackageName");
-
-        AppManager appManager = new AppManager(this, sourcePackageName);
-
-        // Using RemoteViews to bind custom layouts into Notification
-        RemoteViews remoteViews = new RemoteViews(getPackageName(),
-                R.layout.custom_notification);
-
-        remoteViews.setImageViewResource(R.id.img_notification_block, R.drawable.ic_lock);
-        remoteViews.setTextViewText(R.id.txt_notification_msg, appManager.getAppName());
-        remoteViews.setImageViewResource(R.id.img_notification_lock, R.drawable.ic_unlock);
-
-        Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
-        stopIntent.putExtra("sourcePackageName", sourcePackageName);
-        stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
-
-        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
-                getApplicationContext(),
-                0,
-                stopIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification.Builder builder = new Notification.Builder(this)
-                // Set Icon
-                .setSmallIcon(R.drawable.ic_vibwear_notification)
-                        // Dismiss Notification
-                .setAutoCancel(true)
-                        // Set PendingIntent into Notification
-                .setContentIntent(stopPendingIntent)
-                        // Set RemoteViews into Notification
-                .setContent(remoteViews);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, builder.build());
-
-        StopNotificationHandler stopHandler = new StopNotificationHandler(this);
-        stopHandler.sendEmptyMessageDelayed(
-                StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
-                StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
-        );
-
-    }
-
-//	protected void showTemporaryNotification(Intent intent) {
-//		NotificationCompat.Builder builder = buildNotification();
-//
-//        NotificationManager notificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, builder.build());
-//
-//        StopNotificationHandler stopHandler = new StopNotificationHandler(this);
-//        stopHandler.sendEmptyMessageDelayed(
-//                StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
-//                StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
-//        );
-//	}
-//
-//	protected NotificationCompat.Builder buildNotification() {
-//
-//		// Open NotificationView.java Activity
-//		PendingIntent pIntent = PendingIntent.getActivity(
-//				getApplicationContext(),
-//				VIBWEAR_TEMPORARY_NOTIFICATION_ID,
-//				getIntent(),
-//				PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//		NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
-//				// Set Icon
-//				.setSmallIcon(R.drawable.ic_launcher)
-//						// Set Ticker Message
-//				.setTicker(getApplicationContext().getString(R.string.customnotificationticker))
-//						// Dismiss Notification
-//				.setAutoCancel(true)
-//						// Set PendingIntent into Notification
-//				.setContentIntent(pIntent);
-//
-//		builder = builder.setContent(getComplexNotificationView());
-//
-//		return builder;
-//	}
-//
-//	private RemoteViews getComplexNotificationView() {
-//		// Using RemoteViews to bind custom layouts into Notification
-//		RemoteViews notificationView = new RemoteViews(
-//				getApplicationContext().getPackageName(),
-//				R.layout.activity_custom_notification
-//		);
-//
-//		// Locate and set the Image into customnotificationtext.xml ImageViews
-//		notificationView.setImageViewResource(
-//				R.id.imagenotileft,
-//				R.drawable.ic_launcher);
-//
-//		// Locate and set the Text into customnotificationtext.xml TextViews
-//		notificationView.setTextViewText(R.id.title, getTitle());
-//		notificationView.setTextViewText(R.id.text, "Some text");
-//
-//		return notificationView;
-//	}
+	protected void showTemporaryNotification(Intent intent) {
+        new TemporaryNotification(this, intent).show();
+	}
 
 	protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();

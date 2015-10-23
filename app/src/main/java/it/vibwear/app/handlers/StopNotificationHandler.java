@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Handler;
 
 import it.vibwear.app.VibWearActivity;
+import it.vibwear.app.notifications.TemporaryNotification;
 
 /**
  * Created by biospank on 29/08/15.
@@ -35,7 +36,7 @@ public class StopNotificationHandler extends Handler {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.cancel(VibWearActivity.VIBWEAR_TEMPORARY_NOTIFICATION_ID);
+        notificationManager.cancel(TemporaryNotification.VIBWEAR_TEMPORARY_NOTIFICATION_ID);
 
     }
 
