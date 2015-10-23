@@ -203,9 +203,9 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	
 	@Override
 	public void onBatteryRequest() {
-        Intent intent = new Intent();
-        intent.putExtra("sourcePackageName", "com.viber.voip");
-        showTemporaryNotification(intent);
+        //Intent intent = new Intent();
+        //intent.putExtra("sourcePackageName", "com.viber.voip");
+        //showTemporaryNotification(intent);
 		if (isDeviceConnected()) {
             Toast.makeText(this,
                     getString(R.string.battery_level_msg,
