@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
@@ -209,9 +210,9 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	
 	@Override
 	public void onBatteryRequest() {
-        //Intent intent = new Intent();
-        //intent.putExtra("sourcePackageName", "com.viber.voip");
-        //showTemporaryNotification(intent);
+        Intent intent = new Intent();
+        intent.putExtra("sourcePackageName", "com.viber.voip");
+        showTemporaryNotification(intent);
 		if (isDeviceConnected()) {
             Toast.makeText(this,
                     getString(R.string.battery_level_msg,
@@ -371,101 +372,103 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 	}
 
-	protected void showTemporaryNotification(Intent intent) {
-		Bundle extraInfo = intent.getExtras();
-
-		String sourcePackageName = extraInfo.getString("sourcePackageName");
-
-        if(sourcePackageName != null) {
-            AppManager appManager = new AppManager(this, sourcePackageName);
-
-            mBuilder = new Notification.Builder(this);
-
-            mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
-                    .setContentTitle(appManager.getAppName())
-                    //.setContentText(appManager.getAppName())
-                    //.setContentInfo(sourcePackageName)
-                    .setStyle(new Notification.BigTextStyle().bigText(getResources().getString(R.string.stop_notification_msg)));
-
-            Intent startIntent = new Intent(this, VibWearActivity.class);
-
-            PendingIntent startPendingIntent =
-                    PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            mBuilder.setContentIntent(startPendingIntent);
-
-            Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
-            stopIntent.putExtra("sourcePackageName", sourcePackageName);
-            stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
-
-            PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
-                    getApplicationContext(),
-                    0,
-                    stopIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-
-            mBuilder.addAction(R.drawable.ic_lock,
-                    getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
-
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, mBuilder.build());
-
-            StopNotificationHandler stopHandler = new StopNotificationHandler(this);
-            stopHandler.sendEmptyMessageDelayed(
-                    StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
-                    StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
-            );
-        }
-
-	}
-
-//    public void showCustomNotification() {
-//        // Using RemoteViews to bind custom layouts into Notification
-//        RemoteViews remoteViews = new RemoteViews(getPackageName(),
-//                R.layout.custom_notification);
+//	protected void showTemporaryNotification(Intent intent) {
+//		Bundle extraInfo = intent.getExtras();
 //
-//        // Set Notification Title
-//        String strtitle = getString(R.string.customnotificationtitle);
-//        // Set Notification Text
-//        String strtext = getString(R.string.customnotificationtext);
+//		String sourcePackageName = extraInfo.getString("sourcePackageName");
 //
-//        // Open NotificationView Class on Notification Click
-//        Intent intent = new Intent(this, NotificationView.class);
-//        // Send data to NotificationView Class
-//        intent.putExtra("title", strtitle);
-//        intent.putExtra("text", strtext);
-//        // Open NotificationView.java Activity
-//        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
+//        if(sourcePackageName != null) {
+//            AppManager appManager = new AppManager(this, sourcePackageName);
 //
-//        Notification.Builder builder = new Notification.Builder(this)
-//                // Set Icon
-//                .setSmallIcon(R.drawable.logosmall)
-//                        // Set Ticker Message
-//                .setTicker(getString(R.string.customnotificationticker))
-//                        // Dismiss Notification
-//                .setAutoCancel(true)
-//                        // Set PendingIntent into Notification
-//                .setContentIntent(pIntent)
-//                        // Set RemoteViews into Notification
-//                .setContent(remoteViews);
+//            mBuilder = new Notification.Builder(this);
 //
-//        // Locate and set the Image into customnotificationtext.xml ImageViews
-//        remoteViews.setImageViewResource(R.id.imagenotileft,R.drawable.ic_launcher);
-//        remoteViews.setImageViewResource(R.id.imagenotiright,R.drawable.androidhappy);
+//            mBuilder.setSmallIcon(R.drawable.ic_vibwear_notification)
+//                    .setContentTitle(appManager.getAppName())
+//                    //.setContentText(appManager.getAppName())
+//                    //.setContentInfo(sourcePackageName)
+//                    .setStyle(new Notification.BigTextStyle().bigText(getResources().getString(R.string.stop_notification_msg)));
 //
-//        // Locate and set the Text into customnotificationtext.xml TextViews
-//        remoteViews.setTextViewText(R.id.title,getString(R.string.customnotificationtitle));
-//        remoteViews.setTextViewText(R.id.text,getString(R.string.customnotificationtext));
+//            Intent startIntent = new Intent(this, VibWearActivity.class);
 //
-//        // Create Notification Manager
-//        NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//        // Build Notification with Notification Manager
-//        notificationmanager.notify(0, builder.build());
+//            PendingIntent startPendingIntent =
+//                    PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 //
-//    }
+//            mBuilder.setContentIntent(startPendingIntent);
+//
+//            Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
+//            stopIntent.putExtra("sourcePackageName", sourcePackageName);
+//            stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
+//
+//            PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
+//                    getApplicationContext(),
+//                    0,
+//                    stopIntent,
+//                    PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//            mBuilder.addAction(R.drawable.ic_lock,
+//                    getResources().getString(R.string.stop_notification_btn_confirm), stopPendingIntent);
+//
+//            NotificationManager notificationManager =
+//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//            notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, mBuilder.build());
+//
+//            StopNotificationHandler stopHandler = new StopNotificationHandler(this);
+//            stopHandler.sendEmptyMessageDelayed(
+//                    StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
+//                    StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
+//            );
+//        }
+//
+//	}
+
+    protected void showTemporaryNotification(Intent intent) {
+        Bundle extraInfo = intent.getExtras();
+
+        String sourcePackageName = extraInfo.getString("sourcePackageName");
+
+        AppManager appManager = new AppManager(this, sourcePackageName);
+
+        // Using RemoteViews to bind custom layouts into Notification
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),
+                R.layout.custom_notification);
+
+        remoteViews.setImageViewResource(R.id.img_notification_block, R.drawable.ic_lock);
+        remoteViews.setTextViewText(R.id.txt_notification_msg, appManager.getAppName());
+        remoteViews.setImageViewResource(R.id.img_notification_lock, R.drawable.ic_unlock);
+
+        Intent stopIntent = new Intent(getApplicationContext(), StopNotificationReceiver.class);
+        stopIntent.putExtra("sourcePackageName", sourcePackageName);
+        stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
+
+        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
+                getApplicationContext(),
+                0,
+                stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder builder = new Notification.Builder(this)
+                // Set Icon
+                .setSmallIcon(R.drawable.ic_vibwear_notification)
+                        // Dismiss Notification
+                .setAutoCancel(true)
+                        // Set PendingIntent into Notification
+                .setContentIntent(stopPendingIntent)
+                        // Set RemoteViews into Notification
+                .setContent(remoteViews);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, builder.build());
+
+        StopNotificationHandler stopHandler = new StopNotificationHandler(this);
+        stopHandler.sendEmptyMessageDelayed(
+                StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
+                StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
+        );
+
+    }
 
     protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
