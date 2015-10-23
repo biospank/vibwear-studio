@@ -470,7 +470,65 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
     }
 
-    protected void startDeviceScanner() {
+//	protected void showTemporaryNotification(Intent intent) {
+//		NotificationCompat.Builder builder = buildNotification();
+//
+//        NotificationManager notificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        notificationManager.notify(VIBWEAR_TEMPORARY_NOTIFICATION_ID, builder.build());
+//
+//        StopNotificationHandler stopHandler = new StopNotificationHandler(this);
+//        stopHandler.sendEmptyMessageDelayed(
+//                StopNotificationHandler.DISMISS_NOTIFICATION_MSG,
+//                StopNotificationHandler.DISMISS_NOTIFICATION_TIMEOUT
+//        );
+//	}
+//
+//	protected NotificationCompat.Builder buildNotification() {
+//
+//		// Open NotificationView.java Activity
+//		PendingIntent pIntent = PendingIntent.getActivity(
+//				getApplicationContext(),
+//				VIBWEAR_TEMPORARY_NOTIFICATION_ID,
+//				getIntent(),
+//				PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//		NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
+//				// Set Icon
+//				.setSmallIcon(R.drawable.ic_launcher)
+//						// Set Ticker Message
+//				.setTicker(getApplicationContext().getString(R.string.customnotificationticker))
+//						// Dismiss Notification
+//				.setAutoCancel(true)
+//						// Set PendingIntent into Notification
+//				.setContentIntent(pIntent);
+//
+//		builder = builder.setContent(getComplexNotificationView());
+//
+//		return builder;
+//	}
+//
+//	private RemoteViews getComplexNotificationView() {
+//		// Using RemoteViews to bind custom layouts into Notification
+//		RemoteViews notificationView = new RemoteViews(
+//				getApplicationContext().getPackageName(),
+//				R.layout.activity_custom_notification
+//		);
+//
+//		// Locate and set the Image into customnotificationtext.xml ImageViews
+//		notificationView.setImageViewResource(
+//				R.id.imagenotileft,
+//				R.drawable.ic_launcher);
+//
+//		// Locate and set the Text into customnotificationtext.xml TextViews
+//		notificationView.setTextViewText(R.id.title, getTitle());
+//		notificationView.setTextViewText(R.id.text, "Some text");
+//
+//		return notificationView;
+//	}
+
+	protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
         ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this,
                 new UUID[]{GATT.GATTService.METAWEAR.uuid()}, true);
