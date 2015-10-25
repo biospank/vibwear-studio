@@ -48,7 +48,6 @@ public class VersionPreference {
         } else if (currentVersionCode > savedVersionCode) {
 
             // TODO This is an upgrade
-            firstRun = true;
 
         }
 
