@@ -353,7 +353,13 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	}
 
 	protected void showTemporaryNotification(Intent intent) {
-        new TemporaryNotification(this, intent).show();
+        Bundle extraInfo = intent.getExtras();
+
+        String sourcePackageName = extraInfo.getString("sourcePackageName");
+
+        if(sourcePackageName != null)
+            new TemporaryNotification(this, intent).show();
+        
 	}
 
 	protected void startDeviceScanner() {
