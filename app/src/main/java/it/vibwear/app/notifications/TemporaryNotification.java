@@ -20,11 +20,11 @@ public class TemporaryNotification {
     public static final int VIBWEAR_TEMPORARY_NOTIFICATION_ID = 9572;
 
     private Context context;
-    private Intent intent;
+    private String packageName;
 
-    public TemporaryNotification(Context context, Intent intent) {
+    public TemporaryNotification(Context context, String packageName) {
         this.context = context;
-        this.intent = intent;
+        this.packageName = packageName;
     }
 
     public void show() {
@@ -44,12 +44,8 @@ public class TemporaryNotification {
     }
 
     private Notification.Builder buildNotification() {
-        Bundle extraInfo = this.intent.getExtras();
-
-        String sourcePackageName = extraInfo.getString("sourcePackageName");
-
         Intent stopIntent = new Intent(this.context, StopNotificationReceiver.class);
-        stopIntent.putExtra("sourcePackageName", sourcePackageName);
+        stopIntent.putExtra("sourcePackageName", this.packageName);
         stopIntent.setAction(StopNotificationReceiver.STOP_ACTION);
 
         PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
@@ -66,13 +62,13 @@ public class TemporaryNotification {
                         // Set PendingIntent into Notification
                 .setContentIntent(stopPendingIntent);
 
-        builder = builder.setContent(getNotificationView(sourcePackageName));
+        builder = builder.setContent(getNotificationView());
 
         return builder;
     }
 
-    private RemoteViews getNotificationView(String sourcePackageName) {
-        AppManager appManager = new AppManager(this.context, sourcePackageName);
+    private RemoteViews getNotificationView() {
+        AppManager appManager = new AppManager(this.context, this.packageName);
 
         // Using RemoteViews to bind custom layouts into Notification
         RemoteViews notificationView = new RemoteViews(
