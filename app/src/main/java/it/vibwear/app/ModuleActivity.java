@@ -131,9 +131,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 	     */
         public void receivedGattError(GattOperation gattOp, int status) {
             if (gattOp.name() == GattOperation.CONNECTION_STATE_CHANGE.toString() &&
-                    status == 133)
-                if (device != null && mwController != null)
-                    mwController.reconnect(false);
+                    ((status == 8) || (status == 133)))
+                disconnected();
 
         }
     };
