@@ -79,13 +79,27 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         public void connected() {
             if (isDeviceConnected()) {
                 readDeviceInfo();
-                readDeviceName();
-                reconnectTaskFragment.dismissDialog();
+                //readDeviceName();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        reconnectTaskFragment.dismissDialog();
+
+                    }
+                });
             }
 
-            invalidateOptionsMenu();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
 
-            getRemoteSignals();
+                    updateUi();
+                    getRemoteSignals();
+
+                }
+            });
+
         }
 
         @Override
@@ -94,7 +108,14 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
                 tryReconnect();
             }
 
-            invalidateOptionsMenu();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    updateUi();
+
+                }
+            });
 
         }
 
@@ -286,6 +307,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
     ;
 
+    protected void updateUi() {}
+
     protected void getRemoteSignals() {
         Handler handler = new Handler();
 
@@ -377,7 +400,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            invalidateOptionsMenu();
+            updateUi();
         }
 
     };
@@ -546,6 +569,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     }
 
     public void unbindDevice() {
+        mwBoard.disconnect();
+        mwBoard = null;
 //        switchController.disableNotification();
 //        device = null;
 //

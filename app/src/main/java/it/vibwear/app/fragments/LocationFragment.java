@@ -143,14 +143,14 @@ public class LocationFragment extends Fragment {
 		if(connected) {
 			icLocation.setImageResource(R.drawable.ic_connection_on);
             icSettings.setImageResource(R.drawable.ic_settings_active);
-            if(isAdded())
+            //if(isAdded())
                 layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOn));
 		} else {
 			icLocation.setImageResource(R.drawable.ic_connection);
             icSettings.setImageResource(R.drawable.ic_settings);
 			icSignal.setImageResource(R.drawable.ic_signal);
 			icBattery.setImageResource(R.drawable.ic_battery);
-            if(isAdded())
+            //if(isAdded())
                 layout.findViewById(R.id.header).setBackgroundColor(getResources().getColor(R.color.headColorOff));
 		}
 	}

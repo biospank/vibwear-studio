@@ -155,16 +155,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		super.onBackPressed();
 	}
 	
-    @Override
-    public void invalidateOptionsMenu() {
-    	super.invalidateOptionsMenu();
-
+    protected void updateUi() {
 		if (isDeviceConnected()) {
-			locationFrag.updateConnectionImageResource(true);
-			if(progress != null)
+            locationFrag.updateConnectionImageResource(true);
+            if (progress != null)
                 progress.dismiss();
 
-            showPermanentNotification(true);
         } else {
 			locationFrag.updateConnectionImageResource(false);
 		}
@@ -351,7 +347,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		if(show) {
             new PermanentNotification(this).show();
 		} else {
-			//mwService.stopForeground(true);
+            //mwService.stopForeground(true);
 		}
 	}
 
