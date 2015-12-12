@@ -71,7 +71,7 @@ public class ReconnectTaskFragment extends Fragment {
 
     public void startNewAsyncTask(BluetoothDevice device) {
         // Create and execute the background task.
-        mTask = new ReconnectTask(mActivity.getMwController());
+        mTask = new ReconnectTask(mActivity.getMwBoard());
         mTask.execute(new BleScanner(mActivity, device));
         showDialog();
     }

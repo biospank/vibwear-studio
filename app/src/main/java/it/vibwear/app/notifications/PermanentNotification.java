@@ -1,12 +1,14 @@
 package it.vibwear.app.notifications;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.VibWearActivity;
+import it.vibwear.app.handlers.StopNotificationHandler;
 
 /**
  * Created by biospank on 23/10/15.
@@ -20,8 +22,14 @@ public class PermanentNotification {
         this.context = context;
     }
 
-    public Notification.Builder create() {
-        return buildNotification();
+    public void show() {
+        Notification.Builder builder = buildNotification();
+
+        NotificationManager notificationManager =
+                (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(VIBWEAR_PERSISTENT_NOTIFICATION_ID, builder.build());
+
     }
 
     private Notification.Builder buildNotification() {

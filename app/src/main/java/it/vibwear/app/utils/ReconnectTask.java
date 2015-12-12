@@ -5,18 +5,19 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.mbientlab.metawear.api.MetaWearController;
+import com.mbientlab.metawear.MetaWearBoard;
+
 
 /**
  * Created by biospank on 28/06/15.
  */
 public class ReconnectTask extends AsyncTask<BleScanner, Boolean, Boolean> {
 
-    private MetaWearController mwController;
+    private MetaWearBoard mwBoard;
     private BleScanner bleScanner;
 
-    public ReconnectTask(MetaWearController controller) {
-        this.mwController = controller;
+    public ReconnectTask(MetaWearBoard board) {
+        this.mwBoard = board;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class ReconnectTask extends AsyncTask<BleScanner, Boolean, Boolean> {
         super.onPostExecute(deviceFound);
 
         if(deviceFound)
-            mwController.reconnect(false);
+            mwBoard.connect();
 
     }
 

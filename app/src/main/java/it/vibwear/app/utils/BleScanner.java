@@ -4,9 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.os.Handler;
-
-import com.mbientlab.metawear.api.MetaWearController;
 
 /**
  * Created by biospank on 23/06/15.
