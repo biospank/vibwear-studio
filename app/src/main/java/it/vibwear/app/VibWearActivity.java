@@ -27,12 +27,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.mbientlab.metawear.MetaWearBoard;
+import com.mbientlab.metawear.UnsupportedModuleException;
+import com.mbientlab.metawear.module.Settings;
 
 public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.6.4";
@@ -121,6 +124,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		registerReceiver(intentReceiver, intentFilter);
 
         startScheduledTimers();
+        initModules();
 	}
 	
 	@Override
@@ -242,7 +246,16 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     @Override
     public void onBoardNameChange(String boardName) {
         if(isDeviceConnected()) {
-            //settingsController.setDeviceName(boardName);
+            if(settingsController == null) {
+                try {
+                    settingsController = getMwBoard().getModule(Settings.class);
+                } catch (UnsupportedModuleException ume) {
+
+                }
+            }
+
+            settingsController.configure().setDeviceName(boardName).commit();
+
             deviceName = boardName;
         }
     }
@@ -296,6 +309,25 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 		
 	}
+
+    private void initModules() {
+        if(isDeviceConnected()) {
+            Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    readDeviceName();
+                }
+            }, 500);
+
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    readMechanicalSwitch();
+                }
+            }, 500);
+
+        }
+    }
 	
 	private void cancelScheduledTimers() {
 
