@@ -8,8 +8,8 @@ android {
         applicationId "it.lampwireless.vibwear.app"
         minSdkVersion 18
         targetSdkVersion 21
-        versionCode 25
-        versionName "1.6.4"
+        versionCode 26
+        versionName "1.6.5"
     }
 
     buildTypes {

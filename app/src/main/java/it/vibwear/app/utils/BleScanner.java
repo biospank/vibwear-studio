@@ -15,7 +15,7 @@ public class BleScanner {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mIsCustomUUID;
     public final long SCAN_RETRY_DELAY = 2000;
-    public final long SCAN_DURATION = 1000;
+    public final long SCAN_DURATION = 2000;
     private final short RSSI_MIN_THRESHOLD = 20;
     private BluetoothDevice mDevice;
     private static boolean found;

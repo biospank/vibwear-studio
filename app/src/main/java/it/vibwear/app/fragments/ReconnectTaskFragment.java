@@ -80,14 +80,13 @@ public class ReconnectTaskFragment extends Fragment {
         if (mTask != null && mTask.getStatus() != AsyncTask.Status.FINISHED) {
             mTask.cancel(true);
             mTask = null;
-            mProgressDialog.dismiss();
+            dismissDialog();
         }
     }
 
     public boolean isRunning() {
         return ((mTask != null) &&
-                (mTask.getStatus() == AsyncTask.Status.RUNNING ||
-                        mTask.getStatus() == AsyncTask.Status.PENDING));
+                (mTask.getStatus() == AsyncTask.Status.RUNNING));
     }
 
     public void showDialog() {

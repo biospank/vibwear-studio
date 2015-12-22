@@ -209,7 +209,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         bindMetaWearService();
 
         if (savedInstanceState != null) {
-            device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
+            device = savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
         }
 
         attachReconnectTask();
