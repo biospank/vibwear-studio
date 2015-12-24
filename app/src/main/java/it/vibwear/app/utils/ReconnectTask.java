@@ -33,9 +33,7 @@ public class ReconnectTask extends AsyncTask<BleScanner, Boolean, Boolean> {
                 bleScanner.startScan();
                 Thread.sleep(bleScanner.SCAN_DURATION);
                 bleScanner.stopScan();
-            } catch (InterruptedException e) {
-                bleScanner.setKeepScanning(false);
-            }
+            } catch (InterruptedException e) {}
 
             if(bleScanner.deviceFound() || isCancelled()) {
                 bleScanner.setKeepScanning(false);
