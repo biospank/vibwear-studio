@@ -1,6 +1,8 @@
 package it.vibwear.app;
 
 import java.util.List;
+import java.util.Map;
+
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.adapters.Contact;
 import it.vibwear.app.fragments.ReconnectTaskFragment;
@@ -19,11 +21,14 @@ import it.vibwear.app.utils.SosPreference;
 import it.vibwear.app.utils.VibrationPreference;
 
 import com.mbientlab.metawear.AsyncOperation;
+import com.mbientlab.metawear.DataSignal;
 import com.mbientlab.metawear.Message;
 import com.mbientlab.metawear.MetaWearBleService;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.RouteManager;
 import com.mbientlab.metawear.UnsupportedModuleException;
+import com.mbientlab.metawear.impl.DefaultMetaWearBoard;
+import com.mbientlab.metawear.module.DataProcessor;
 import com.mbientlab.metawear.module.Haptic;
 import com.mbientlab.metawear.module.Settings;
 import com.mbientlab.metawear.module.Switch;
@@ -49,6 +54,7 @@ import android.os.SystemClock;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 public class ModuleActivity extends Activity implements OnDeviceSelectedListener, ReconnectTaskFragment.OnReconnectTaskCallbacks {
     public static final String EXTRA_BLE_DEVICE =
@@ -66,10 +72,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     private static final Short LOW_SIGNAL_VIBRATION_GAP = 500;
     private static final String TAG_TASK_FRAGMENT = "reconnect_task_fragment";
 
-    //private LocalBroadcastManager broadcastManager = null;
     protected MetaWearBleService.LocalBinder mwService;
     private MetaWearBoard mwBoard;
-    //protected MetaWearController mwController;
     protected Haptic hapticController;
     protected static BluetoothDevice device;
     protected Switch switchController;
@@ -85,29 +89,19 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         @Override
         public void connected() {
             if (isDeviceConnected()) {
+                initModules();
                 readDeviceInfo();
-                //readDeviceName();
-                //readMechanicalSwitch();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                readDeviceName();
+                readMechanicalSwitch();
+                getRemoteSignals();
+                updateUi();
 
-                        reconnectTaskFragment.dismissDialog();
-
-                    }
-                });
-            }
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    updateUi();
-                    getRemoteSignals();
-
+                if(reconnectTaskFragment != null) {
+                    reconnectTaskFragment.stopAsyncTask();
+                    reconnectTaskFragment.dismissDialog();
                 }
-            });
 
+            }
 
         }
 
@@ -117,22 +111,37 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
                 tryReconnect();
             }
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    updateUi();
-
-                }
-            });
+            updateUi();
 
         }
 
         @Override
         public void failure(int status, Throwable error) {
+            if (device != null && mwBoard != null) {
+                tryReconnect();
+            }
+
+            updateUi();
 
         }
     };
+
+    protected void initModules() {
+        try {
+            switchController = mwBoard.getModule(Switch.class);
+            settingsController = mwBoard.getModule(Settings.class);
+            settingsController.handleEvent().fromDisconnect().monitor(new DataSignal.ActivityHandler() {
+                @Override
+                public void onSignalActive(Map<String, DataProcessor> map, DataSignal.DataToken dataToken) {
+
+                }
+            }).commit();
+            hapticController = mwBoard.getModule(Haptic.class);
+        } catch (UnsupportedModuleException ume) {
+            Toast.makeText(ModuleActivity.this, ume.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+    }
 
     public void readDeviceInfo() {
 
@@ -226,7 +235,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
                                 if (msg.getData(Boolean.class)) {
 
                                 } else {
-
+                                    sendTextMessage();
                                 }
                             }
                         });
@@ -279,7 +288,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         if (savedInstanceState != null) {
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
-            deserializeBoard();
+            //deserializeBoard();
         }
 
         attachReconnectTask();
@@ -321,6 +330,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mwService = (MetaWearBleService.LocalBinder) service;
+            mwService.executeOnUiThread();
 
 //            broadcastManager = LocalBroadcastManager.getInstance(mwService);
 //            broadcastManager.registerReceiver(MetaWearBleService.getMetaWearBroadcastReceiver(),
@@ -361,7 +371,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     private void initializeAndConnect() {
         // Create a MetaWear board object for the Bluetooth Device
         mwBoard = mwService.getMetaWearBoard(device);
-        boardMacAddress = mwBoard.getMacAddress();
+        //boardMacAddress = mwBoard.getMacAddress();
 
 //        try {
 //            switchController = mwBoard.getModule(Switch.class);
@@ -481,7 +491,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
     public void onDestroy() {
         super.onDestroy();
 
-        getApplicationContext().unbindService(metaWearServiceConnection);
 //        if (broadcastManager != null) {
 //            broadcastManager.unregisterReceiver(MetaWearBleService.getMetaWearBroadcastReceiver());
 //        }
@@ -490,6 +499,8 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
             try {
                 unregisterReceiver(bluetoothStateReceiver);
             } catch (IllegalArgumentException iae) {}
+
+            getApplicationContext().unbindService(metaWearServiceConnection);
         }
 
 //        getApplicationContext().unbindService(this);
@@ -514,7 +525,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         super.onSaveInstanceState(outState);
         if (device != null) {
             outState.putParcelable(EXTRA_BLE_DEVICE, device);
-            serializeBoard();
+            //serializeBoard();
         }
     }
 
@@ -544,16 +555,6 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         isMwServiceBound = true;
 
-    }
-
-    private void unbindMetaWearService() {
-        try {
-            if (isMwServiceBound) {
-                getApplicationContext().unbindService(metaWearServiceConnection);
-                isMwServiceBound = false;
-            }
-        } catch (IllegalArgumentException iae) {
-        }
     }
 
     @Override
@@ -588,6 +589,21 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         }
     }
 
+    protected void sendTextMessage() {
+        SosPreference contactPreference = new SosPreference(getApplicationContext());
+        List<Contact> contacts = contactPreference.getContacts();
+        SmsManager smsManager = SmsManager.getDefault();
+
+        String msg = contactPreference.getSosMessage();
+
+        if (msg.isEmpty())
+            msg = getString(R.string.sos_default_msg);
+
+        for (Contact contact : contacts) {
+            smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
+        }
+    }
+
     public MetaWearBoard getMwBoard() {
         return mwBoard;
     }
@@ -608,5 +624,21 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
         } else {
             Log.i("ModuleActivity", "Cannot find state for this board");
         }
+    }
+
+    protected void restartMwService() {
+        boardMacAddress = mwBoard.getMacAddress();
+
+        stopService(new Intent(ModuleActivity.this, BoundMwService.class));
+
+        bindMetaWearService();
+
+        final BluetoothManager btManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        final BluetoothDevice remoteDevice =
+                btManager.getAdapter().getRemoteDevice(boardMacAddress);
+
+        // Create a MetaWear board object for the Bluetooth Device
+        mwBoard = mwService.getMetaWearBoard(remoteDevice);
     }
 }

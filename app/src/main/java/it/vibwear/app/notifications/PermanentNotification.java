@@ -32,6 +32,14 @@ public class PermanentNotification {
 
     }
 
+    public void cancel() {
+        NotificationManager notificationManager =
+                (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.cancel(VIBWEAR_PERSISTENT_NOTIFICATION_ID);
+
+    }
+
     private Notification.Builder buildNotification() {
         Intent startIntent = new Intent(this.context, VibWearActivity.class);
 

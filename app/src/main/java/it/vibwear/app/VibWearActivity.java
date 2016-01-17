@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mbientlab.metawear.MetaWearBleService;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.module.Settings;
@@ -48,7 +49,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
-	private Notification.Builder mBuilder;
+	//private Notification.Builder mBuilder;
+    private PermanentNotification pNotification;
 	protected ProgressDialog progress;
 
 	IntentFilter intentFilter;
@@ -124,7 +126,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		registerReceiver(intentReceiver, intentFilter);
 
         startScheduledTimers();
-        initModules();
 	}
 	
 	@Override
@@ -165,6 +166,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
             if (progress != null)
                 progress.dismiss();
 
+			showPermanentNotification(true);
         } else {
 			locationFrag.updateConnectionImageResource(false);
 		}
@@ -197,6 +199,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	@Override
 	public void onSignalRequest() {
+        //restartMwService();
         //showPermanentNotification(true);
 		if(isDeviceConnected()) {
             Toast.makeText(this,
@@ -212,7 +215,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
         //showTemporaryNotification(intent);
 		if (isDeviceConnected()) {
             Toast.makeText(this,
-                    getString(R.string.battery_level_msg,
+					getString(R.string.battery_level_msg,
                             locationFrag.getCurrentBatteryLevel()), Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -232,7 +235,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		//vibrate(ModuleActivity.LOW_SIGNAL_VIB_MODE, null);
 	}
 
-    @Override
+	@Override
     public void onLowBattery() {
         SharedPreferences settings = getSharedPreferences(SettingsDetailFragment.LOW_BATTERY_PREFS_NAME,
                 Context.MODE_PRIVATE);
@@ -247,7 +250,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
     public void onBoardNameChange(String boardName) {
         if(isDeviceConnected()) {
             if(settingsController == null) {
-                try {
+				try {
                     settingsController = getMwBoard().getModule(Settings.class);
                 } catch (UnsupportedModuleException ume) {
 
@@ -292,10 +295,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			signalTimer = new Timer();
 			signalTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
-                public void run() {
-                    requestSignalLevel();
-                }
-            }, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
+				public void run() {
+					requestSignalLevel();
+				}
+			}, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
 		}
 
 		if (batteryTimer == null) {
@@ -310,25 +313,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		
 	}
 
-    private void initModules() {
-        if(isDeviceConnected()) {
-            Handler handler = new Handler();
-
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    readDeviceName();
-                }
-            }, 500);
-
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    readMechanicalSwitch();
-                }
-            }, 500);
-
-        }
-    }
-	
 	private void cancelScheduledTimers() {
 
         if (batteryTimer != null) {
@@ -377,9 +361,12 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	public void showPermanentNotification(boolean show) {
 		if(show) {
-            new PermanentNotification(this).show();
+            if(pNotification == null)
+                pNotification = new PermanentNotification(this);
+
+            pNotification.show();
 		} else {
-            //mwService.stopForeground(true);
+            pNotification.cancel();
 		}
 	}
 
