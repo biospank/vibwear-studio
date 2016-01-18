@@ -366,7 +366,8 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
             pNotification.show();
 		} else {
-            pNotification.cancel();
+			if(pNotification != null)
+				pNotification.cancel();
 		}
 	}
 

@@ -288,6 +288,7 @@ public class ModuleActivity extends Activity implements OnDeviceSelectedListener
 
         if (savedInstanceState != null) {
             device = (BluetoothDevice) savedInstanceState.getParcelable(EXTRA_BLE_DEVICE);
+            //initializeAndConnect();
             //deserializeBoard();
         }
 
