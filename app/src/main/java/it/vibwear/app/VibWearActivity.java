@@ -1,6 +1,7 @@
 package it.vibwear.app;
 
 import it.lampwireless.vibwear.app.R;
+import it.vibwear.app.adapters.Contact;
 import it.vibwear.app.fragments.LocationFragment;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
@@ -9,16 +10,15 @@ import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.notifications.PermanentNotification;
 import it.vibwear.app.notifications.TemporaryNotification;
 import it.vibwear.app.scanner.ScannerFragment;
-import it.vibwear.app.services.BoundMwService;
+import it.vibwear.app.utils.SosPreference;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -27,18 +27,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.mbientlab.metawear.MetaWearBleService;
+import android.telephony.SmsManager;
 import com.mbientlab.metawear.MetaWearBoard;
-import com.mbientlab.metawear.UnsupportedModuleException;
-import com.mbientlab.metawear.module.Settings;
 
-public class VibWearActivity extends ModuleActivity implements OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
+public class VibWearActivity extends ModuleActivity implements ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 	private static final String VERSION = "1.6.4";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
@@ -49,7 +45,6 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	private Timer signalTimer;
 	private Timer batteryTimer;
 	private PowerManager powerMgr;
-	//private Notification.Builder mBuilder;
     private PermanentNotification pNotification;
 	protected ProgressDialog progress;
 
@@ -160,7 +155,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		super.onBackPressed();
 	}
 	
-    protected void updateUi() {
+    public void updateUi() {
 		if (isDeviceConnected()) {
             locationFrag.updateConnectionImageResource(true);
             if (progress != null)
@@ -175,14 +170,14 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 	@Override
 	public void onLocationChange() {
 		if(isDeviceConnected()) {
-			unbindDevice();
+			mwConnectionFragment.unbindDevice();
             locationFrag.updateConnectionImageResource(false);
 		} else {
             if(isReconnectTaskRunning()) {
                 stopReconnectTaskAndUnbindDevice();
             }
 
-            if(!startBluetoothAdapter())
+            if(!mwConnectionFragment.startBluetoothAdapter(this))
                 startDeviceScanner();
 		}
 
@@ -190,11 +185,16 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
 	@Override
 	public void onDeviceSelected(BluetoothDevice device, String name) {
-		super.onDeviceSelected(device, name);
+		mwConnectionFragment.onDeviceSelected(device, name);
 		progress = new ProgressDialog(this);
 		progress.setTitle(R.string.progressTitle);
 		progress.setMessage(getResources().getString(R.string.progressMsg));
 		progress.show();
+	}
+
+	@Override
+	public void onDialogCanceled() {
+
 	}
 
 	@Override
@@ -220,13 +220,11 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 	}
 
-	@Override
-	protected void updateSignalLevel(int rssiPercent) {
+	public void updateSignalLevel(int rssiPercent) {
 		locationFrag.updateSignalImageResource(rssiPercent);
 	}
 
-	@Override
-	protected void updateBatteryLevel(String batteryLevel) {
+	public void updateBatteryLevel(String batteryLevel) {
 		locationFrag.updateBatteryLevelImageResource(batteryLevel);
 	}
 	
@@ -248,22 +246,15 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 
     @Override
     public void onBoardNameChange(String boardName) {
-        if(isDeviceConnected()) {
-            if(settingsController == null) {
-				try {
-                    settingsController = getMwBoard().getModule(Settings.class);
-                } catch (UnsupportedModuleException ume) {
-
-                }
-            }
-
-            settingsController.configure().setDeviceName(boardName).commit();
-
-            deviceName = boardName;
-        }
+		mwConnectionFragment.changeBoardName(boardName);
+        mwConnectionFragment.setDeviceName(boardName);
     }
 
-	protected void initializeView(Bundle savedInstanceState) {
+    public String getDeviceName() {
+        return mwConnectionFragment.getDeviceName();
+    }
+
+    protected void initializeView(Bundle savedInstanceState) {
 		if(savedInstanceState != null) {
 			locationFrag = (LocationFragment) getFragmentManager().getFragment(savedInstanceState, "locationFragment");
 			servicesFrag = (ServicesFragment) getFragmentManager().getFragment(savedInstanceState, "servicesFragment");
@@ -295,10 +286,10 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			signalTimer = new Timer();
 			signalTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
-				public void run() {
-					requestSignalLevel();
-				}
-			}, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
+                public void run() {
+                    mwConnectionFragment.requestSignalLevel();
+                }
+            }, SIGNAL_START_DELAY, SIGNAL_SCHEDULE_TIME);
 		}
 
 		if (batteryTimer == null) {
@@ -306,7 +297,7 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 			batteryTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    requestBatteryLevel();
+                    mwConnectionFragment.requestBatteryLevel();
                 }
             }, BATTERY_START_DELAY, BATTERY_SCHEDULE_TIME);
 		}
@@ -371,7 +362,22 @@ public class VibWearActivity extends ModuleActivity implements OnLocationChangeL
 		}
 	}
 
-	protected void showTemporaryNotification(Intent intent) {
+    public void sendTextMessage() {
+        SosPreference contactPreference = new SosPreference(getApplicationContext());
+        List<Contact> contacts = contactPreference.getContacts();
+        SmsManager smsManager = SmsManager.getDefault();
+
+        String msg = contactPreference.getSosMessage();
+
+        if (msg.isEmpty())
+            msg = getString(R.string.sos_default_msg);
+
+        for (Contact contact : contacts) {
+            smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
+        }
+    }
+
+    protected void showTemporaryNotification(Intent intent) {
         Bundle extraInfo = intent.getExtras();
 
         String sourcePackageName = extraInfo.getString("sourcePackageName");
