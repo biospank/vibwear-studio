@@ -102,11 +102,15 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
         	AlertDialog.Builder builder=new AlertDialog.Builder(this);
         	builder.setIcon(R.drawable.ic_launcher);
         	builder.setTitle(R.string.menu_about);
+
+			String firmwareVersion = mwConnectionFragment.getFirmwareVersion();
+
         	if(firmwareVersion != null) {
             	builder.setMessage("VibWear v. " + VERSION + "\nFirmware v. " + firmwareVersion);
         	} else {
         		builder.setMessage("VibWear v. " + VERSION);
         	}
+
         	builder.setCancelable(true);
         	builder.create();
         	builder.show();

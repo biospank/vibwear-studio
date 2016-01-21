@@ -44,6 +44,7 @@ public class MwConnectionFragment extends Fragment {
     private Switch switchController;
     private Settings settingsController;
     private String deviceName;
+    private String firmwareVersion;
 
     /**
      * Callback interface through which the fragment will report the
@@ -53,6 +54,7 @@ public class MwConnectionFragment extends Fragment {
         void onDeviceConnect();
         void onDeviceDisconnect();
         void onDeviceFailure();
+        void onRemoteFailure();
     }
 
     /**
@@ -137,7 +139,7 @@ public class MwConnectionFragment extends Fragment {
             settingsController.handleEvent().fromDisconnect().monitor(new DataSignal.ActivityHandler() {
                 @Override
                 public void onSignalActive(Map<String, DataProcessor> map, DataSignal.DataToken dataToken) {
-
+                    mCallbacks.onRemoteFailure();
                 }
             }).commit();
             hapticController = mwBoard.getModule(Haptic.class);
@@ -163,6 +165,14 @@ public class MwConnectionFragment extends Fragment {
         this.deviceName = boardName;
     }
 
+    public String getFirmwareVersion() {
+        return this.firmwareVersion;
+    }
+
+    public void setFirmwareVersion(String revision) {
+        this.firmwareVersion = revision;
+    }
+
     public void readDeviceInfo() {
 
         AsyncOperation<MetaWearBoard.DeviceInformation> result = mwBoard.readDeviceInformation();
@@ -170,7 +180,7 @@ public class MwConnectionFragment extends Fragment {
         result.onComplete(new AsyncOperation.CompletionHandler<MetaWearBoard.DeviceInformation>() {
             @Override
             public void success(final MetaWearBoard.DeviceInformation deviceInfo) {
-
+                setFirmwareVersion(deviceInfo.firmwareRevision());
             }
 
             @Override

@@ -37,7 +37,6 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
     public static final String TAG_TASK_FRAGMENT = "reconnect_task_fragment";
     public static final String TAG_MW_FRAGMENT = "mw_connect_fragment";
 
-    protected String firmwareVersion;
     protected ReconnectTaskFragment reconnectTaskFragment;
     protected MwConnectionFragment mwConnectionFragment;
     protected BluetoothStateReceiver bluetoothStateReceiver;
@@ -220,10 +219,8 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
 
     @Override
     public void onDeviceConnect() {
-        if(reconnectTaskFragment != null) {
+        if(reconnectTaskFragment != null)
             reconnectTaskFragment.stopAsyncTask();
-            reconnectTaskFragment.dismissDialog();
-        }
     }
 
     @Override
@@ -233,6 +230,11 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
 
     @Override
     public void onDeviceFailure() {
+        tryReconnect();
+    }
+
+    @Override
+    public void onRemoteFailure() {
         tryReconnect();
     }
 
