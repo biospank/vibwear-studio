@@ -219,8 +219,10 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
 
     @Override
     public void onDeviceConnect() {
-        if(reconnectTaskFragment != null)
+        if(reconnectTaskFragment != null) {
             reconnectTaskFragment.stopAsyncTask();
+            reconnectTaskFragment.dismissDialog();
+        }
     }
 
     @Override
@@ -235,7 +237,7 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
 
     @Override
     public void onRemoteFailure() {
-        tryReconnect();
+        getMwBoard().disconnect();
     }
 
     public boolean isDeviceConnected() {
