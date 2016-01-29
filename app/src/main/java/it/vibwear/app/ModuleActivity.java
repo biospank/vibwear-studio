@@ -237,7 +237,7 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
 
     @Override
     public void onRemoteFailure() {
-        getMwBoard().disconnect();
+//        getMwBoard().disconnect();
     }
 
     public boolean isDeviceConnected() {
