@@ -35,7 +35,7 @@ import android.telephony.SmsManager;
 import com.mbientlab.metawear.MetaWearBoard;
 
 public class VibWearActivity extends ModuleActivity implements ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
-	private static final String VERSION = "1.7.0b";
+	private static final String VERSION = "1.7.0b1";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
@@ -181,7 +181,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
                 stopReconnectTaskAndUnbindDevice();
             }
 
-            if(!mwConnectionFragment.startBluetoothAdapter(this))
+            if(mwConnectionFragment.startBluetoothAdapter())
                 startDeviceScanner();
 		}
 

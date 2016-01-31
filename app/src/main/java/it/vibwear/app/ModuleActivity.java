@@ -73,7 +73,7 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
             fm.beginTransaction().add(mwConnectionFragment, TAG_MW_FRAGMENT).commit();
         }
 
-        mwConnectionFragment.startBluetoothAdapter(this);
+        mwConnectionFragment.startBluetoothAdapter();
 
         mwConnectionFragment.bindMetaWearService(this);
 

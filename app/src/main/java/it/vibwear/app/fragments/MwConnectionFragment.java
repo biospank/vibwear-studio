@@ -136,12 +136,12 @@ public class MwConnectionFragment extends Fragment {
         try {
             switchController = mwBoard.getModule(Switch.class);
             settingsController = mwBoard.getModule(Settings.class);
-            settingsController.handleEvent().fromDisconnect().monitor(new DataSignal.ActivityHandler() {
-                @Override
-                public void onSignalActive(Map<String, DataProcessor> map, DataSignal.DataToken dataToken) {
-                    mCallbacks.onRemoteFailure();
-                }
-            }).commit();
+//            settingsController.handleEvent().fromDisconnect().monitor(new DataSignal.ActivityHandler() {
+//                @Override
+//                public void onSignalActive(Map<String, DataProcessor> map, DataSignal.DataToken dataToken) {
+//                    mCallbacks.onRemoteFailure();
+//                }
+//            }).commit();
             hapticController = mwBoard.getModule(Haptic.class);
         } catch (UnsupportedModuleException ume) {
             Toast.makeText(mActivity, ume.getMessage(), Toast.LENGTH_LONG).show();
@@ -319,17 +319,25 @@ public class MwConnectionFragment extends Fragment {
 
     }
 
-    public boolean startBluetoothAdapter(ModuleActivity act) {
-        BluetoothManager bluetoothManager =
-                (BluetoothManager) act.getSystemService(Context.BLUETOOTH_SERVICE);
+    public boolean startBluetoothAdapter() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (!bluetoothManager.getAdapter().isEnabled()) {
-            final Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, ModuleActivity.REQUEST_ENABLE_BT);
+        if(bluetoothAdapter.isEnabled())
             return true;
-        } else {
-            return false;
-        }
+        else
+            return bluetoothAdapter.enable();
+
+
+//        BluetoothManager bluetoothManager =
+//                (BluetoothManager) act.getSystemService(Context.BLUETOOTH_SERVICE);
+//
+//        if (!bluetoothManager.getAdapter().isEnabled()) {
+//            final Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(enableIntent, ModuleActivity.REQUEST_ENABLE_BT);
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
     public void bindMetaWearService(ModuleActivity act) {
