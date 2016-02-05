@@ -227,6 +227,7 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
 
     @Override
     public void onDeviceDisconnect() {
+        mwConnectionFragment.startBluetoothAdapter();
         tryReconnect();
     }
 
