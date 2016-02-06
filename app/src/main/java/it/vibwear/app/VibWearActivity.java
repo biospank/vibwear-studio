@@ -2,6 +2,7 @@ package it.vibwear.app;
 
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.adapters.Contact;
+import it.vibwear.app.fragments.KillerAppDialogFragment;
 import it.vibwear.app.fragments.LocationFragment;
 import it.vibwear.app.fragments.ServicesFragment;
 import it.vibwear.app.fragments.AlarmFragment.AlarmListner;
@@ -10,8 +11,11 @@ import it.vibwear.app.fragments.SettingsDetailFragment;
 import it.vibwear.app.notifications.PermanentNotification;
 import it.vibwear.app.notifications.TemporaryNotification;
 import it.vibwear.app.scanner.ScannerFragment;
+import it.vibwear.app.utils.AppManager;
 import it.vibwear.app.utils.SosPreference;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,10 +30,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 import android.telephony.SmsManager;
 import com.mbientlab.metawear.MetaWearBoard;
@@ -40,6 +47,8 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
+	private static final String ONE_TIME_DIALOG = "ONE_TIME_DIALOG";
+	private static final String ONE_TIME_DIALOG_KEY = "is.first.run";
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
@@ -47,6 +56,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	private PowerManager powerMgr;
     private PermanentNotification pNotification;
 	protected ProgressDialog progress;
+	private boolean isFirstRun = true;
 
 	IntentFilter intentFilter;
 
@@ -76,6 +86,8 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		initializeView(savedInstanceState);
+
+		showKillerAppWarning();
 
 	}
 
@@ -364,6 +376,38 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 			if(pNotification != null)
 				pNotification.cancel();
 		}
+	}
+
+	protected void showKillerAppWarning() {
+		SharedPreferences prefs = this.getSharedPreferences(ONE_TIME_DIALOG, Context.MODE_PRIVATE);
+		isFirstRun = prefs.getBoolean(ONE_TIME_DIALOG_KEY, true);
+
+		if (isFirstRun) {
+			ArrayList<String> killerApps = AppManager.findKillerApp(this);
+
+			//if (!killerApps.isEmpty()) {
+
+				Bundle bundle = new Bundle();
+				bundle.putStringArray("killer.apps", killerApps.toArray(new String[0]));
+
+				KillerAppDialogFragment killerAppDialog = KillerAppDialogFragment.newInstance();
+				killerAppDialog.setArguments(bundle);
+				killerAppDialog.show(getFragmentManager(), "killer_app_fragment");
+
+//				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//				builder.setIcon(R.drawable.ic_launcher);
+//				builder.setTitle("");
+//				builder.setMessage("Killer app!!");
+//				builder.setCancelable(true);
+//				builder.create();
+//				builder.show();
+			//}
+
+			isFirstRun = false;
+
+			//prefs.edit().putBoolean(ONE_TIME_DIALOG_KEY, isFirstRun).commit();
+		}
+
 	}
 
     public void sendTextMessage() {

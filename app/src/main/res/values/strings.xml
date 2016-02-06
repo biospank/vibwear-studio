@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 Copyright 2014 MbientLab Inc. All rights reserved.
 
 IMPORTANT: Your use of this Software is limited to those specific rights
@@ -33,7 +32,7 @@ contact MbientLab Inc, at www.mbientlab.com.
 <resources>
 
     <string name="app_name">VibWear</string>
-    
+
     <string name="ble_not_supported">BLE not supported</string>
     <string name="refresh">Refresh</string>
     <string name="inboundsms">incoming sms</string>
@@ -67,7 +66,7 @@ contact MbientLab Inc, at www.mbientlab.com.
 
     <string name="accessibility_dialog_title">Accessibility</string>
     <string name="accessibility_dialog_msg">VibWear accessibility is not enabled.\nEnable VibWear to receive notification events?</string>
-    
+
     <string name="callServiceDesc">Call alert off!</string>
     <string name="smsServiceDesc">Sms alert off!</string>
     <string name="chatServiceDesc">Chat alert off!</string>
@@ -100,28 +99,34 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="delete_sos_contact_confirm">Confirm</string>
     <string name="delete_sos_contact_cancel">Cancel</string>
     <string name="pick_contact_label">Browse</string>
-   	<string name="label_sos_msg">S.O.S. message</string>
-   	<string name="label_sos_contacts">S.O.S. contacts</string>
-   	<string name="label_vib_slider">Vibration length</string>
+    <string name="label_sos_msg">S.O.S. message</string>
+    <string name="label_sos_contacts">S.O.S. contacts</string>
+    <string name="label_vib_slider">Vibration length</string>
     <string name="label_audio_slider">Sensible threshold</string>
-   	<string name="label_time_picker_alarm">Set alarm</string>
-   	<string name="label_vib_zero_sec">0</string>
+    <string name="label_time_picker_alarm">Set alarm</string>
+    <string name="label_vib_zero_sec">0</string>
     <string name="label_vib_five_sec">5</string>
-	<string name="label_vib_ten_sec">10</string>
+    <string name="label_vib_ten_sec">10</string>
     <string name="label_audio_low_level">100</string>
     <string name="label_audio_mid_level">5K</string>
     <string name="label_audio_high_level">10K</string>
-	<string name="not_available">n/a</string>
-	<string name="contact_with_number_msg">Only contacts with numbers will be added</string>
-	<string name="sos_msg_hint">Type here your message</string>
-	<string name="sos_default_msg">Vibwear: type your message on s.o.s. settings</string>
+    <string name="not_available">n/a</string>
+    <string name="contact_with_number_msg">Only contacts with numbers will be added</string>
+    <string name="sos_msg_hint">Type here your message</string>
+    <string name="sos_default_msg">Vibwear: type your message on s.o.s. settings</string>
     <string name="tap_to_block_notification">Block this notification</string>
-				
+
     <string name="scanner_title">Select device:</string>
     <string name="scanner_empty">No device found</string>
     <string name="scanner_action_scan">Scan</string>
     <string name="scanner_action_cancel">Cancel</string>
     <string name="scanner_subtitle_bonded">BONDED DEVICES:</string>
     <string name="scanner_subtitle__not_bonded">AVAILABLE DEVICES:</string>
+
+    <string name="killer_app_dialog_warning_text">
+        Some installed apps has been detected causing issues to VibWear. Please remove or configure them properly.
+    </string>
+
+    <string name="killer_app_dialog_hide_me_text">I got it</string>
 
 </resources>

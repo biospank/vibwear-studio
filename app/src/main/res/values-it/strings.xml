@@ -124,4 +124,11 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="scanner_subtitle_bonded">DISPOSITIVI COLLEGATI:</string>
     <string name="scanner_subtitle__not_bonded">DISPOSITIVI DISPONIBILI:</string>
 
+    <string name="killer_app_dialog_warning_text">
+        Sono state rilevate app che potrebbero causare il malfunzionamento di VibWear. Si consiglia di configurarle oppure rimuoverle.
+    </string>
+
+    <string name="killer_app_dialog_hide_me_text">Non mostrare questo messaggio</string>
+
+
 </resources>
