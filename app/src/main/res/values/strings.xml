@@ -123,6 +123,7 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="scanner_subtitle_bonded">BONDED DEVICES:</string>
     <string name="scanner_subtitle__not_bonded">AVAILABLE DEVICES:</string>
 
+    <string name="killer_app_dialog_title">Warning!!</string>
     <string name="killer_app_dialog_warning_text">
         Some installed apps has been detected causing issues to VibWear. Please remove or configure them properly.
     </string>

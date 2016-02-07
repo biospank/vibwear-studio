@@ -47,8 +47,6 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
 	private static final long BATTERY_SCHEDULE_TIME = 60000;
-	private static final String ONE_TIME_DIALOG = "ONE_TIME_DIALOG";
-	private static final String ONE_TIME_DIALOG_KEY = "is.first.run";
 	private LocationFragment locationFrag;
 	private ServicesFragment servicesFrag;
 	private Timer signalTimer;
@@ -56,7 +54,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	private PowerManager powerMgr;
     private PermanentNotification pNotification;
 	protected ProgressDialog progress;
-	private boolean isFirstRun = true;
+	private KillerAppDialogFragment killerAppDialog;
 
 	IntentFilter intentFilter;
 
@@ -142,8 +140,10 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if(isFinishing())
-            showPermanentNotification(false);
+		if(isFinishing()) {
+			killerAppDialog.setFirstRun(true);
+			showPermanentNotification(false);
+		}
 
 		unregisterReceiver(intentReceiver);
 
@@ -379,33 +379,24 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	}
 
 	protected void showKillerAppWarning() {
-		SharedPreferences prefs = this.getSharedPreferences(ONE_TIME_DIALOG, Context.MODE_PRIVATE);
-		isFirstRun = prefs.getBoolean(ONE_TIME_DIALOG_KEY, true);
+		if(killerAppDialog == null)
+			killerAppDialog = KillerAppDialogFragment.newInstance(getApplicationContext());
 
-		if (isFirstRun) {
+		if (killerAppDialog.isFirstRun()) {
 			ArrayList<String> killerApps = AppManager.findKillerApp(this);
 
-			//if (!killerApps.isEmpty()) {
+			if ((!killerApps.isEmpty()) && (!killerAppDialog.isHideMe())) {
 
 				Bundle bundle = new Bundle();
 				bundle.putStringArray("killer.apps", killerApps.toArray(new String[0]));
 
-				KillerAppDialogFragment killerAppDialog = KillerAppDialogFragment.newInstance();
 				killerAppDialog.setArguments(bundle);
 				killerAppDialog.show(getFragmentManager(), "killer_app_fragment");
 
-//				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//				builder.setIcon(R.drawable.ic_launcher);
-//				builder.setTitle("");
-//				builder.setMessage("Killer app!!");
-//				builder.setCancelable(true);
-//				builder.create();
-//				builder.show();
-			//}
+			}
 
-			isFirstRun = false;
+			killerAppDialog.setFirstRun(false);
 
-			//prefs.edit().putBoolean(ONE_TIME_DIALOG_KEY, isFirstRun).commit();
 		}
 
 	}
