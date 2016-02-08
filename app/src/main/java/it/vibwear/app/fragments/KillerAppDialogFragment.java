@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,33 +34,42 @@ public class KillerAppDialogFragment extends DialogFragment {
     private static Context context;
 
     public static KillerAppDialogFragment newInstance(Context context) {
-        KillerAppDialogFragment.context = context;
         KillerAppDialogFragment fragment = new KillerAppDialogFragment();
 
         return fragment;
     }
 
+//    @Override
+//    public Dialog onCreateDialog(Bundle savedInstanceState) {
+//        View dialogView = setupView();
+//
+//        return new AlertDialog.Builder(getActivity())
+//                .setIcon(R.drawable.ic_launcher)
+//                .setTitle(R.string.killer_app_dialog_title)
+//                .setView(dialogView)
+//                .setPositiveButton(R.string.pref_dialog_positive_button_text,
+//                        new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int whichButton) {
+//
+//                            }
+//                        }
+//            )
+//            .create();
+//
+//    }
+
+
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View dialogView = setupView();
-
-        return new AlertDialog.Builder(getActivity())
-                .setIcon(R.drawable.ic_launcher)
-                .setTitle(R.string.killer_app_dialog_title)
-                .setView(dialogView)
-                .setPositiveButton(R.string.pref_dialog_positive_button_text,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-
-                            }
-                        }
-            )
-            .create();
-
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.context = activity;
     }
 
-    private View setupView() {
-        View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_killer_app_dialog, null, false);
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View dialogView = inflater.inflate(R.layout.fragment_killer_app_dialog,
+                container, false);
 
         createKillerAppIcons(dialogView);
 
@@ -83,6 +95,9 @@ public class KillerAppDialogFragment extends DialogFragment {
             }
         });
 
+        Dialog dialog = getDialog();
+
+        dialog.setTitle(getString(R.string.killer_app_dialog_title));
 
         return dialogView;
     }
@@ -98,19 +113,12 @@ public class KillerAppDialogFragment extends DialogFragment {
             if(!killerAppList.isEmpty()) {
                 Iterator<String> iterator = killerAppList.iterator();
 
-                String packageName = iterator.next();
+                FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 
-                ImageView icon = (ImageView) view.findViewById(R.id.killerAppIcon1);
-                icon.setImageDrawable((new AppManager(getActivity(), packageName)).getIconApp());
+                while (iterator.hasNext())
+                    fragmentTransaction.add(R.id.killerAppIconsLayout, KillerAppIconFragment.newInstance(iterator.next()));
 
-                //FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-
-                //for(String packageName : killerAppPackages) {
-                //fragmentTransaction.add(R.id.killerAppIconsLayout, KillerAppIconFragment.newInstance(killerAppPackages[0]));
-
-                //}
-
-                //fragmentTransaction.commit();
+                fragmentTransaction.commit();
 
             }
         }
@@ -118,7 +126,7 @@ public class KillerAppDialogFragment extends DialogFragment {
 
     private void savePreference(boolean state) {
         SharedPreferences.Editor editor;
-        SharedPreferences settings = KillerAppDialogFragment.context.getSharedPreferences(HIDE_ME_PREF_NAME,
+        SharedPreferences settings = context.getSharedPreferences(HIDE_ME_PREF_NAME,
                 Context.MODE_PRIVATE);
         editor = settings.edit();
 
@@ -128,22 +136,22 @@ public class KillerAppDialogFragment extends DialogFragment {
 
     }
 
-    public boolean isHideMe() {
-        SharedPreferences settings = KillerAppDialogFragment.context.getSharedPreferences(HIDE_ME_PREF_NAME,
+    public boolean isHideMe(Context context) {
+        SharedPreferences settings = context.getSharedPreferences(HIDE_ME_PREF_NAME,
                 Context.MODE_PRIVATE);
         return settings.getBoolean(HIDE_ME_KEY, false);
 
     }
 
-    public boolean isFirstRun() {
-        SharedPreferences settings = KillerAppDialogFragment.context.getSharedPreferences(ONE_TIME_DIALOG, Context.MODE_PRIVATE);
+    public boolean isFirstRun(Context context) {
+        SharedPreferences settings = context.getSharedPreferences(ONE_TIME_DIALOG, Context.MODE_PRIVATE);
         return settings.getBoolean(ONE_TIME_DIALOG_KEY, true);
 
     }
 
-    public void setFirstRun(boolean firsRun) {
+    public void setFirstRun(Context context, boolean firsRun) {
         SharedPreferences.Editor editor;
-        SharedPreferences settings = KillerAppDialogFragment.context.getSharedPreferences(ONE_TIME_DIALOG,
+        SharedPreferences settings = context.getSharedPreferences(ONE_TIME_DIALOG,
                 Context.MODE_PRIVATE);
         editor = settings.edit();
 

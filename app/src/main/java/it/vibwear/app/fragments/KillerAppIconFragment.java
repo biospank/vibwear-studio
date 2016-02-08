@@ -1,7 +1,6 @@
 package it.vibwear.app.fragments;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +37,7 @@ public class KillerAppIconFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_killer_app_icon, container, false);

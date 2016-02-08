@@ -141,7 +141,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	public void onDestroy() {
 		super.onDestroy();
 		if(isFinishing()) {
-			killerAppDialog.setFirstRun(true);
+			killerAppDialog.setFirstRun(this, true);
 			showPermanentNotification(false);
 		}
 
@@ -382,20 +382,20 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 		if(killerAppDialog == null)
 			killerAppDialog = KillerAppDialogFragment.newInstance(getApplicationContext());
 
-		if (killerAppDialog.isFirstRun()) {
+		if (killerAppDialog.isFirstRun(this)) {
 			ArrayList<String> killerApps = AppManager.findKillerApp(this);
 
-			if ((!killerApps.isEmpty()) && (!killerAppDialog.isHideMe())) {
+			if ((!killerApps.isEmpty()) && (!killerAppDialog.isHideMe(this))) {
 
 				Bundle bundle = new Bundle();
 				bundle.putStringArray("killer.apps", killerApps.toArray(new String[0]));
 
 				killerAppDialog.setArguments(bundle);
-				killerAppDialog.show(getFragmentManager(), "killer_app_fragment");
+				killerAppDialog.show(getFragmentManager(), null);
 
 			}
 
-			killerAppDialog.setFirstRun(false);
+			killerAppDialog.setFirstRun(this, false);
 
 		}
 
