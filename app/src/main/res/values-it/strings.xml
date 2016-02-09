@@ -126,7 +126,7 @@ contact MbientLab Inc, at www.mbientlab.com.
 
     <string name="killer_app_dialog_title">Attenzione!!</string>
     <string name="killer_app_dialog_warning_text">
-        Sono state rilevate app che potrebbero interferire col corretto funzionamento di VibWear. Si consiglia di rimuoverle o di configurarle in modo opportuno.
+        Su questo dispositivo sono installate app che interferiscono col corretto funzionamento di VibWear. Si consiglia di rimuoverle o di configurarle in modo opportuno.
     </string>
 
     <string name="killer_app_dialog_hide_me_text">Ignora il messaggio</string>
