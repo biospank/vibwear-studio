@@ -383,7 +383,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 			killerAppDialog = KillerAppDialogFragment.newInstance(getApplicationContext());
 
 		if (killerAppDialog.isFirstRun(this)) {
-			ArrayList<String> killerApps = AppManager.findKillerApp(this);
+			ArrayList<String> killerApps = AppManager.findKillerApps(this);
 
 			if ((!killerApps.isEmpty()) && (!killerAppDialog.isHideMe(this))) {
 

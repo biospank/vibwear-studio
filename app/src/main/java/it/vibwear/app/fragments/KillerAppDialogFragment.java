@@ -30,6 +30,7 @@ public class KillerAppDialogFragment extends DialogFragment {
     private static final String ONE_TIME_DIALOG_KEY = "is.first.run";
     private static final String HIDE_ME_PREF_NAME = "HIDE_ME_DIALOG";
     private static final String HIDE_ME_KEY = "hide.me.key";
+    private final int KILLER_ICONS_LIMIT = 5;
 
     private static Context context;
 
@@ -115,8 +116,12 @@ public class KillerAppDialogFragment extends DialogFragment {
 
                 FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 
-                while (iterator.hasNext())
+                int i = 1;
+
+                while (iterator.hasNext() && i < KILLER_ICONS_LIMIT) {
                     fragmentTransaction.add(R.id.killerAppIconsLayout, KillerAppIconFragment.newInstance(iterator.next()));
+                    i++;
+                }
 
                 fragmentTransaction.commit();
 
