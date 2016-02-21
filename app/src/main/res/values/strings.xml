@@ -115,6 +115,26 @@ contact MbientLab Inc, at www.mbientlab.com.
     <string name="sos_msg_hint">Type here your message</string>
     <string name="sos_default_msg">Vibwear: type your message on s.o.s. settings</string>
     <string name="tap_to_block_notification">Block this notification</string>
+    <string name="title_dfu_dialog">Firmware Update</string>
+    <string name="title_firmware_update">Firmware Firmware</string>
+    <string name="label_dfu_dialog_confirm">Ok</string>
+    <string name="label_dfu_dialog_cancel">Cancel</string>
+    <string name="label_update_firmware">Upgrade</string>
+    <string name="label_check_for_update">Check for update</string>
+
+    <string name="notify_dfu_bootloader">Entering Bootloader Mode</string>
+    <string name="notify_dfu_starting">Starting Update</string>
+    <string name="notify_dfu_validating">Validating</string>
+    <string name="notify_dfu_disconnecting">Disconnecting</string>
+    <string name="notify_dfu_uploading">Uploading</string>
+    <string name="notify_dfu_success">DFU Succeeded</string>
+    <string name="notify_dfu_fail">DFU Failed</string>
+
+    <string name="message_dfu_accept">A firmware update is available.  Do you wish to download the newest firmware version?</string>
+    <string name="message_dfu">Updating the firmware to the latest version, please wait</string>
+    <string name="message_dfu_success">Firmware successfully updated to the latest version</string>
+    <string name="message_dfu_fail">Firmware failed to update.</string>
+    <string name="message_dfu_latest">Your board is already running the latest firmware.  Do you still wish to proceed with the firmware update anyways?</string>
 
     <string name="scanner_title">Select device:</string>
     <string name="scanner_empty">No device found</string>

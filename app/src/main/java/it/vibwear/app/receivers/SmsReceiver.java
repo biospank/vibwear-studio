@@ -1,4 +1,4 @@
-package it.vibwear.app;
+package it.vibwear.app.receivers;
 
 import it.vibwear.app.fragments.ServicesFragment;
 import android.content.BroadcastReceiver;

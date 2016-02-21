@@ -1,7 +1,7 @@
 package it.vibwear.app.utils;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.VibWearUtil;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;

@@ -1,7 +1,7 @@
 package it.vibwear.app.utils;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.ChatNotificationService;
+import it.vibwear.app.services.ChatNotificationService;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

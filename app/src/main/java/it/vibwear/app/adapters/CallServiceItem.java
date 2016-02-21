@@ -1,7 +1,7 @@
 package it.vibwear.app.adapters;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.VibWearUtil;
+import it.vibwear.app.utils.VibWearUtil;
 import it.vibwear.app.fragments.CallDetailFragment;
 import it.vibwear.app.utils.CallPreference;
 import android.app.Activity;

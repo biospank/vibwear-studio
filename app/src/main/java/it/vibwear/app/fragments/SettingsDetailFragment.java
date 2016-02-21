@@ -27,6 +27,7 @@ public class SettingsDetailFragment extends Fragment {
     private EditText etBoardName;
     private Button btChange;
     private CheckBox cbNotifyMe;
+    private Button btCheckFirmware;
 
     private OnSettingsChangeListener mListener;
 
@@ -81,7 +82,7 @@ public class SettingsDetailFragment extends Fragment {
         btChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onButtonPressed();
+                onChangeNameButtonPressed();
             }
         });
 
@@ -91,6 +92,15 @@ public class SettingsDetailFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 setOnLowBatteryPref(isChecked);
+            }
+        });
+
+        btCheckFirmware = (Button) layout.findViewById(R.id.bt_check_for_update);
+
+        btCheckFirmware.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCheckFirwareButtonPressed();
             }
         });
 
@@ -118,7 +128,7 @@ public class SettingsDetailFragment extends Fragment {
     }
 
 
-    public void onButtonPressed() {
+    public void onChangeNameButtonPressed() {
         if (mListener != null) {
             String name = etBoardName.getText().toString();
             if(name.length() > 0) {
@@ -128,8 +138,13 @@ public class SettingsDetailFragment extends Fragment {
         }
     }
 
+    public void onCheckFirwareButtonPressed() {
+        mListener.onFirmwareUpdate();
+    }
+
     public interface OnSettingsChangeListener {
         public void onBoardNameChange(String boardName);
+        public void onFirmwareUpdate();
     }
 
 

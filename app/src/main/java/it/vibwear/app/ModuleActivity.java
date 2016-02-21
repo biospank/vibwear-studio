@@ -245,4 +245,6 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
         return mwConnectionFragment.isDeviceConnected();
     }
 
+    protected void resetConnectionStateHandler() {  mwConnectionFragment.initializeAndConnect(5000L); }
+
 }

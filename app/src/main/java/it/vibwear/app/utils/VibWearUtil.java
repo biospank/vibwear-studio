@@ -1,4 +1,4 @@
-package it.vibwear.app;
+package it.vibwear.app.utils;
 
 import java.text.DateFormat;
 import java.util.Calendar;

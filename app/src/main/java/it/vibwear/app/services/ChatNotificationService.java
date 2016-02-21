@@ -1,4 +1,4 @@
-package it.vibwear.app;
+package it.vibwear.app.services;
 
 import it.vibwear.app.fragments.ServicesFragment;
 import android.accessibilityservice.AccessibilityService;
@@ -87,7 +87,7 @@ public class ChatNotificationService extends AccessibilityService {
 	public static boolean isAccessibilitySettingsOn(Context mContext) {
         int accessibilityEnabled = 0;
 //        String TAG = "VibWear";
-        final String service = "it.lampwireless.vibwear.app/it.vibwear.app.ChatNotificationService";
+        final String service = "it.lampwireless.vibwear.app/it.vibwear.app.services.ChatNotificationService";
         boolean accessibilityFound = false;
         try {
             accessibilityEnabled = Settings.Secure.getInt(

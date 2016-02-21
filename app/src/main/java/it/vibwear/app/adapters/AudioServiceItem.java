@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.VibWearUtil;
+import it.vibwear.app.utils.VibWearUtil;
 import it.vibwear.app.fragments.AudioDetailFragment;
 import it.vibwear.app.fragments.AudioTaskFragment;
 import it.vibwear.app.utils.AudioPreference;

@@ -116,6 +116,27 @@ contact MbientLab Inc, at www.mbientlab.com.
 	<string name="sos_msg_hint">Scrivi il tuo messaggio</string>
 	<string name="sos_default_msg">Vibwear: scrivi il tuo messaggio nelle impostazioni s.o.s.</string>
     <string name="tap_to_block_notification">Blocca qusta notifica</string>
+    <string name="label_update_firmware">Firmware</string>
+    <string name="label_check_for_update">Verifica aggiornamento</string>
+    <string name="title_firmware_update">Aggiornamento Firmware</string>
+    <string name="title_dfu_dialog">Aggiorna Firmware</string>
+    <string name="label_dfu_dialog_confirm">Aggiorna</string>
+    <string name="label_dfu_dialog_cancel">Annulla</string>
+
+    <string name="notify_dfu_bootloader">Modalità Bootloader attiva</string>
+    <string name="notify_dfu_starting">Aggiornamento in corso</string>
+    <string name="notify_dfu_validating">Validazione</string>
+    <string name="notify_dfu_disconnecting">Disconnessione in corso</string>
+    <string name="notify_dfu_uploading">Caricamento</string>
+    <string name="notify_dfu_success">DFU eseguito correttamente</string>
+    <string name="notify_dfu_fail">DFU fallito</string>
+
+    <string name="message_dfu_accept">E\' disponibile un aggiornamento del firmware. Vuoi scaricare la nuova versione?</string>
+    <string name="message_dfu">Aggiornamento del firmware all\'ultima versione...</string>
+    <string name="message_dfu_success">Firmware aggiornato all\'ultima versione.</string>
+    <string name="message_dfu_fail">Aggiornamento firmware fallito.</string>
+    <string name="message_dfu_latest">Il tuo dispositivo sta usando l\'ultima versione del firmware. Desideri comunque procedere con l\'aggiornamento?</string>
+
 
     <string name="scanner_title">Seleziona dispositivo:</string>
     <string name="scanner_empty">Nessun dispositivo</string>

@@ -1,13 +1,11 @@
 package it.vibwear.app.fragments;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.VibWearUtil;
 import it.vibwear.app.utils.AlarmPreference;
 import it.vibwear.app.utils.AudioPreference;
 import it.vibwear.app.utils.CallPreference;
 import it.vibwear.app.utils.ChatPreference;
 import it.vibwear.app.utils.SmsPreference;
-import it.vibwear.app.utils.SosPreference;
 import it.vibwear.app.utils.VibrationPreference;
 import android.app.Activity;
 import android.app.Fragment;
@@ -17,9 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class VibSliderFragment extends Fragment {
 

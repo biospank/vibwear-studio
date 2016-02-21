@@ -45,6 +45,8 @@ public class MwConnectionFragment extends Fragment {
     private Settings settingsController;
     private String deviceName;
     private String firmwareVersion;
+    private final Handler connectScheduler = new Handler();
+
 
     /**
      * Callback interface through which the fragment will report the
@@ -386,14 +388,26 @@ public class MwConnectionFragment extends Fragment {
 
         this.device = device;
 
-        initializeAndConnect();
+        initializeAndConnect(0);
     }
 
-    private void initializeAndConnect() {
+    public void initializeAndConnect(long delay) {
         // Create a MetaWear board object for the Bluetooth Device
-        mwBoard = mwService.getMetaWearBoard(device);
+        if(mwBoard == null)
+            mwBoard = mwService.getMetaWearBoard(device);
+
         mwBoard.setConnectionStateHandler(stateHandler);
-        mwBoard.connect();
+
+        if (delay != 0) {
+            connectScheduler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mwBoard.connect();
+                }
+            }, delay);
+        } else {
+            mwBoard.connect();
+        }
         //boardMacAddress = mwBoard.getMacAddress();
     }
 

@@ -3,7 +3,7 @@ package it.vibwear.app.fragments;
 import java.util.Calendar;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.VibWearUtil;
+import it.vibwear.app.utils.VibWearUtil;
 import it.vibwear.app.utils.AlarmPreference;
 import it.vibwear.app.utils.TimePreference;
 import android.app.Activity;

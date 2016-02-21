@@ -2,6 +2,7 @@ package it.vibwear.app;
 
 import it.lampwireless.vibwear.app.R;
 import it.vibwear.app.adapters.Contact;
+import it.vibwear.app.fragments.DfuProgressFragment;
 import it.vibwear.app.fragments.KillerAppDialogFragment;
 import it.vibwear.app.fragments.LocationFragment;
 import it.vibwear.app.fragments.ServicesFragment;
@@ -21,12 +22,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -34,11 +39,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
 import android.telephony.SmsManager;
+
+import com.mbientlab.metawear.AsyncOperation;
 import com.mbientlab.metawear.MetaWearBoard;
 
 public class VibWearActivity extends ModuleActivity implements ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
@@ -266,7 +274,26 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
         mwConnectionFragment.setDeviceName(boardName);
     }
 
-    public String getDeviceName() {
+	@Override
+	public void onFirmwareUpdate() {
+		getMwBoard().checkForFirmwareUpdate().onComplete(new AsyncOperation.CompletionHandler<Boolean>() {
+			@Override
+			public void success(Boolean result) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(VibWearActivity.this);
+
+				if (!result) {
+					setupDfuDialog(builder, R.string.message_dfu_latest);
+				} else {
+					setupDfuDialog(builder, R.string.message_dfu_accept);
+				}
+
+				builder.create();
+				builder.show();
+			}
+		});
+	}
+
+	public String getDeviceName() {
         return mwConnectionFragment.getDeviceName();
     }
 
@@ -429,8 +456,95 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	protected void startDeviceScanner() {
         FragmentManager fm = getFragmentManager();
         ScannerFragment dialog = ScannerFragment.getInstance(VibWearActivity.this,
-                new UUID[]{MetaWearBoard.METAWEAR_SERVICE_UUID}, true);
+				new UUID[]{MetaWearBoard.METAWEAR_SERVICE_UUID}, true);
         dialog.show(fm, "scan_fragment");
     }
+
+	private void setupDfuDialog(AlertDialog.Builder builder, int msgResId) {
+		builder.setTitle(R.string.title_dfu_dialog)
+				.setPositiveButton(R.string.label_dfu_dialog_confirm, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						initiateDfu();
+					}
+				})
+				.setNegativeButton(R.string.label_dfu_dialog_cancel, null)
+				.setCancelable(false)
+				.setMessage(msgResId);
+	}
+
+	private void initiateDfu() {
+		final String DFU_PROGRESS_FRAGMENT_TAG= "dfu_progress_popup";
+		DfuProgressFragment dfuProgressDialog= new DfuProgressFragment();
+		dfuProgressDialog.show(getFragmentManager(), DFU_PROGRESS_FRAGMENT_TAG);
+
+		runOnUiThread(new Runnable() {
+			final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			final Notification.Builder checkpointNotifyBuilder = new Notification.Builder(VibWearActivity.this).setSmallIcon(android.R.drawable.stat_sys_upload)
+					.setOnlyAlertOnce(true).setOngoing(true).setProgress(0, 0, true);
+			final Notification.Builder progressNotifyBuilder = new Notification.Builder(VibWearActivity.this).setSmallIcon(android.R.drawable.stat_sys_upload)
+					.setOnlyAlertOnce(true).setOngoing(true).setContentTitle(getString(R.string.notify_dfu_uploading));
+			final int NOTIFICATION_ID = 1024;
+
+			@Override
+			public void run() {
+				getMwBoard().updateFirmware(new MetaWearBoard.DfuProgressHandler() {
+					@Override
+					public void reachedCheckpoint(State dfuState) {
+						switch (dfuState) {
+							case INITIALIZING:
+								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_bootloader));
+								break;
+							case STARTING:
+								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_starting));
+								break;
+							case VALIDATING:
+								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_validating));
+								break;
+							case DISCONNECTING:
+								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_disconnecting));
+								break;
+						}
+
+						manager.notify(NOTIFICATION_ID, checkpointNotifyBuilder.build());
+					}
+
+					@Override
+					public void receivedUploadProgress(int progress) {
+						progressNotifyBuilder.setContentText(String.format("%d%%", progress)).setProgress(100, progress, false);
+						manager.notify(NOTIFICATION_ID, progressNotifyBuilder.build());
+						((DfuProgressFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).updateProgress(progress);
+					}
+				}).onComplete(new AsyncOperation.CompletionHandler<Void>() {
+					final Notification.Builder builder = new Notification.Builder(VibWearActivity.this).setOnlyAlertOnce(true)
+							.setOngoing(false).setAutoCancel(true);
+
+					@Override
+					public void success(Void result) {
+						((DialogFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
+						builder.setContentTitle(getString(R.string.notify_dfu_success)).setSmallIcon(android.R.drawable.stat_sys_upload_done);
+						manager.notify(NOTIFICATION_ID, builder.build());
+
+						Toast.makeText(VibWearActivity.this, R.string.message_dfu_success, Toast.LENGTH_LONG).show();
+						resetConnectionStateHandler();
+					}
+
+					@Override
+					public void failure(Throwable error) {
+						Log.e("MetaWearApp", "Firmware update failed", error);
+
+						Throwable cause = error.getCause() == null ? error : error.getCause();
+						((DialogFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
+						builder.setContentTitle(getString(R.string.notify_dfu_fail)).setSmallIcon(android.R.drawable.ic_dialog_alert)
+								.setContentText(cause.getLocalizedMessage());
+						manager.notify(NOTIFICATION_ID, builder.build());
+
+						Toast.makeText(VibWearActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+						resetConnectionStateHandler();
+					}
+				});
+			}
+		});
+	}
 
 }

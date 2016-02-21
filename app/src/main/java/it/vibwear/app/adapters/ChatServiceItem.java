@@ -1,12 +1,11 @@
 package it.vibwear.app.adapters;
 
 import it.lampwireless.vibwear.app.R;
-import it.vibwear.app.ChatNotificationService;
-import it.vibwear.app.VibWearUtil;
+import it.vibwear.app.services.ChatNotificationService;
+import it.vibwear.app.utils.VibWearUtil;
 import it.vibwear.app.fragments.ChatDetailFragment;
 import it.vibwear.app.utils.ChatPreference;
 import it.vibwear.app.utils.NotificationPreference;
-import it.vibwear.app.utils.VersionPreference;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
