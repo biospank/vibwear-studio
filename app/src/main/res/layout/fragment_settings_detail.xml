@@ -54,6 +54,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_marginRight="10dp"
+                android:background="@drawable/buttonshape"
+                android:textColor="#FFFFFF"
                 android:text="@string/change"/>
 
         </LinearLayout>
@@ -138,6 +140,8 @@
             android:layout_weight="2"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
+            android:background="@drawable/buttonshape_warn"
+            android:textColor="#FFFFFF"
             android:text="@string/label_check_for_update"/>
 
     </LinearLayout>

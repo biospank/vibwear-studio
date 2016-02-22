@@ -66,6 +66,7 @@
 	        android:layout_marginRight="10dp"
             android:clickable="true"
             android:textAlignment="viewEnd"
+            android:background="@drawable/buttonshape_default"
             android:src="@drawable/ic_contacts"/>
         
     </LinearLayout>
