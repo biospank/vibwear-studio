@@ -152,5 +152,8 @@ contact MbientLab Inc, at www.mbientlab.com.
 
     <string name="killer_app_dialog_hide_me_text">Ignora il messaggio</string>
 
+    <string name="my_position">Nel messaggio</string>
+    <string name="label_geolocation">La mia posizione</string>
+
 
 </resources>

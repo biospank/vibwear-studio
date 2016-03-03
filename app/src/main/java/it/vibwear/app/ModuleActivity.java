@@ -202,21 +202,6 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
         registerReceiver(bluetoothStateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
     }
 
-    protected void sendTextMessage() {
-        SosPreference contactPreference = new SosPreference(getApplicationContext());
-        List<Contact> contacts = contactPreference.getContacts();
-        SmsManager smsManager = SmsManager.getDefault();
-
-        String msg = contactPreference.getSosMessage();
-
-        if (msg.isEmpty())
-            msg = getString(R.string.sos_default_msg);
-
-        for (Contact contact : contacts) {
-            smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
-        }
-    }
-
     @Override
     public void onDeviceConnect() {
         if(reconnectTaskFragment != null) {

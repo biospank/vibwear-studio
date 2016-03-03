@@ -150,4 +150,7 @@ contact MbientLab Inc, at www.mbientlab.com.
 
     <string name="killer_app_dialog_hide_me_text">I got it</string>
 
+    <string name="my_position">Into message</string>
+    <string name="label_geolocation">My position</string>
+
 </resources>

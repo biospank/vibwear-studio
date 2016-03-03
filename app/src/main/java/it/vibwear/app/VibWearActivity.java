@@ -15,6 +15,8 @@ import it.vibwear.app.scanner.ScannerFragment;
 import it.vibwear.app.utils.AppManager;
 import it.vibwear.app.utils.SosPreference;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,21 +37,29 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.Toast;
 import android.telephony.SmsManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.mbientlab.metawear.AsyncOperation;
 import com.mbientlab.metawear.MetaWearBoard;
 
-public class VibWearActivity extends ModuleActivity implements ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
+public class VibWearActivity extends ModuleActivity implements
+        ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener,
+        SettingsDetailFragment.OnSettingsChangeListener, AlarmListner,
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
+
 	private static final String VERSION = "1.7.0";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
@@ -63,6 +73,10 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
     private PermanentNotification pNotification;
 	protected ProgressDialog progress;
 	private KillerAppDialogFragment killerAppDialog;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+    private Notification.Builder mBuilder;
 
 	IntentFilter intentFilter;
 
@@ -165,6 +179,20 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 		cancelScheduledTimers();
 	}
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Connect the client.
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        // Disconnecting the client invalidates it.
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
 	@Override
 	public void onBackPressed() {
 		if (isDeviceConnected()) {
@@ -213,7 +241,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	public void onDeviceSelected(BluetoothDevice device, String name) {
 		mwConnectionFragment.onDeviceSelected(device, name);
 		progress = new ProgressDialog(this);
-		progress.setTitle(R.string.progressTitle);
+        progress.setTitle(R.string.progressTitle);
 		progress.setMessage(getResources().getString(R.string.progressMsg));
 		progress.show();
 	}
@@ -278,15 +306,15 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 
 	@Override
 	public void onFirmwareUpdate() {
-		getMwBoard().checkForFirmwareUpdate().onComplete(new AsyncOperation.CompletionHandler<Boolean>() {
-			@Override
-			public void success(Boolean result) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(VibWearActivity.this);
+        getMwBoard().checkForFirmwareUpdate().onComplete(new AsyncOperation.CompletionHandler<Boolean>() {
+            @Override
+            public void success(Boolean result) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(VibWearActivity.this);
 
-				if (!result) {
-					setupDfuDialog(builder, R.string.message_dfu_latest);
-				} else {
-					setupDfuDialog(builder, R.string.message_dfu_accept);
+                if (!result) {
+                    setupDfuDialog(builder, R.string.message_dfu_latest);
+                } else {
+                    setupDfuDialog(builder, R.string.message_dfu_accept);
 				}
 
 				builder.create();
@@ -323,6 +351,8 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 		intentFilter.addAction(ServicesFragment.ALARM_VIB_ACTION);
 		intentFilter.addAction(ServicesFragment.CHAT_VIB_ACTION);
         intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
+
+        buildGoogleApiClient();
 
 	}
 	
@@ -440,6 +470,8 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
         if (msg.isEmpty())
             msg = getString(R.string.sos_default_msg);
 
+        msg += " " + getLocationUrlMap();
+
         for (Contact contact : contacts) {
             smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
         }
@@ -480,68 +512,68 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 		DfuProgressFragment dfuProgressDialog= new DfuProgressFragment();
 		dfuProgressDialog.show(getFragmentManager(), DFU_PROGRESS_FRAGMENT_TAG);
 
-		runOnUiThread(new Runnable() {
-			final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			final Notification.Builder checkpointNotifyBuilder = new Notification.Builder(VibWearActivity.this).setSmallIcon(android.R.drawable.stat_sys_upload)
-					.setOnlyAlertOnce(true).setOngoing(true).setProgress(0, 0, true);
-			final Notification.Builder progressNotifyBuilder = new Notification.Builder(VibWearActivity.this).setSmallIcon(android.R.drawable.stat_sys_upload)
-					.setOnlyAlertOnce(true).setOngoing(true).setContentTitle(getString(R.string.notify_dfu_uploading));
-			final int NOTIFICATION_ID = 1024;
+        runOnUiThread(new Runnable() {
+            final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            final Notification.Builder checkpointNotifyBuilder = new Notification.Builder(VibWearActivity.this).setSmallIcon(android.R.drawable.stat_sys_upload)
+                    .setOnlyAlertOnce(true).setOngoing(true).setProgress(0, 0, true);
+            final Notification.Builder progressNotifyBuilder = new Notification.Builder(VibWearActivity.this).setSmallIcon(android.R.drawable.stat_sys_upload)
+                    .setOnlyAlertOnce(true).setOngoing(true).setContentTitle(getString(R.string.notify_dfu_uploading));
+            final int NOTIFICATION_ID = 1024;
 
-			@Override
-			public void run() {
-				getMwBoard().updateFirmware(new MetaWearBoard.DfuProgressHandler() {
-					@Override
-					public void reachedCheckpoint(State dfuState) {
-						switch (dfuState) {
-							case INITIALIZING:
-								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_bootloader));
-								break;
-							case STARTING:
-								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_starting));
-								break;
-							case VALIDATING:
-								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_validating));
-								break;
-							case DISCONNECTING:
-								checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_disconnecting));
-								break;
-						}
+            @Override
+            public void run() {
+                getMwBoard().updateFirmware(new MetaWearBoard.DfuProgressHandler() {
+                    @Override
+                    public void reachedCheckpoint(State dfuState) {
+                        switch (dfuState) {
+                            case INITIALIZING:
+                                checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_bootloader));
+                                break;
+                            case STARTING:
+                                checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_starting));
+                                break;
+                            case VALIDATING:
+                                checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_validating));
+                                break;
+                            case DISCONNECTING:
+                                checkpointNotifyBuilder.setContentTitle(getString(R.string.notify_dfu_disconnecting));
+                                break;
+                        }
 
-						manager.notify(NOTIFICATION_ID, checkpointNotifyBuilder.build());
-					}
+                        manager.notify(NOTIFICATION_ID, checkpointNotifyBuilder.build());
+                    }
 
-					@Override
-					public void receivedUploadProgress(int progress) {
-						progressNotifyBuilder.setContentText(String.format("%d%%", progress)).setProgress(100, progress, false);
-						manager.notify(NOTIFICATION_ID, progressNotifyBuilder.build());
-						((DfuProgressFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).updateProgress(progress);
-					}
-				}).onComplete(new AsyncOperation.CompletionHandler<Void>() {
-					final Notification.Builder builder = new Notification.Builder(VibWearActivity.this).setOnlyAlertOnce(true)
-							.setOngoing(false).setAutoCancel(true);
+                    @Override
+                    public void receivedUploadProgress(int progress) {
+                        progressNotifyBuilder.setContentText(String.format("%d%%", progress)).setProgress(100, progress, false);
+                        manager.notify(NOTIFICATION_ID, progressNotifyBuilder.build());
+                        ((DfuProgressFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).updateProgress(progress);
+                    }
+                }).onComplete(new AsyncOperation.CompletionHandler<Void>() {
+                    final Notification.Builder builder = new Notification.Builder(VibWearActivity.this).setOnlyAlertOnce(true)
+                            .setOngoing(false).setAutoCancel(true);
 
-					@Override
-					public void success(Void result) {
-						((DialogFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
-						builder.setContentTitle(getString(R.string.notify_dfu_success)).setSmallIcon(android.R.drawable.stat_sys_upload_done);
-						manager.notify(NOTIFICATION_ID, builder.build());
+                    @Override
+                    public void success(Void result) {
+                        ((DialogFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
+                        builder.setContentTitle(getString(R.string.notify_dfu_success)).setSmallIcon(android.R.drawable.stat_sys_upload_done);
+                        manager.notify(NOTIFICATION_ID, builder.build());
 
-						Toast.makeText(VibWearActivity.this, R.string.message_dfu_success, Toast.LENGTH_LONG).show();
-						resetConnectionStateHandler();
-					}
+                        Toast.makeText(VibWearActivity.this, R.string.message_dfu_success, Toast.LENGTH_LONG).show();
+                        resetConnectionStateHandler();
+                    }
 
-					@Override
-					public void failure(Throwable error) {
-						Log.e("MetaWearApp", "Firmware update failed", error);
+                    @Override
+                    public void failure(Throwable error) {
+                        Log.e("MetaWearApp", "Firmware update failed", error);
 
-						Throwable cause = error.getCause() == null ? error : error.getCause();
-						((DialogFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
-						builder.setContentTitle(getString(R.string.notify_dfu_fail)).setSmallIcon(android.R.drawable.ic_dialog_alert)
-								.setContentText(cause.getLocalizedMessage());
-						manager.notify(NOTIFICATION_ID, builder.build());
+                        Throwable cause = error.getCause() == null ? error : error.getCause();
+                        ((DialogFragment) getFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
+                        builder.setContentTitle(getString(R.string.notify_dfu_fail)).setSmallIcon(android.R.drawable.ic_dialog_alert)
+                                .setContentText(cause.getLocalizedMessage());
+                        manager.notify(NOTIFICATION_ID, builder.build());
 
-						Toast.makeText(VibWearActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(VibWearActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 						resetConnectionStateHandler();
 					}
 				});
@@ -549,4 +581,79 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 		});
 	}
 
+    protected String getLocationUrlMap() {
+        //             return servicesFrag.getLocationUrlMap();
+        String query = "";
+        String url = "";
+        try {
+            if(mLastLocation != null) {
+                Log.i("Location", "latitude: " + mLastLocation.getLatitude());
+                Log.i("Location", "longitude: " + mLastLocation.getLongitude());
+                query = URLEncoder.encode(mLastLocation.getLatitude() + "N," + mLastLocation.getLongitude() + "W", "utf-8");
+                url = "http://maps.google.com/maps?q=" + query;
+            }
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            //                     e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i("Vibwear", "GoogleApiClient connection established");
+//             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+//        if (mLastLocation != null) {
+//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+//        }
+
+//             if (mRequestingLocationUpdates) {
+//                     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        createLocationRequest();
+        startLocationUpdates();
+//         }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i("Vibwear", "GoogleApiClient connection has been suspend");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(this, "connection failded", Toast.LENGTH_LONG).show();
+        Log.i("Vibwear", "GoogleApiClient connection has failed");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        Log.i("Vibwear", "Location received: " + location.toString());
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
 }

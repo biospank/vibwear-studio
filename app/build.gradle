@@ -29,4 +29,5 @@ dependencies {
     compile 'com.mbientlab:metawear:2.4.0'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.google.android.gms:play-services-location:8.1.0'
 }
