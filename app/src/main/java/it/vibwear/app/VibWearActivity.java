@@ -149,7 +149,9 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 	public void onDestroy() {
 		super.onDestroy();
 		if(isFinishing()) {
-			killerAppDialog.setFirstRun(this, true);
+			if(killerAppDialog != null)
+				killerAppDialog.setFirstRun(this, true);
+
 			showPermanentNotification(false);
 		}
 
