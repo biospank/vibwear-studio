@@ -13,12 +13,9 @@ import it.vibwear.app.notifications.PermanentNotification;
 import it.vibwear.app.notifications.TemporaryNotification;
 import it.vibwear.app.scanner.ScannerFragment;
 import it.vibwear.app.utils.AppManager;
+import it.vibwear.app.utils.GACServiceManager;
 import it.vibwear.app.utils.SosPreference;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,7 +34,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
@@ -45,20 +41,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import android.telephony.SmsManager;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.mbientlab.metawear.AsyncOperation;
 import com.mbientlab.metawear.MetaWearBoard;
 
 public class VibWearActivity extends ModuleActivity implements
         ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener,
-        SettingsDetailFragment.OnSettingsChangeListener, AlarmListner,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
+        SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
 
 	private static final String VERSION = "1.7.0";
 	private static final long SIGNAL_START_DELAY = 10000;
@@ -73,9 +61,7 @@ public class VibWearActivity extends ModuleActivity implements
     private PermanentNotification pNotification;
 	protected ProgressDialog progress;
 	private KillerAppDialogFragment killerAppDialog;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
-    private LocationRequest mLocationRequest;
+    private GACServiceManager gacServiceManager;
     private Notification.Builder mBuilder;
 
 	IntentFilter intentFilter;
@@ -157,9 +143,10 @@ public class VibWearActivity extends ModuleActivity implements
 		registerReceiver(intentReceiver, intentFilter);
 
         startScheduledTimers();
+
 	}
-	
-	@Override
+
+    @Override
 	public void onDestroy() {
 		super.onDestroy();
 		if(isFinishing()) {
@@ -167,6 +154,7 @@ public class VibWearActivity extends ModuleActivity implements
 				killerAppDialog.setFirstRun(this, true);
 
 			showPermanentNotification(false);
+            gacServiceManager.disconnect();
 		}
 
 		unregisterReceiver(intentReceiver);
@@ -178,20 +166,6 @@ public class VibWearActivity extends ModuleActivity implements
 		super.onPause();
 		cancelScheduledTimers();
 	}
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Connect the client.
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        // Disconnecting the client invalidates it.
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
 
 	@Override
 	public void onBackPressed() {
@@ -274,7 +248,7 @@ public class VibWearActivity extends ModuleActivity implements
 		}
 	}
 
-	public void updateSignalLevel(int rssiPercent) {
+    public void updateSignalLevel(int rssiPercent) {
 		locationFrag.updateSignalImageResource(rssiPercent);
 	}
 
@@ -352,9 +326,9 @@ public class VibWearActivity extends ModuleActivity implements
 		intentFilter.addAction(ServicesFragment.CHAT_VIB_ACTION);
         intentFilter.addAction(ServicesFragment.AUDIO_VIB_ACTION);
 
-        buildGoogleApiClient();
+        connectGoogleApiClient();
 
-	}
+    }
 	
 	private void startScheduledTimers() {
 		if (signalTimer == null) {
@@ -470,11 +444,19 @@ public class VibWearActivity extends ModuleActivity implements
         if (msg.isEmpty())
             msg = getString(R.string.sos_default_msg);
 
-        msg += " " + getLocationUrlMap();
+        msg += " " + gacServiceManager.getLocationUrlMap();
 
         for (Contact contact : contacts) {
             smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
         }
+    }
+
+    public void startServiceUpdates() {
+        servicesFrag.getSosService().startLocationUpdates();
+    }
+
+    public void stopServiceUpdates() {
+        servicesFrag.getSosService().stopLocationUpdates();
     }
 
     protected void showTemporaryNotification(Intent intent) {
@@ -581,79 +563,9 @@ public class VibWearActivity extends ModuleActivity implements
 		});
 	}
 
-    protected String getLocationUrlMap() {
-        //             return servicesFrag.getLocationUrlMap();
-        String query = "";
-        String url = "";
-        try {
-            if(mLastLocation != null) {
-                Log.i("Location", "latitude: " + mLastLocation.getLatitude());
-                Log.i("Location", "longitude: " + mLastLocation.getLongitude());
-                query = URLEncoder.encode(mLastLocation.getLatitude() + "N," + mLastLocation.getLongitude() + "W", "utf-8");
-                url = "http://maps.google.com/maps?q=" + query;
-            }
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            //                     e.printStackTrace();
-        }
+    private void connectGoogleApiClient() {
+        gacServiceManager = GACServiceManager.getInstance(this);
+        gacServiceManager.connect();
 
-        return url;
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i("Vibwear", "GoogleApiClient connection established");
-//             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                mGoogleApiClient);
-//        if (mLastLocation != null) {
-//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-//        }
-
-//             if (mRequestingLocationUpdates) {
-//                     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        createLocationRequest();
-        startLocationUpdates();
-//         }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i("Vibwear", "GoogleApiClient connection has been suspend");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(this, "connection failded", Toast.LENGTH_LONG).show();
-        Log.i("Vibwear", "GoogleApiClient connection has failed");
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        Log.i("Vibwear", "Location received: " + location.toString());
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        }
-
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-    }
-
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 }

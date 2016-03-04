@@ -154,6 +154,9 @@ contact MbientLab Inc, at www.mbientlab.com.
 
     <string name="my_position">Nel messaggio</string>
     <string name="label_geolocation">La mia posizione</string>
+    <string name="sos_activate_gps_msg">Attivando il GPS puoi inviare messaggi con la tua posizione geografica</string>
+    <string name="activate_gps_btn_confirm">Attiva</string>
+    <string name="activate_gps_btn_cancel">Annulla</string>
 
 
 </resources>

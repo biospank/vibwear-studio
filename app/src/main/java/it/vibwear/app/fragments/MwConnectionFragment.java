@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -107,6 +108,8 @@ public class MwConnectionFragment extends Fragment {
 
                 mActivity.updateUi();
 
+                mActivity.startServiceUpdates();
+
                 mCallbacks.onDeviceConnect();
 
             }
@@ -116,6 +119,8 @@ public class MwConnectionFragment extends Fragment {
         @Override
         public void disconnected() {
             mActivity.updateUi();
+
+            mActivity.stopServiceUpdates();
 
             if (device != null && mwBoard != null) {
                 mCallbacks.onDeviceDisconnect();

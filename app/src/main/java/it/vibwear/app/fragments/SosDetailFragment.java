@@ -95,7 +95,6 @@ public class SosDetailFragment extends Fragment {
 
 	}
 
-	// code
 	@Override
 	public void onActivityResult(int reqCode, int resultCode, Intent data) {
 		super.onActivityResult(reqCode, resultCode, data);

@@ -12,6 +12,7 @@ import it.vibwear.app.utils.AudioPreference;
 import it.vibwear.app.utils.CallPreference;
 import it.vibwear.app.utils.ChatPreference;
 import it.vibwear.app.utils.DefaultPreference;
+import it.vibwear.app.utils.GACServiceManager;
 import it.vibwear.app.utils.SmsPreference;
 import it.vibwear.app.utils.SosPreference;
 import it.vibwear.app.utils.VibrationPreference;
@@ -40,7 +41,6 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
     protected ReconnectTaskFragment reconnectTaskFragment;
     protected MwConnectionFragment mwConnectionFragment;
     protected BluetoothStateReceiver bluetoothStateReceiver;
-    private String boardMacAddress = null;
 
 
     public MetaWearBoard getMwBoard() {
@@ -208,6 +208,7 @@ public class ModuleActivity extends Activity implements MwConnectionFragment.OnM
             reconnectTaskFragment.stopAsyncTask();
             reconnectTaskFragment.dismissDialog();
         }
+
     }
 
     @Override

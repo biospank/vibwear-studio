@@ -152,5 +152,8 @@ contact MbientLab Inc, at www.mbientlab.com.
 
     <string name="my_position">Into message</string>
     <string name="label_geolocation">My position</string>
+    <string name="sos_activate_gps_msg">GPS activation allow VibWear to send text with geolocation</string>
+    <string name="activate_gps_btn_confirm">Activate</string>
+    <string name="activate_gps_btn_cancel">Cancel</string>
 
 </resources>
