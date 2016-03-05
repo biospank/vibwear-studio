@@ -20,6 +20,8 @@ import java.net.URLEncoder;
  */
 public class GACServiceManager implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
     private static GACServiceManager manager;
+    private static long LOCATION_REQUEST_INTERVAL = 60 * 1000;
+    private static long LOCATION_REQUEST_FASTEST_INTERVAL = 15 * 1000;
 
     private Context context;
     private Location mLastLocation;
@@ -80,18 +82,7 @@ public class GACServiceManager implements GoogleApiClient.OnConnectionFailedList
     @Override
     public void onConnected(Bundle bundle) {
         Log.i("Vibwear", "GoogleApiClient connection established");
-//             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                mGoogleApiClient);
-//        if (mLastLocation != null) {
-//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-//        }
-
-//             if (mRequestingLocationUpdates) {
-//                     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         createLocationRequest();
-//        startLocationUpdates();
-//         }
     }
 
     @Override
@@ -121,9 +112,9 @@ public class GACServiceManager implements GoogleApiClient.OnConnectionFailedList
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(LOCATION_REQUEST_INTERVAL);
+        mLocationRequest.setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
 }

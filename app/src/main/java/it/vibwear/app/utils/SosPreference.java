@@ -18,7 +18,9 @@ public class SosPreference implements SwitchPreference {
     public static final String SOS_CONTACTS = "sos_contact_list";
 	public static final String SOS_KEY_PREF = "pref_key_sos";
     public static final String SOS_MSG = "sos_msg";
-    
+    public static final String MY_POSTITION_PREFS_NAME = "MY_POSTITION_DETAILS";
+    public static final String MY_POSTITION_KEY = "my_position";
+
 	protected Context context;
 
     public SosPreference(Context context) {
@@ -98,8 +100,27 @@ public class SosPreference implements SwitchPreference {
         editor.commit();
 		
 	}
-	
-	@Override
+
+    public boolean getMyPositionPref() {
+        SharedPreferences settings = context.getSharedPreferences(MY_POSTITION_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        return settings.getBoolean(MY_POSTITION_KEY, false);
+
+    }
+
+    public void setMyPositionPref(boolean newValue) {
+        SharedPreferences.Editor editor;
+        SharedPreferences settings = context.getSharedPreferences(MY_POSTITION_PREFS_NAME,
+                Context.MODE_PRIVATE);
+        editor = settings.edit();
+
+        editor.putBoolean(MY_POSTITION_KEY, newValue);
+
+        editor.commit();
+
+    }
+
+    @Override
 	public boolean switchState() {
 		Editor editor;
 		boolean active;

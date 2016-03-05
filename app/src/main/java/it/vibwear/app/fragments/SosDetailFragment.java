@@ -30,10 +30,8 @@ import android.widget.Toast;
 public class SosDetailFragment extends Fragment {
 	// Declare
 	static final int PICK_CONTACT=1;
-    public static final String MY_POSTITION_PREFS_NAME = "MY_POSTITION_DETAILS";
-    public static final String MY_POSTITION_KEY = "my_position";
     protected Context context;
-	protected SosPreference contactPreference;
+	protected SosPreference sosPreference;
 	protected ContactListAdapter adapter;
 	
 	protected EditText etSosMsg;
@@ -57,10 +55,10 @@ public class SosDetailFragment extends Fragment {
 		});
 		
 		ListView lvSosContacts = (ListView)sosDetail.findViewById(R.id.lv_sos_contacts);
+
+		sosPreference = new SosPreference(context);
 		
-		contactPreference = new SosPreference(context);
-		
-		List<Contact> contacts = contactPreference.getContacts();
+		List<Contact> contacts = sosPreference.getContacts();
 		
 		adapter = new ContactListAdapter(container.getContext(), contacts);
 
@@ -68,16 +66,16 @@ public class SosDetailFragment extends Fragment {
 		
 		etSosMsg = (EditText)sosDetail.findViewById(R.id.et_sos_msg);
 		
-		etSosMsg.setText(contactPreference.getSosMessage());
+		etSosMsg.setText(sosPreference.getSosMessage());
 
         CheckBox cbMyPosition = (CheckBox)sosDetail.findViewById(R.id.cb_my_position);
 
-        cbMyPosition.setChecked(getMyPositionPref());
+        cbMyPosition.setChecked(sosPreference.getMyPositionPref());
 
         cbMyPosition.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setMyPositionPref(isChecked);
+				sosPreference.setMyPositionPref(isChecked);
             }
         });
 
@@ -90,7 +88,7 @@ public class SosDetailFragment extends Fragment {
 
 	@Override
 	public void onDestroyView() {
-		contactPreference.setSosMessage(etSosMsg.getText().toString());
+		sosPreference.setSosMessage(etSosMsg.getText().toString());
 		super.onDestroyView();
 
 	}
@@ -147,25 +145,6 @@ public class SosDetailFragment extends Fragment {
 			break;
 		}
 	}
-
-    public boolean getMyPositionPref() {
-        SharedPreferences settings = getActivity().getSharedPreferences(MY_POSTITION_PREFS_NAME,
-            Context.MODE_PRIVATE);
-        return settings.getBoolean(MY_POSTITION_KEY, false);
-
-    }
-
-    public void setMyPositionPref(boolean newValue) {
-        SharedPreferences.Editor editor;
-        SharedPreferences settings = getActivity().getSharedPreferences(MY_POSTITION_PREFS_NAME,
-                Context.MODE_PRIVATE);
-        editor = settings.edit();
-
-        editor.putBoolean(MY_POSTITION_KEY, newValue);
-
-        editor.commit();
-
-    }
 
     /**** Method for Setting the Height of the ListView dynamically.
      **** Hack to fix the issue of not showing all the items of the ListView

@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.view.View;
 import android.widget.ImageView;
@@ -83,6 +84,12 @@ public class SosServiceItem extends ServiceItem {
         setLocalizedText();
 	
 	}
+
+    @Override
+    public boolean consume(Intent intent) {
+        return switchPref.getState();
+    }
+
 
     public void startLocationUpdates() {
         if(switchPref.getState())

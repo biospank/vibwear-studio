@@ -435,20 +435,34 @@ public class VibWearActivity extends ModuleActivity implements
 	}
 
     public void sendTextMessage() {
-        SosPreference contactPreference = new SosPreference(getApplicationContext());
-        List<Contact> contacts = contactPreference.getContacts();
-        SmsManager smsManager = SmsManager.getDefault();
+		Intent sosIntent = new Intent();
+		sosIntent.setAction(ServicesFragment.SOS_VIB_ACTION);
 
-        String msg = contactPreference.getSosMessage();
+		if(servicesFrag.consumeIntent(sosIntent)) {
 
-        if (msg.isEmpty())
-            msg = getString(R.string.sos_default_msg);
+			SosPreference sosPreference = new SosPreference(getApplicationContext());
+			List<Contact> contacts = sosPreference.getContacts();
+			SmsManager smsManager = SmsManager.getDefault();
 
-        msg += " " + gacServiceManager.getLocationUrlMap();
+			String msg = sosPreference.getSosMessage();
 
-        for (Contact contact : contacts) {
-            smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
-        }
+			if (msg.isEmpty()) {
+                if (sosPreference.getMyPositionPref()) {
+                    msg = gacServiceManager.getLocationUrlMap();
+                } else {
+                    msg = getString(R.string.sos_default_msg);
+                }
+            } else {
+                if (sosPreference.getMyPositionPref()) {
+                    msg += " " + gacServiceManager.getLocationUrlMap();
+                }
+            }
+
+			for (Contact contact : contacts) {
+				smsManager.sendTextMessage(contact.getPhone(), null, msg, null, null);
+			}
+
+		}
     }
 
     public void startServiceUpdates() {
