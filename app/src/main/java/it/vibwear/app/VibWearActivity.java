@@ -14,9 +14,7 @@ import it.vibwear.app.notifications.TemporaryNotification;
 import it.vibwear.app.scanner.ScannerFragment;
 import it.vibwear.app.utils.AppManager;
 import it.vibwear.app.utils.SosPreference;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,14 +33,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.Toast;
 import android.telephony.SmsManager;
 
@@ -50,7 +45,7 @@ import com.mbientlab.metawear.AsyncOperation;
 import com.mbientlab.metawear.MetaWearBoard;
 
 public class VibWearActivity extends ModuleActivity implements ScannerFragment.OnDeviceSelectedListener, OnLocationChangeListener, SettingsDetailFragment.OnSettingsChangeListener, AlarmListner {
-	private static final String VERSION = "1.7.0";
+	private static final String VERSION = "1.7.1";
 	private static final long SIGNAL_START_DELAY = 10000;
 	private static final long SIGNAL_SCHEDULE_TIME = 15000;
 	private static final long BATTERY_START_DELAY = 60000;
@@ -93,7 +88,7 @@ public class VibWearActivity extends ModuleActivity implements ScannerFragment.O
 
 		initializeView(savedInstanceState);
 
-		// showKillerAppWarning();
+		showKillerAppWarning();
 
 	}
 
